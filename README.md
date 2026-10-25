@@ -5,8 +5,6 @@
 对话只是这个空间里的一种活动。AI 的存在感由能量与情绪驱动，不是提示词"演"出来的。
 记忆归用户控制，边界是 UI 行为——你会看到它被改写，而不是只能相信它被改写。
 
----
-
 ## 现在能跑什么
 
 | 房间 | 状态 |
@@ -21,6 +19,12 @@
 1. **对话流**走 `assistant-ui` 的 `ExternalStoreRuntime`。消息真相源在 Zustand，runtime 只接管流式、中断、回看，不持有内容。
 2. **存在感**走 PixiJS v8 `ParticleContainer`，`dynamicProperties` 只声明 `position` 与 `color`，其余静态属性不重复上传。
 3. **边界**是渲染前的拦截层：`lib/boundary/rules.ts` 在文本进入 UI 前改写，命中痕迹显示在消息下方，可展开看原句。
+
+| 门廊 | 共同空间 |
+| --- | --- |
+| ![门廊](docs/threshold.jpg) | ![共同空间](docs/space.jpg) |
+| **记忆回廊** | **边界** |
+| ![记忆回廊](docs/memory.jpg) | ![边界](docs/boundary.jpg) |
 
 ---
 
