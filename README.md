@@ -50,37 +50,55 @@ __co.chat.getState().append({
 
 ---
 
-## 部署到 GitHub Pages
+## 部署
 
-五步，全部已在仓库里配好，只差推上去：
+**线上地址：<https://water1014.github.io/co-space/>**
+**仓库：<https://github.com/water1014/co-space>**
 
-1. **推送仓库**（下面的命令用你自己的凭据，不要用明文 token）：
+当前 Pages 的来源是 **`gh-pages` 分支**（`/` 根目录），不是 Actions。
+原因很实际：首次推送用的 token 只有 `repo` scope，GitHub 拒绝任何携带
+`.github/workflows/*` 的写入。所以先把站点发出去，把自动化留作下一步。
+
+### 改了代码怎么发
+
+```bash
+pnpm deploy      # = bash scripts/deploy-gh-pages.sh
+```
+
+它做三件事：构建 → 在 `dist/` 里单独提交 → 强制推到 `gh-pages`。Pages 一分钟内重建。
+（前提是 `gh auth login` 之后跑过一次 `gh auth setup-git`，让 git 拿到凭据。）
+
+### 想切回 Actions 管线
+
+`deploy.yml` 已经写好，只差一次带 `workflow` scope 的写入：
+
+1. Settings → Developer settings → Tokens (classic) → 点开这个 token → 勾上 **workflow** → Update。
+   **token 字符串不变**，只是多一个权限。
+2. 然后：
 
    ```bash
-   cd co-space
-   git init -b main
-   git add .
-   git commit -m "共同空间：初始版本"
-   gh repo create co-space --public --source=. --push
+   git add .github/workflows/deploy.yml
+   git commit -m "ci: 启用 Actions 部署"
+   git push
    ```
 
-2. **仓库 Settings → Pages → Source 选 `GitHub Actions`**，不要选 "Deploy from a branch"。
+3. 仓库 Settings → Pages → Source 改选 **GitHub Actions**。
 
-3. **push 即部署**。`.github/workflows/deploy.yml` 会跑测试、构建、上传、发布。
+之后每次 push 都会跑测试、构建、发布，`gh-pages` 分支可以删掉。
 
-4. **base 自动跟随仓库名**。workflow 里 `VITE_BASE_PATH: /${{ github.event.repository.name }}/`，改仓库名不用改代码。
+### SPA 路径回退
 
-5. **SPA 路径回退**已经处理：
-   - `vite build` 后 `scripts/postbuild.mjs` 复制 `index.html` 为 `404.html`，并注入跳转脚本；
-   - `404.html` 把原始路径存进 `sessionStorage` 再跳回 `index.html`；
-   - `index.html` 在 React Router 初始化前把路径 `replaceState` 回去；
-   - 同时写入 `.nojekyll`，避免 `_assets` 被 Jekyll 忽略。
+不管走哪条路，回退逻辑都在 `scripts/postbuild.mjs` 里：
 
-> **关于凭据**：Pages 部署用仓库内置的 `GITHUB_TOKEN`（workflow 里的 `permissions` 已声明），
-> 不需要 Personal Access Token。任何 PAT 都不该出现在聊天、代码或提交历史里。
-> 如果已经贴出去过，去 Settings → Developer settings → Personal access tokens 立刻撤销。
+- 复制 `index.html` 为 `404.html` 并注入跳转脚本；
+- `404.html` 把原始路径存进 `sessionStorage`，`location.replace` 回站点根；
+- `index.html` 在 React Router 初始化前 `replaceState` 还原路径；
+- 同时写入 `.nojekyll`。
 
----
+线上已验证：直接访问 `/co-space/memory` 会正确落在「记忆回廊」，URL 不变。
+
+> **凭据**：Pages 的 Actions 管线用仓库内置的 `GITHUB_TOKEN`，不需要 PAT。
+> 任何 PAT 都不该出现在聊天、代码或提交历史里；贴出去过就撤销重发。
 
 ## 目录
 
