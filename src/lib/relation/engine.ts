@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { usePresenceStore } from "../../stores/presenceStore";
 import { useBoundaryStore } from "../../stores/boundaryStore";
 import { useChatStore } from "../../stores/chatStore";
+import { useLifeStore } from "../../stores/lifeStore";
+import { dueWords } from "../life/derive";
 import { uid } from "../utils/id";
 import type { ChatMessage, InitiativeLevel } from "../../types";
 
@@ -15,6 +17,8 @@ import type { ChatMessage, InitiativeLevel } from "../../types";
 const TICK_MS = 4000;
 const INITIATIVE_COOLDOWN = 18 * 60_000;
 let lastInitiativeAt = 0;
+/** 今天问过单词了没有：每天最多主动问一次。 */
+let lastWordDay = "";
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -82,6 +86,51 @@ function tick() {
     chat.append(msg);
     presence.touch();
     presence.pulse();
+  }
+
+  // 每日单词询问：每天最多一次，问的是还没掌握的那一个。
+  const today = new Date();
+  const startOfToday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  ).getTime();
+  const dayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+  const asked = chat.messages.some(
+    (m) =>
+      m.role === "assistant" &&
+      m.createdAt >= startOfToday &&
+      m.parts.some((p) => p.type === "text" && p.text.includes("今日一词")),
+  );
+  if (
+    !asked &&
+    lastWordDay !== dayKey &&
+    hour >= 9 &&
+    hour < 23 &&
+    !boundary.quietMode &&
+    idle > 60_000
+  ) {
+    const life = useLifeStore.getState();
+    const w = dueWords(life.wordBook, 1)[0];
+    if (w) {
+      lastWordDay = dayKey;
+      const msg: ChatMessage = {
+        id: uid("ase"),
+        role: "assistant",
+        parts: [
+          {
+            type: "text",
+            text: `今日一词。\n\n${w.word} —— ${w.phonetic}\n\n意思是什么？`,
+          },
+        ],
+        createdAt: now,
+        status: "complete",
+        origin: "initiative",
+      };
+      chat.append(msg);
+      presence.touch();
+      presence.pulse();
+    }
   }
 }
 

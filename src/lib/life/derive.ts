@@ -3,6 +3,7 @@ import type {
   LedgerEntry,
   MealKey,
   SleepLog,
+  WordEntry,
   WordProgress,
   WrongWord,
 } from "../../types";
@@ -21,6 +22,28 @@ export function bedDateKey(bedAt: string): string {
   const now = new Date();
   if (Number.isFinite(h) && h < 6) now.setDate(now.getDate() - 1);
   return dayKeyOf(now);
+}
+
+/**
+ * 给定「那天起床」的日期和实际入睡时刻，算出这一觉记在哪一天。
+ * 凌晨（6 点前）躺下算前一天——凌晨两点的那一觉属于昨天。
+ */
+export function sleepDateOf(wakeDateKey: string, bedAt: string): string {
+  const [h] = bedAt.split(":").map(Number);
+  const d = new Date(`${wakeDateKey}T00:00:00`);
+  if (Number.isFinite(h) && h < 6) d.setDate(d.getDate() - 1);
+  return dayKeyOf(d);
+}
+
+/**
+ * 反推：这一觉是「哪一天早上醒来」的。
+ * 凌晨一点半睡、七点五十醒，它属于第二天早上那一栏。
+ */
+export function wakeDateOf(date: string, bedAt: string): string {
+  const [h] = bedAt.split(":").map(Number);
+  const d = new Date(`${date}T00:00:00`);
+  if (Number.isFinite(h) && h < 6) d.setDate(d.getDate() + 1);
+  return dayKeyOf(d);
 }
 
 export function daysTogether(anniversary: string): number {
@@ -53,9 +76,10 @@ export const nightSleeps = (sleep: SleepLog[]) =>
 export const naps = (sleep: SleepLog[]) =>
   sleep.filter((s) => s.kind === "nap");
 
+/** 今天早上醒来的那一觉：凌晨入睡的那一觉也算今天的。 */
 export const todaySleep = (sleep: SleepLog[]) => {
   const t = todayKey();
-  return nightSleeps(sleep).find((s) => s.date === t);
+  return nightSleeps(sleep).find((s) => wakeDateOf(s.date, s.bedAt) === t);
 };
 
 export const todayNaps = (sleep: SleepLog[]) =>
@@ -106,6 +130,49 @@ export function streakDays(
     else if (i > 0) break;
   }
   return streak;
+}
+
+/** 某月的奶茶：杯数与花费。额度按杯数算。 */
+export function monthBoba(bobas: BobaEntry[], monthKey: string) {
+  const list = bobas.filter((b) => dayKeyOf(b.at).startsWith(monthKey));
+  return {
+    count: list.length,
+    spend: list.reduce((s, b) => s + b.price, 0),
+    list,
+  };
+}
+
+/** 奖惩卡结算：已完成卡的分数和。 */
+export function rewardScore(rewards: { done: boolean; points: number }[]) {
+  return rewards
+    .filter((r) => r.done)
+    .reduce((s, r) => s + r.points, 0);
+}
+
+/** 今天该考的一组词：优先没掌握的，其次最久没碰的。 */
+export function dueWords(
+  book: WordEntry[],
+  size = 8,
+): WordEntry[] {
+  const pending = book.filter((w) => !w.mastered);
+  const pool = pending.length ? pending : book;
+  return [...pool]
+    .sort((a, b) => (a.lastAt ?? 0) - (b.lastAt ?? 0))
+    .slice(0, size);
+}
+
+/** 某个月的记账明细，按天聚合。 */
+export function monthLedgerByDay(ledger: LedgerEntry[], monthKey: string) {
+  const map = new Map<string, LedgerEntry[]>();
+  ledger
+    .filter((e) => dayKeyOf(e.at).startsWith(monthKey))
+    .forEach((e) => {
+      const k = dayKeyOf(e.at);
+      const list = map.get(k) ?? [];
+      list.push(e);
+      map.set(k, list);
+    });
+  return [...map.entries()].sort((a, b) => b[0].localeCompare(a[0]));
 }
 
 /** 本月统计：几顿饭、平均睡多久、花了多少、奶茶几杯。 */
@@ -176,6 +243,9 @@ export function lifeContext(input: {
   wrongWords: WrongWord[];
   todos: { text: string; done: boolean }[];
   bobaBudget: number;
+  bobaQuota?: number;
+  rewards?: { text: string; points: number; done: boolean }[];
+  wordBook?: { word: string; mastered: boolean; wrongTimes: number }[];
   anniversary: string;
 }): string {
   const meals = todayMeals(input.meals);
@@ -186,6 +256,12 @@ export function lifeContext(input: {
   const bobaN = todayBobaCount(input.bobas);
   const words = todayWords(input.words);
   const openTodos = input.todos.filter((t) => !t.done);
+  const quota = input.bobaQuota ?? 0;
+  const mastered = input.wordBook?.filter((w) => w.mastered).length ?? 0;
+  const wordTotal = input.wordBook?.length ?? 0;
+  const score = (input.rewards ?? [])
+    .filter((r) => r.done)
+    .reduce((s, r) => s + r.points, 0);
   const month = monthSummary({
     month: new Date(),
     meals: input.meals,
@@ -205,12 +281,16 @@ export function lifeContext(input: {
         }`
       : "睡眠：昨晚没记",
     `记账：今天 ¥${total.toFixed(0)}`,
-    `奶茶：今天 ${bobaN} 杯共 ¥${boba.toFixed(0)}（额度 ¥${input.bobaBudget}${boba > input.bobaBudget ? "，已超" : ""}）`,
+    `奶茶：今天 ${bobaN} 杯共 ¥${boba.toFixed(0)}（额度 ${quota} 杯 / ¥${input.bobaBudget}${
+      quota && bobaN > quota ? "，已超" : ""
+    }）`,
     words ? `单词：${words.learned}/${words.goal}` : "单词：今天还没开始",
+    wordTotal ? `词库：已掌握 ${mastered}/${wordTotal}` : "",
     `本月：${month.meals} 顿饭，平均睡 ${month.avgSleep}h，花了 ¥${month.spend}，奶茶 ${month.bobas} 杯`,
+    input.rewards?.length ? `奖惩记分：${score > 0 ? `+${score}` : score}` : "",
     openTodos.length
       ? `未完成：${openTodos.map((t) => t.text).join("；")}`
       : "待办：都清了",
   ];
-  return lines.join("；");
+  return lines.filter(Boolean).join("；");
 }

@@ -1,5 +1,5 @@
 import type { BobaEntry, MemoryEntry, MessagePart, Mood } from "../../types";
-import { todayBoba, todayMeals, todaySleep } from "../life/derive";
+import { todayBoba, todayLedger, todayMeals, todaySleep } from "../life/derive";
 import type { LedgerEntry, MealKey, SleepLog } from "../../types";
 
 /**
@@ -21,6 +21,14 @@ export type ReplyContext = {
     bobas: BobaEntry[];
     bobaBudget: number;
   };
+  /** 聊天里说的话触发了哪些记录动作，会写进思考过程里。 */
+  actions?: { summary: string }[];
+  /** 今天该考的一个词；用户说"考我单词"时用。 */
+  dueWord?: { word: string; phonetic: string; meaning: string };
+  /** 一句话的生活概况：在一起第几天、今天三餐、奶茶、单词、奖惩分。 */
+  lifeSummary?: string;
+  /** 今天喝了几杯奶茶。 */
+  bobaCount?: number;
 };
 
 export type ReplyPlan = {
@@ -62,12 +70,21 @@ export function composePlan(input: string, ctx: ReplyContext): ReplyPlan {
   }
   steps.push(`读今日记录：三餐 ${meals.length}/3，奶茶 ¥${boba.toFixed(0)}`);
   tools.push("life");
+  if (ctx.lifeSummary) {
+    steps.push(`生活概况：${ctx.lifeSummary}`);
+  }
 
   if (ctx.memories.length) {
     tools.push("recall");
     steps.push(`召回 ${ctx.memories.length} 条记忆，最高一条「${clip(ctx.memories[0].text, 18)}」`);
   } else {
     steps.push("记忆里没有能对上的，按没有处理");
+  }
+
+  // 聊天里说的话落到记录里了——必须说出来，让人知道它做了什么。
+  if (ctx.actions?.length) {
+    tools.push("write");
+    ctx.actions.forEach((a) => steps.push(a.summary));
   }
 
   /* ---- 优先处理生活事实 ---- */
@@ -79,9 +96,26 @@ export function composePlan(input: string, ctx: ReplyContext): ReplyPlan {
     text = `今天到现在只吃了一顿。\n\n先去吃，回来再说别的。`;
   }
 
+  // 写完记录要回一句"记上了"，让对方知道它做了什么。
+  if (ctx.actions?.length) {
+    const ack = ctx.actions.map((a) => a.summary).join("；");
+    text = text ? `${text}\n\n（${ack}，已经放进对应的房间了。）` : `记上了：${ack}。\n\n都在"一起"里，你自己去看。`;
+  }
+
   /* ---- 再看用户说了什么 ---- */
   if (!text) {
-    if (/(累|撑不住|没力气|困|加班|不想动)/.test(input)) {
+    if (/(考我单词|背单词|单词|默写|听写)/.test(input)) {
+      const w = ctx.dueWord;
+      text = w
+        ? `来。\n\n${w.word} —— ${w.phonetic}\n\n意思是什么？\n\n答错三次它会自己进错词本，别想赖掉。`
+        : `词都背完了？\n\n那换点别的。`;
+    } else if (/(看看记录|看记账|看我的记录|一起看看|记录怎么样|今天的记录)/.test(input)) {
+      const t = todayLedger(ctx.life.ledger);
+      const spend = t.reduce((s, e) => s + e.amount, 0);
+      text = `看到了。\n\n三餐 ${meals.length}/3。奶茶 ${ctx.bobaCount ?? 0} 杯。${
+        sleep ? `昨晚睡了 ${sleep.hours} 小时。` : "昨晚没记睡眠。"
+      }今天花了 ¥${spend.toFixed(0)}，${t.length} 笔。\n\n${ctx.lifeSummary ?? ""}`;
+    } else if (/(累|撑不住|没力气|困|加班|不想动)/.test(input)) {
       text = `听起来是那种"事情没做完，人已经到极限"的累。\n\n不用现在把一切想明白。先把手上这件放下。`;
     } else if (/(难过|想哭|委屈|崩|孤独|一个人)/.test(input)) {
       text = `这句话我听见了，没有想马上把它修好。\n\n你可以继续说，也可以停在这儿。`;

@@ -6,6 +6,8 @@ import { useLifeStore } from "../../stores/lifeStore";
 import { useConnectorStore } from "../../stores/connectorStore";
 import { useProjectsStore } from "../../stores/projectsStore";
 import { composePlan, streamText } from "../mock/replies";
+import { parseLifeActions } from "./tools";
+import { dueWords, lifeContext } from "../life/derive";
 import { uid } from "../utils/id";
 import type { ChatMessage, MessagePart } from "../../types";
 
@@ -28,12 +30,19 @@ async function respond(userText: string): Promise<void> {
   const boundary = useBoundaryStore.getState();
   const presence = usePresenceStore.getState();
   const memory = useMemoryStore.getState();
-  const life = useLifeStore.getState();
 
   presence.setThinking(true);
 
   // 每一次回应都先"回忆"一次，成功与否都留下一条回声。
   await memory.recordEcho(userText);
+
+  // 聊天里说的话可能变成记录——先落地，再回应。
+  const actions = parseLifeActions(userText);
+  actions.forEach((a) => a.apply());
+
+  // 记录写完了，重新取一次状态：回复里要说得准。
+  const lifeNow = useLifeStore.getState();
+  const due = dueWords(lifeNow.wordBook, 1)[0];
 
   const plan = composePlan(userText, {
     name: boundary.name,
@@ -45,12 +54,33 @@ async function respond(userText: string): Promise<void> {
       useProjectsStore.getState().activePersona() ??
       (useConnectorStore.getState().persona.trim() || undefined),
     life: {
-      meals: life.meals,
-      sleep: life.sleep,
-      ledger: life.ledger,
-      bobas: life.bobas,
-      bobaBudget: life.bobaBudget,
+      meals: lifeNow.meals,
+      sleep: lifeNow.sleep,
+      ledger: lifeNow.ledger,
+      bobas: lifeNow.bobas,
+      bobaBudget: lifeNow.bobaBudget,
     },
+    actions: actions.map((a) => ({ summary: a.summary })),
+    lifeSummary: lifeContext({
+      meals: lifeNow.meals,
+      sleep: lifeNow.sleep,
+      ledger: lifeNow.ledger,
+      bobas: lifeNow.bobas,
+      words: lifeNow.words,
+      wrongWords: lifeNow.wrongWords,
+      todos: lifeNow.todos,
+      bobaBudget: lifeNow.bobaBudget,
+      bobaQuota: lifeNow.bobaQuota,
+      rewards: lifeNow.rewards,
+      wordBook: lifeNow.wordBook,
+      anniversary: lifeNow.anniversary,
+    }),
+    dueWord: due
+      ? { word: due.word, phonetic: due.phonetic, meaning: due.meaning }
+      : undefined,
+    bobaCount: lifeNow.bobas.filter(
+      (b) => new Date(b.at).toDateString() === new Date().toDateString(),
+    ).length,
   });
 
   // 思考阶段：这段时间是可见的，不是假的延迟。

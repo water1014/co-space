@@ -482,6 +482,7 @@ function ChatHeader() {
 function EmptyChat() {
   const setDraft = useChatStore((s) => s.setDraft);
   const chips = ["今天很累", "帮我记一件事", "我今天辞职了"];
+  const records = ["我刚吃了午饭", "刚买奶茶花了22", "今天花了38块吃晚饭", "我睡了7小时"];
   return (
     <div className="fadein flex flex-1 flex-col justify-center py-16">
       <p className="serif text-[17px] leading-[2] text-ink-soft">
@@ -497,6 +498,18 @@ function EmptyChat() {
             key={c}
             onClick={() => setDraft(c)}
             className="press glass-flat px-3 py-1.5 text-[12px] text-ink-soft"
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+      <p className="mt-6 text-[11px] text-ink-faint">说这些话，它会自己记进对应的房间：</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {records.map((c) => (
+          <button
+            key={c}
+            onClick={() => setDraft(c)}
+            className="press rounded-full border border-[var(--line)] px-3 py-1 text-[11.5px] text-ink-faint"
           >
             {c}
           </button>

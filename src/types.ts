@@ -181,6 +181,8 @@ export type SleepLog = {
   /** 午睡分钟数。 */
   minutes?: number;
   by?: Who;
+  /** 备注：昨天有点困… */
+  note?: string;
 };
 
 export type LedgerEntry = {
@@ -226,6 +228,34 @@ export type WordProgress = {
   date: string;
   learned: number;
   goal: number;
+};
+
+/** 词库里的一个词：六级核心词，按组排。 */
+export type WordEntry = {
+  id: string;
+  word: string;
+  phonetic: string;
+  meaning: string;
+  /** 第几天 / 第几组。 */
+  group: number;
+  /** 是否已掌握。 */
+  mastered: boolean;
+  /** 错过几次；错三次自动进错词本。 */
+  wrongTimes: number;
+  lastAt?: number;
+};
+
+/** 奖惩卡：做得好有赏，做不好也有账。 */
+export type RewardTask = {
+  id: string;
+  text: string;
+  /** reward = 奖励，penalty = 记一笔账。 */
+  kind: "reward" | "penalty";
+  /** 分值：正数为赏，负数为罚。 */
+  points: number;
+  done: boolean;
+  by?: Who;
+  at: number;
 };
 
 /* ---------------- 关系 / 连接 ---------------- */

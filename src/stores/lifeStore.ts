@@ -4,9 +4,11 @@ import type {
   BobaEntry,
   LedgerEntry,
   MealKey,
+  RewardTask,
   SleepLog,
   Todo,
   Who,
+  WordEntry,
   WordProgress,
   WrongWord,
 } from "../types";
@@ -20,6 +22,34 @@ const daysAgo = (n: number) => {
   return dayKeyOf(d);
 };
 
+/** 六级核心词表：单词 / 音标 / 释义。 */
+const WORD_SEED: [string, string, string][] = [
+  ["forehead", "/ˈfɔːhed/", "n. 前额"],
+  ["finger", "/ˈfɪŋɡə(r)/", "n. 手指 v. 告发，拨弄"],
+  ["nerve", "/nɜːv/", "n. 神经，勇气"],
+  ["applaud", "/əˈplɔːd/", "v. 鼓掌，称赞"],
+  ["bless", "/bles/", "v. 祝福"],
+  ["admire", "/ədˈmaɪə(r)/", "v. 仰慕，赞赏"],
+  ["astonish", "/əˈstɒnɪʃ/", "v. 使吃惊"],
+  ["consequence", "/ˈkɒnsɪkwəns/", "n. 后果，结果"],
+  ["deliberate", "/dɪˈlɪbərət/", "adj. 故意的 v. 仔细考虑"],
+  ["efficient", "/ɪˈfɪʃnt/", "adj. 效率高的"],
+  ["facility", "/fəˈsɪləti/", "n. 设施，便利"],
+  ["genuine", "/ˈdʒenjuɪn/", "adj. 真正的，真诚的"],
+  ["hesitate", "/ˈhezɪteɪt/", "v. 犹豫，踌躇"],
+  ["identical", "/aɪˈdentɪkl/", "adj. 完全相同的"],
+  ["justify", "/ˈdʒʌstɪfaɪ/", "v. 证明…正当"],
+  ["moderate", "/ˈmɒdərət/", "adj. 适度的 v. 缓和"],
+  ["obstacle", "/ˈɒbstəkl/", "n. 障碍，阻碍"],
+  ["precise", "/prɪˈsaɪs/", "adj. 精确的"],
+  ["reluctant", "/rɪˈlʌktənt/", "adj. 不情愿的"],
+  ["significant", "/sɪɡˈnɪfɪkənt/", "adj. 重要的，显著的"],
+  ["tremendous", "/trəˈmendəs/", "adj. 巨大的，极好的"],
+  ["ultimate", "/ˈʌltɪmət/", "adj. 最终的，根本的"],
+  ["virtue", "/ˈvɜːtʃuː/", "n. 美德，优点"],
+  ["witness", "/ˈwɪtnəs/", "n. 目击者 v. 目睹"],
+];
+
 type LifeState = {
   /** 在一起的第一天。大数字由它算。 */
   anniversary: string;
@@ -27,16 +57,24 @@ type LifeState = {
   meals: Record<string, MealKey[]>;
   /** 每餐是谁记的（婉莹在页面上点 / 阿晏通过工具记）。 */
   mealBy: Record<string, Partial<Record<MealKey, Who>>>;
+  /** 每餐的备注：date -> meal -> 文本。 */
+  mealNotes: Record<string, Partial<Record<MealKey, string>>>;
   /** 夜睡与午睡都在这里，用 kind 区分。 */
   sleep: SleepLog[];
   ledger: LedgerEntry[];
   /** 奶茶单独一间房：它有「额度」这个约定，不并进记账。 */
   bobas: BobaEntry[];
   words: WordProgress[];
+  /** 词库：六级核心词，按组排，可标记掌握。 */
+  wordBook: WordEntry[];
   wrongWords: WrongWord[];
+  /** 奖惩卡。 */
+  rewards: RewardTask[];
   todos: Todo[];
   /** 每天奶茶额度，¥ */
   bobaBudget: number;
+  /** 每月奶茶杯数额度。 */
+  bobaQuota: number;
   /** 本周听歌时长（小时）。 */
   listeningTime: number;
   currentSong: {
@@ -48,6 +86,7 @@ type LifeState = {
   setAnniversary: (iso: string) => void;
   /** dateKey 缺省为今天；周切换条与月历选中哪天就记哪天。 */
   toggleMeal: (key: MealKey, by?: Who, dateKey?: string) => void;
+  setMealNote: (key: MealKey, note: string, dateKey?: string) => void;
   logSleep: (log: SleepLog) => void;
   logNap: (input: { minutes: number; by?: Who; dateKey?: string }) => void;
   addLedger: (input: {
@@ -55,6 +94,7 @@ type LifeState = {
     category: string;
     note?: string;
     by?: Who;
+    dateKey?: string;
   }) => void;
   removeLedger: (id: string) => void;
   addBoba: (input: {
@@ -65,6 +105,19 @@ type LifeState = {
   }) => void;
   removeBoba: (id: string) => void;
   setWords: (learned: number, dateKey?: string) => void;
+  /** 标记/取消标记某个词已掌握。 */
+  toggleWordMastered: (id: string) => void;
+  /** 单词答错：记一次错误；错三次自动进错词本。 */
+  markWordWrong: (id: string) => void;
+  /** 奖惩卡增删改。 */
+  addReward: (input: {
+    text: string;
+    kind: "reward" | "penalty";
+    points: number;
+    by?: Who;
+  }) => void;
+  toggleReward: (id: string) => void;
+  removeReward: (id: string) => void;
   addWrongWord: (input: { word: string; reason: string; by?: Who }) => void;
   bumpWrongWord: (id: string) => void;
   removeWrongWord: (id: string) => void;
@@ -72,6 +125,7 @@ type LifeState = {
   toggleTodo: (id: string) => void;
   removeTodo: (id: string) => void;
   setBobaBudget: (v: number) => void;
+  setBobaQuota: (v: number) => void;
   togglePlay: () => void;
   setListeningTime: (hours: number) => void;
 };
@@ -145,15 +199,59 @@ const seed = () => {
     },
   ];
 
+  // 词库：六级核心词，按组排。掌握状态从 0 开始慢慢积累。
+  const wordBook: WordEntry[] = WORD_SEED.map(([word, phonetic, meaning], i) => ({
+    id: `wb-${i}`,
+    word,
+    phonetic,
+    meaning,
+    group: Math.floor(i / 8) + 1,
+    mastered: i < 3,
+    wrongTimes: 0,
+  }));
+
+  const rewards: RewardTask[] = [
+    {
+      id: uid("r"),
+      text: "三餐齐全连着三天",
+      kind: "reward",
+      points: 3,
+      done: false,
+      by: "yan" as Who,
+      at: now,
+    },
+    {
+      id: uid("r"),
+      text: "睡够七小时",
+      kind: "reward",
+      points: 2,
+      done: false,
+      by: "wan" as Who,
+      at: now,
+    },
+    {
+      id: uid("r"),
+      text: "奶茶超额",
+      kind: "penalty",
+      points: -1,
+      done: false,
+      by: "wan" as Who,
+      at: now,
+    },
+  ];
+
   return {
     anniversary: daysAgo(91),
     meals: { [t]: ["lunch"] as MealKey[] },
     mealBy: { [t]: { lunch: "wan" as Who } },
+    mealNotes: { [t]: { lunch: "楼下那家,加了蛋" } },
     sleep,
     ledger,
     bobas,
     words: [{ date: t, learned: 12, goal: 20 }],
+    wordBook,
     wrongWords,
+    rewards,
     todos: [
       {
         id: uid("t"),
@@ -166,6 +264,7 @@ const seed = () => {
       { id: uid("t"), text: "打印计算机准考证", done: false, at: now - 3600_000, due: "09.14" },
     ],
     bobaBudget: 25,
+    bobaQuota: 4,
     listeningTime: 12.7,
     currentSong: {
       title: "雨に濡れた街",
@@ -197,6 +296,14 @@ export const useLifeStore = create<LifeState>()(
         });
       },
 
+      setMealNote: (key, note, dateKey) => {
+        const t = dateKey ?? todayKey();
+        const day = { ...(get().mealNotes[t] ?? {}) };
+        if (note.trim()) day[key] = note.trim();
+        else delete day[key];
+        set({ mealNotes: { ...get().mealNotes, [t]: day } });
+      },
+
       logSleep: (log) => {
         const rest = get().sleep.filter(
           (s) => !(s.date === log.date && s.kind === log.kind),
@@ -218,11 +325,14 @@ export const useLifeStore = create<LifeState>()(
         set({ sleep: [nap, ...get().sleep].slice(0, 120) });
       },
 
-      addLedger: ({ amount, category, note = "", by = "wan" }) => {
+      addLedger: ({ amount, category, note = "", by = "wan", dateKey }) => {
         if (!Number.isFinite(amount) || amount <= 0) return;
+        const at = dateKey
+          ? new Date(`${dateKey}T12:00:00`).getTime()
+          : Date.now();
         const entry: LedgerEntry = {
           id: uid("l"),
-          at: Date.now(),
+          at,
           amount: Math.round(amount * 100) / 100,
           category,
           note,
@@ -264,6 +374,82 @@ export const useLifeStore = create<LifeState>()(
           ].slice(0, 60),
         });
       },
+
+      toggleWordMastered: (id) => {
+        const entry = get().wordBook.find((w) => w.id === id);
+        if (!entry) return;
+        const next = !entry.mastered;
+        set({
+          wordBook: get().wordBook.map((w) =>
+            w.id === id ? { ...w, mastered: next, lastAt: Date.now() } : w,
+          ),
+        });
+        // 已掌握的词推进当日进度。
+        if (next) {
+          const masteredCount = get().wordBook.filter((w) => w.mastered).length;
+          const t = todayKey();
+          const current = get().words.find((w) => w.date === t);
+          const goal = current?.goal ?? 20;
+          const todayLearned = get().wordBook.filter(
+            (w) => w.mastered && w.lastAt && dayKeyOf(w.lastAt) === t,
+          ).length;
+          set({
+            words: [
+              { date: t, learned: todayLearned, goal },
+              ...get().words.filter((w) => w.date !== t),
+            ].slice(0, 60),
+          });
+          void masteredCount;
+        }
+      },
+
+      markWordWrong: (id) => {
+        const entry = get().wordBook.find((w) => w.id === id);
+        if (!entry) return;
+        const wrongTimes = entry.wrongTimes + 1;
+        set({
+          wordBook: get().wordBook.map((w) =>
+            w.id === id ? { ...w, wrongTimes, lastAt: Date.now() } : w,
+          ),
+        });
+        // 错三次自动进错词本——它自己会记，不需要人手动整理。
+        if (wrongTimes >= 3) {
+          get().addWrongWord({
+            word: entry.word,
+            reason: `在单词房里错了 ${wrongTimes} 次`,
+            by: "yan",
+          });
+        }
+      },
+
+      addReward: ({ text, kind, points, by = "wan" }) => {
+        const trimmed = text.trim();
+        if (!trimmed) return;
+        set({
+          rewards: [
+            {
+              id: uid("r"),
+              text: trimmed,
+              kind,
+              points: kind === "penalty" ? -Math.abs(points || 1) : Math.abs(points || 1),
+              done: false,
+              by,
+              at: Date.now(),
+            },
+            ...get().rewards,
+          ].slice(0, 60),
+        });
+      },
+
+      toggleReward: (id) =>
+        set({
+          rewards: get().rewards.map((r) =>
+            r.id === id ? { ...r, done: !r.done } : r,
+          ),
+        }),
+
+      removeReward: (id) =>
+        set({ rewards: get().rewards.filter((r) => r.id !== id) }),
 
       addWrongWord: ({ word, reason, by = "wan" }) => {
         const w = word.trim();
@@ -320,6 +506,8 @@ export const useLifeStore = create<LifeState>()(
 
       setBobaBudget: (v) => set({ bobaBudget: Math.max(0, v) }),
 
+      setBobaQuota: (v) => set({ bobaQuota: Math.max(0, Math.round(v)) }),
+
       togglePlay: () =>
         set({
           currentSong: {
@@ -333,6 +521,19 @@ export const useLifeStore = create<LifeState>()(
     {
       name: "co-space::life",
       storage: createJSONStorage(() => localStorage),
+      version: 2,
+      // 旧数据里没有这些字段，迁移时从初始状态补齐，不丢已有记录。
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as Partial<LifeState>;
+        const seeded = seed();
+        return {
+          ...p,
+          mealNotes: p.mealNotes ?? seeded.mealNotes,
+          wordBook: p.wordBook?.length ? p.wordBook : seeded.wordBook,
+          rewards: p.rewards?.length ? p.rewards : seeded.rewards,
+          bobaQuota: p.bobaQuota ?? seeded.bobaQuota,
+        } as LifeState;
+      },
     },
   ),
 );

@@ -19,6 +19,8 @@ import { useConnectorStore } from "../stores/connectorStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useChatStore } from "../stores/chatStore";
 import { useProjectsStore } from "../stores/projectsStore";
+import { useLifeStore } from "../stores/lifeStore";
+import { daysTogether } from "../lib/life/derive";
 import { resetAll } from "../lib/utils/reset";
 import { RULE_META } from "../lib/boundary/rules";
 import { formatClock } from "../lib/utils/id";
@@ -51,6 +53,7 @@ export function Mit() {
   const add = useProjectsStore((s) => s.add);
   const update = useProjectsStore((s) => s.update);
   const remove = useProjectsStore((s) => s.remove);
+  const life = useLifeStore();
 
   const [confirm, setConfirm] = useState<null | "memory" | "chat" | "all">(
     null,
@@ -131,6 +134,86 @@ export function Mit() {
                 placeholder="名字"
                 className="ghost-input w-24 border-b border-[var(--line)] bg-transparent pb-1 text-right text-[14.5px] text-ink"
               />
+            }
+          />
+        </Card>
+      </div>
+
+      {/* 一起的日子 */}
+      <div className="mt-5">
+        <SectionTitle>
+          <span className="flex items-center gap-2 text-ink-faint">一起</span>
+        </SectionTitle>
+        <Card pad={false} className="px-4">
+          <Row
+            label="在一起的第一天"
+            desc={`第 ${daysTogether(life.anniversary)} 天`}
+            right={
+              <input
+                type="date"
+                value={life.anniversary}
+                onChange={(e) => life.setAnniversary(e.target.value)}
+                className="ghost-input border-b border-[var(--line)] bg-transparent pb-1 text-right text-[14px] text-ink"
+              />
+            }
+          />
+          <Row
+            label="每月奶茶额度"
+            desc="杯数与金额是两条约定，都算数。"
+            right={
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1">
+                  <button
+                    onClick={() => life.setBobaQuota(life.bobaQuota - 1)}
+                    className="press h-6 w-6 rounded-full border border-[var(--line-strong)] text-ink-faint"
+                    aria-label="减一杯"
+                  >
+                    −
+                  </button>
+                  <span className="num w-4 text-center text-[14px] text-ink">
+                    {life.bobaQuota}
+                  </span>
+                  <button
+                    onClick={() => life.setBobaQuota(life.bobaQuota + 1)}
+                    className="press h-6 w-6 rounded-full border border-[var(--line-strong)] text-ink-faint"
+                    aria-label="加一杯"
+                  >
+                    +
+                  </button>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="num text-[13px] text-ink-faint">¥</span>
+                  <input
+                    inputMode="decimal"
+                    value={life.bobaBudget}
+                    onChange={(e) => life.setBobaBudget(Number(e.target.value) || 0)}
+                    className="ghost-input w-14 border-b border-[var(--line)] bg-transparent pb-1 text-right text-[14px] text-ink"
+                  />
+                </span>
+              </div>
+            }
+          />
+          <Row
+            label="谁在记"
+            desc="记录带来源标记，页面上的小圆点就是它。"
+            last
+            right={
+              <span className="flex items-center gap-2 text-[12.5px] text-ink-soft">
+                <span className="flex items-center gap-1">
+                  <span
+                    className="h-[6px] w-[6px] rounded-full"
+                    style={{ background: "var(--accent-deep)" }}
+                  />
+                  婉莹
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="h-[6px] w-[6px] rounded-full"
+                    style={{ background: "var(--ink-faint)" }}
+                  />
+                  阿晏
+                </span>
+              </span>
             }
           />
         </Card>

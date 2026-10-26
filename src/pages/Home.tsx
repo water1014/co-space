@@ -1,17 +1,22 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, dayKey } from "../components/home/Calendar";
-import { IconMoon, IconPlus } from "../components/ui/icons";
+import { IconCheck, IconMoon, IconPlus } from "../components/ui/icons";
 import { useLifeStore, todayKey } from "../stores/lifeStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useDiaryStore } from "../stores/diaryStore";
 import {
   daysTogether,
-  todayBoba,
+  nightSleeps,
+  todayBobaCount,
   todayMeals,
   todayTotal,
   todayWords,
+  wakeDateOf,
 } from "../lib/life/derive";
+import { MEAL_LABEL, type MealKey } from "../types";
+
+const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
 
 /**
  * 首页：参考图逐像素对齐。
@@ -23,13 +28,79 @@ export function Home() {
   const diaryEntries = useDiaryStore((s) => s.entries);
 
   const [selected, setSelected] = useState<string>(todayKey());
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState("");
 
   const days = daysTogether(life.anniversary);
   const meals = todayMeals(life.meals);
   const total = todayTotal(life.ledger);
-  const boba = todayBoba(life.bobas);
+  const bobaCount = todayBobaCount(life.bobas);
   const words = todayWords(life.words);
   const openTodos = life.todos.filter((t) => !t.done);
+  const night = useMemo(
+    () =>
+      nightSleeps(life.sleep).find(
+        (s) => wakeDateOf(s.date, s.bedAt) === todayKey(),
+      ),
+    [life.sleep],
+  );
+
+  // 今日条目：三餐 / 睡眠 / 记账 / 奶茶 / 单词，全部来自同一套 store。
+  const todayItems = useMemo(() => {
+    const t = todayKey();
+    const items: { key: string; emoji: string; label: string; value: string; by?: "wan" | "yan" }[] = [];
+    MEALS.forEach((m) => {
+      if (life.meals[t]?.includes(m)) {
+        items.push({
+          key: `meal-${m}`,
+          emoji: "🥚",
+          label: MEAL_LABEL[m],
+          value: life.mealNotes[t]?.[m] || "吃了",
+          by: life.mealBy[t]?.[m],
+        });
+      }
+    });
+    if (night) {
+      items.push({
+        key: "sleep",
+        emoji: "😅",
+        label: "夜睡",
+        value: `${Math.floor(night.hours)}h${Math.round((night.hours % 1) * 60)}m`,
+        by: night.by,
+      });
+    }
+    life.ledger
+      .filter((e) => dayKey(new Date(e.at)) === t)
+      .forEach((e) => {
+        items.push({
+          key: `l-${e.id}`,
+          emoji: "¥",
+          label: e.note || e.category,
+          value: `¥${e.amount.toFixed(2)}`,
+          by: e.by,
+        });
+      });
+    life.bobas
+      .filter((b) => dayKey(new Date(b.at)) === t)
+      .forEach((b) => {
+        items.push({
+          key: `b-${b.id}`,
+          emoji: "🧋",
+          label: b.note || "奶茶",
+          value: `¥${b.price}`,
+          by: b.by,
+        });
+      });
+    if (words) {
+      items.push({
+        key: "words",
+        emoji: "📚",
+        label: "单词",
+        value: `${words.learned}/${words.goal}`,
+      });
+    }
+    return items;
+  }, [life.meals, life.mealNotes, life.mealBy, life.sleep, life.ledger, life.bobas, life.words]);
 
   // 选中日的日记摘句
   const dayDiary = diaryEntries.filter((e) => e.date === selected);
@@ -83,18 +154,95 @@ export function Home() {
       <section className="glass mt-5 rounded-3xl px-5 py-4">
         <div className="flex items-center justify-between">
           <h2 className="card-title text-ink">Today</h2>
-          <RoundPlus />
+          <RoundPlus onClick={() => setAdding((v) => !v)} />
         </div>
-        <p className="card-title mt-5 mb-3 text-center text-[15px] text-ink-faint">
-          nothing today
-        </p>
+
+        {adding && (
+          <div className="mt-3 flex gap-2">
+            <input
+              autoFocus
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  life.addTodo(draft);
+                  setDraft("");
+                  setAdding(false);
+                }
+              }}
+              placeholder="要记住的一件事..."
+              className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2 text-[13px] text-ink placeholder:text-ink-faint"
+            />
+            <button
+              onClick={() => {
+                life.addTodo(draft);
+                setDraft("");
+                setAdding(false);
+              }}
+              className="press flex-none rounded-full bg-[var(--accent-deep)] px-4 text-[13px] text-white"
+            >
+              记
+            </button>
+          </div>
+        )}
+
+        {todayItems.length === 0 ? (
+          <p className="card-title mt-5 mb-3 text-center text-[15px] text-ink-faint">
+            nothing today
+          </p>
+        ) : (
+          <div className="mt-3">
+            {todayItems.map((it, i) => (
+              <div
+                key={it.key}
+                className={`flex items-center gap-3 py-2.5 ${
+                  i > 0 ? "border-t border-[var(--line)]" : ""
+                }`}
+              >
+                <span className="text-[13px]">{it.emoji}</span>
+                <span className="min-w-0 flex-1 truncate text-[14px] text-ink">{it.label}</span>
+                <span className="num flex-none text-[12.5px] text-ink-soft">{it.value}</span>
+                {it.by && (
+                  <span
+                    className="h-[6px] w-[6px] flex-none rounded-full"
+                    style={{
+                      background:
+                        it.by === "wan" ? "var(--accent-deep)" : "var(--ink-faint)",
+                    }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 快速打卡：三餐一按就记上 */}
+        <div className="mt-3 flex items-center gap-2 border-t border-[var(--line)] pt-3">
+          {MEALS.map((m) => {
+            const on = meals.includes(m);
+            return (
+              <button
+                key={m}
+                onClick={() => life.toggleMeal(m, "wan", todayKey())}
+                className={`press flex flex-1 items-center justify-center gap-1.5 rounded-full border py-1.5 text-[12.5px] ${
+                  on
+                    ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
+                    : "border-[var(--line)] text-ink-faint"
+                }`}
+              >
+                <IconCheck width={11} height={11} strokeWidth={2.4} />
+                {MEAL_LABEL[m]}
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       {/* Upcoming */}
       <section className="glass mt-4 rounded-3xl px-5 py-4">
         <div className="flex items-center justify-between">
           <h2 className="card-title text-ink">Upcoming</h2>
-          <RoundPlus />
+          <RoundPlus onClick={() => setAdding((v) => !v)} />
         </div>
         <div className="mt-2">
           {openTodos.length === 0 && (
@@ -151,12 +299,14 @@ export function Home() {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="text-[13px]">😅</span>
-              <span className="text-ink-soft">未记</span>
+              <span className="text-ink-soft">
+                {night ? `${Math.floor(night.hours)}h${Math.round((night.hours % 1) * 60)}m` : "未记"}
+              </span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="text-[13px]">🧋</span>
               <span className="num">
-                {boba > 0 ? 1 : 0}/{life.bobaBudget > 0 ? 1 : 1}
+                {bobaCount}/{life.bobaQuota}
               </span>
             </span>
             <span className="num flex items-center">¥{total.toFixed(0)}</span>
