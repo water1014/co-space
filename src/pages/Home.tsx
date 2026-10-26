@@ -15,6 +15,8 @@ import {
   wakeDateOf,
 } from "../lib/life/derive";
 import { MEAL_LABEL, type MealKey } from "../types";
+import { EMPTY_STATES } from "../content";
+import { useText } from "../lib/content/useText";
 
 const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
 
@@ -27,6 +29,7 @@ export function Home() {
   const memories = useMemoryStore((s) => s.memories);
   const diaryEntries = useDiaryStore((s) => s.entries);
 
+  const t = useText();
   const [selected, setSelected] = useState<string>(todayKey());
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState("");
@@ -119,13 +122,11 @@ export function Home() {
     return s;
   }, [life.meals, life.ledger, life.bobas, life.sleep, memories]);
 
-  const quoteAuthor = "阿晏";
-
   return (
     <div className="flex flex-col px-5 pb-12 pt-10">
       {/* 眉题 + 菜单 */}
       <div className="flex items-center justify-between">
-        <p className="eyebrow !tracking-[0.42em]">DAYS&nbsp;&nbsp;TOGETHER</p>
+        <p className="eyebrow !tracking-[0.42em]">{t.home.eyebrow.replace(/ /g, "\u00a0\u00a0")}</p>
         <Link
           to="/mit"
           aria-label="菜单"
@@ -143,9 +144,9 @@ export function Home() {
           {days}
         </h1>
         <p className="kai mt-2 text-[19px] leading-[1.85] text-ink">
-          永远纠缠在一起吧，红线、命运、我和你。
+          {t.home.quote}
         </p>
-        <p className="quote-by mt-1.5">— {quoteAuthor}</p>
+        <p className="quote-by mt-1.5">— {t.home.quoteAuthor}</p>
       </div>
 
       <div className="mt-6 h-px w-full bg-[var(--line)]" />
@@ -188,7 +189,7 @@ export function Home() {
 
         {todayItems.length === 0 ? (
           <p className="card-title mt-5 mb-3 text-center text-[15px] text-ink-faint">
-            nothing today
+            {EMPTY_STATES.emptyToday}
           </p>
         ) : (
           <div className="mt-3">
@@ -247,7 +248,7 @@ export function Home() {
         <div className="mt-2">
           {openTodos.length === 0 && (
             <p className="card-title py-4 text-center text-[15px] text-ink-faint">
-              nothing upcoming
+              {EMPTY_STATES.emptyTodos}
             </p>
           )}
           {openTodos.map((t, i) => (
@@ -346,7 +347,7 @@ export function Home() {
       {/* 页脚 */}
       <footer className="mt-9">
         <p className="page-head-sub text-center text-[13px]">
-          婉莹 &amp; 阿晏 ♡
+          {t.home.footer}
         </p>
       </footer>
     </div>

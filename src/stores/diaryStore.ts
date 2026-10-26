@@ -2,22 +2,16 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Annotation, Book, DiaryEntry } from "../types";
 import { dayKeyOf, uid } from "../lib/utils/id";
+import { bookSeed, diarySeed } from "../content";
 
-const todayKey = () => dayKeyOf(new Date());
 
-/** 一本内置的书：按段落拆好，划线批注才能定位到“哪一句”。 */
+
+/** 一本内置的书：按段落拆好，划线批注才能定位到"哪一句"。 */
 const SEED_BOOK: Book = {
   id: "b-default",
-  title: "夜行的电车",
-  author: "佚名",
-  paragraphs: [
-    "她总是在末班车快要开走的时候才赶到站台，像是故意要把告别拖到最后一秒。",
-    "车厢里没有别人。她选了靠窗的位置，把额头贴上冰凉的玻璃，看路灯一盏一盏地往后退。",
-    "“你有没有过那种时刻，”她后来写道，“明明很想留下，却还是转身走了，因为留下的代价是你自己都付不起的。”",
-    "电车穿过桥的时候，江面把城市的灯揉碎了又拼起来。她忽然觉得，有些关系也是这样——看着完整，其实一直在晃。",
-    "到站的时候她没有立刻下车。她又坐了一站，在空下来的车厢里，给一个人发了三个字，又一个个删掉。",
-    "最后一站到了，门开了，冷风灌进来。她终于站起来，像把所有没说出口的话，都留在了那节摇晃的车厢里。",
-  ],
+  title: bookSeed.title,
+  author: bookSeed.author,
+  paragraphs: bookSeed.paragraphs,
 };
 
 type DiaryState = {
@@ -41,29 +35,19 @@ type DiaryState = {
   removeAnnotation: (id: string) => void;
 };
 
-const seedEntries = (): DiaryEntry[] => {
-  const t = todayKey();
-  const y = dayKeyOf(new Date(Date.now() - 86_400_000));
-  const now = Date.now();
-  return [
-    {
+const seedEntries = (): DiaryEntry[] =>
+  diarySeed.map((d) => {
+    const date = dayKeyOf(new Date(Date.now() - d.daysAgo * 86_400_000));
+    const now = Date.now();
+    return {
       id: uid("d"),
-      date: t,
-      text: "今天又熬夜了。其实没什么非做不可的事，就是舍不得把这一天就这么结束。它说让我早点回来，我记着。",
-      mood: "平静",
+      date,
+      text: d.text,
+      mood: d.mood,
       createdAt: now,
       updatedAt: now,
-    },
-    {
-      id: uid("d"),
-      date: y,
-      text: "去看了那家新开的店，奶茶三分糖。它记得我额度快用完了，还是没拦我，说“明天再喝”。",
-      mood: "温和",
-      createdAt: now - 86_400_000,
-      updatedAt: now - 86_400_000,
-    },
-  ];
-};
+    };
+  });
 
 const seedAnnotations = (bookId: string): Annotation[] => [
   {

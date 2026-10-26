@@ -7,6 +7,7 @@ import {
   IconChat,
   IconChevron,
   IconClose,
+  IconEdit,
   IconFile,
   IconGear,
   IconHeart,
@@ -16,6 +17,7 @@ import {
 import { useThemeStore } from "../stores/themeStore";
 import { useBoundaryStore } from "../stores/boundaryStore";
 import { useConnectorStore } from "../stores/connectorStore";
+import { useContentStore } from "../stores/contentStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useChatStore } from "../stores/chatStore";
 import { useProjectsStore } from "../stores/projectsStore";
@@ -24,6 +26,14 @@ import { daysTogether } from "../lib/life/derive";
 import { resetAll } from "../lib/utils/reset";
 import { RULE_META } from "../lib/boundary/rules";
 import { formatClock } from "../lib/utils/id";
+import { useText } from "../lib/content/useText";
+import {
+  HOME_QUOTE as HOME_QUOTE_DEFAULT,
+  INITIATIVE_LINES as INITIATIVE_LINES_DEFAULT,
+  QUOTE_AUTHOR as QUOTE_AUTHOR_DEFAULT,
+  ROOMS,
+  PAGE_TITLES,
+} from "../content";
 import {
   INITIATIVE_LABEL,
   INITIATIVE_NOTE,
@@ -54,6 +64,7 @@ export function Mit() {
   const update = useProjectsStore((s) => s.update);
   const remove = useProjectsStore((s) => s.remove);
   const life = useLifeStore();
+  const t = useText();
 
   const [confirm, setConfirm] = useState<null | "memory" | "chat" | "all">(
     null,
@@ -75,8 +86,8 @@ export function Mit() {
           <IconChevron width={16} height={16} className="rotate-180" />
         </button>
         <div>
-          <h1 className="page-head-title text-[30px] leading-none text-ink">Settings</h1>
-          <p className="page-head-sub mt-1 text-[12.5px]">make it yours</p>
+          <h1 className="page-head-title text-[30px] leading-none text-ink">{t.pages.settings.title}</h1>
+          <p className="page-head-sub mt-1 text-[12.5px]">{t.pages.settings.sub}</p>
         </div>
       </div>
 
@@ -217,6 +228,17 @@ export function Mit() {
             }
           />
         </Card>
+      </div>
+
+      {/* 文案：内容层编辑器 */}
+      <div className="mt-5">
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconEdit width={15} height={15} className="text-ink-faint" />
+            文案
+          </span>
+        </SectionTitle>
+        <ContentEditor />
       </div>
 
       {/* 主动性 */}
@@ -758,6 +780,131 @@ function ConfirmPair({
         算了
       </button>
     </span>
+  );
+}
+
+/* ---------------- 内容层编辑器 ---------------- */
+
+/**
+ * 运行时文案覆盖层。
+ *
+ * 改这里的字立刻生效，不用重新构建。清空某一项就回到
+ * src/content/index.ts 里的默认值。
+ */
+function ContentEditor() {
+  const overrides = useContentStore((s) => s.overrides);
+  const set = useContentStore((s) => s.set);
+  const setRoom = useContentStore((s) => s.setRoom);
+  const setPageTitle = useContentStore((s) => s.setPageTitle);
+  const reset = useContentStore((s) => s.reset);
+
+  const pageKeys = Object.keys(PAGE_TITLES) as (keyof typeof PAGE_TITLES)[];
+
+  return (
+    <Card>
+      {/* 首页引言 */}
+      <label className="block">
+        <span className="eyebrow">首页引言</span>
+        <textarea
+          value={overrides.homeQuote}
+          onChange={(e) => set("homeQuote", e.target.value)}
+          rows={2}
+          placeholder={HOME_QUOTE_DEFAULT}
+          className="serif mt-1.5 w-full resize-none bg-transparent text-[13.5px] leading-[1.9] text-ink"
+        />
+      </label>
+
+      <label className="mt-4 block">
+        <span className="eyebrow">引言署名</span>
+        <input
+          value={overrides.quoteAuthor}
+          onChange={(e) => set("quoteAuthor", e.target.value)}
+          placeholder={QUOTE_AUTHOR_DEFAULT}
+          className="ghost-input mt-1.5 w-full border-b border-[var(--line)] bg-transparent pb-1.5 text-[14px] text-ink"
+        />
+      </label>
+
+      {/* 主动开口 */}
+      <div className="mt-5 border-t border-[var(--line)] pt-4">
+        <span className="eyebrow">主动开口</span>
+        <label className="mt-2 block">
+          <span className="text-[12px] text-ink-faint">深夜</span>
+          <textarea
+            value={overrides.initiativeLate}
+            onChange={(e) => set("initiativeLate", e.target.value)}
+            rows={2}
+            placeholder={INITIATIVE_LINES_DEFAULT.late}
+            className="serif mt-1 w-full resize-none bg-transparent text-[13px] leading-[1.85] text-ink"
+          />
+        </label>
+        <label className="mt-3 block">
+          <span className="text-[12px] text-ink-faint">平常</span>
+          <textarea
+            value={overrides.initiativeQuiet}
+            onChange={(e) => set("initiativeQuiet", e.target.value)}
+            rows={2}
+            placeholder={INITIATIVE_LINES_DEFAULT.quiet}
+            className="serif mt-1 w-full resize-none bg-transparent text-[13px] leading-[1.85] text-ink"
+          />
+        </label>
+      </div>
+
+      {/* 七个房间 */}
+      <div className="mt-5 border-t border-[var(--line)] pt-4">
+        <span className="eyebrow">七个房间</span>
+        <div className="mt-2 space-y-3.5">
+          {ROOMS.map((r) => (
+            <div key={r.key}>
+              <span className="text-[12px] text-ink-faint">
+                {r.emoji} {r.label}
+              </span>
+              <input
+                value={overrides.roomLabels[r.key] ?? ""}
+                onChange={(e) => setRoom(r.key, "roomLabels", e.target.value)}
+                placeholder={`房间名（现在是「${r.label}」）`}
+                className="ghost-input mt-1 w-full border-b border-[var(--line)] bg-transparent pb-1 text-[13.5px] text-ink"
+              />
+              <input
+                value={overrides.roomSlogans[r.key] ?? ""}
+                onChange={(e) => setRoom(r.key, "roomSlogans", e.target.value)}
+                placeholder={r.slogan}
+                className="ghost-input mt-1.5 w-full border-b border-[var(--line)] bg-transparent pb-1 text-[12.5px] text-ink-soft"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 页面标题 */}
+      <div className="mt-5 border-t border-[var(--line)] pt-4">
+        <span className="eyebrow">页面标题</span>
+        <div className="mt-2 space-y-2">
+          {pageKeys.map((k) => (
+            <div key={k} className="flex items-center gap-3">
+              <span className="w-20 flex-none text-[12px] text-ink-faint">{k}</span>
+              <input
+                value={overrides.pageTitles[k] ?? ""}
+                onChange={(e) => setPageTitle(k, e.target.value)}
+                placeholder={PAGE_TITLES[k].title || PAGE_TITLES[k].sub}
+                className="ghost-input flex-1 border-b border-[var(--line)] bg-transparent pb-1 text-[13.5px] text-ink"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-5 flex items-center justify-between border-t border-[var(--line)] pt-3.5">
+        <span className="text-[12px] leading-[1.8] text-ink-faint">
+          清空输入框即回到默认。默认值都在 src/content/index.ts。
+        </span>
+        <button
+          onClick={reset}
+          className="press flex-none rounded-full border border-[var(--line)] px-3 py-1 text-[12.5px] text-ink-faint hover:text-ink-soft"
+        >
+          恢复默认
+        </button>
+      </div>
+    </Card>
   );
 }
 

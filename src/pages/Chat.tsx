@@ -37,6 +37,8 @@ import {
 } from "../components/ui/icons";
 import { useThemeStore } from "../stores/themeStore";
 import { formatClock } from "../lib/utils/id";
+import { EMPTY_STATES } from "../content";
+import { useText } from "../lib/content/useText";
 import type { BoundaryHit, ChatMessage, MessagePart } from "../types";
 
 /**
@@ -177,6 +179,7 @@ function ChatHeader() {
   const [drawer, setDrawer] = useState<null | "history" | "projects" | "model">(null);
   const phase = moonPhase();
   const activeProject = projects.find((p) => p.id === activeId);
+  const t = useText();
 
   // 会话历史：把用户消息按天分组，当作「之前的对话」入口
   const historyDays = (() => {
@@ -215,7 +218,7 @@ function ChatHeader() {
       <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
         <IconMoon width={16} height={16} className="flex-none text-ink-soft" />
         <h1 className="truncate text-[19px] italic text-ink">
-          {activeProject?.name ?? "阿晏"}
+          {activeProject?.name ?? t.pages.chat.title}
         </h1>
         <span
           className={`h-[7px] w-[7px] flex-none rounded-full ${
@@ -481,16 +484,15 @@ function ChatHeader() {
 
 function EmptyChat() {
   const setDraft = useChatStore((s) => s.setDraft);
-  const chips = ["今天很累", "帮我记一件事", "我今天辞职了"];
-  const records = ["我刚吃了午饭", "刚买奶茶花了22", "今天花了38块吃晚饭", "我睡了7小时"];
+  const chips = [...EMPTY_STATES.chatChips];
+  const records = [...EMPTY_STATES.chatRecordChips];
   return (
     <div className="fadein flex flex-1 flex-col justify-center py-16">
       <p className="serif text-[17px] leading-[2] text-ink-soft">
-        还没有说过话。
+        {EMPTY_STATES.chatTitle}
       </p>
-      <p className="mt-2 text-[12.5px] leading-[1.9] text-ink-faint">
-        它在等第一句。也可以先告诉它今天吃了什么——
-        它会去翻你的记录，而不是假装知道。
+      <p className="mt-2 whitespace-pre-line text-[12.5px] leading-[1.9] text-ink-faint">
+        {EMPTY_STATES.chatHint}
       </p>
       <div className="mt-6 flex flex-wrap gap-2">
         {chips.map((c) => (

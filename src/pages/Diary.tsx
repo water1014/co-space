@@ -4,6 +4,7 @@ import { IconCheck, IconClose, IconPlus } from "../components/ui/icons";
 import { Calendar, dayKey } from "../components/home/Calendar";
 import { Reader } from "../components/diary/Reader";
 import { useDiaryStore, replyToQuote } from "../stores/diaryStore";
+import { useText } from "../lib/content/useText";
 import { formatDate } from "../lib/utils/id";
 import type { DiaryEntry } from "../types";
 
@@ -20,6 +21,7 @@ export function Diary() {
   const annotations = useDiaryStore((s) => s.annotations);
   const activeBookId = useDiaryStore((s) => s.activeBookId);
   const addAnnotation = useDiaryStore((s) => s.addAnnotation);
+  const t = useText();
 
   const [writing, setWriting] = useState(false);
   const [timeline, setTimeline] = useState(false);
@@ -67,7 +69,7 @@ export function Diary() {
       {/* 页头 */}
       <header className="flex items-center gap-2 px-5 pt-6">
         <PenIcon />
-        <h1 className="page-head-title flex-1 text-[30px] leading-none text-ink">Diary</h1>
+        <h1 className="page-head-title flex-1 text-[30px] leading-none text-ink">{t.pages.diary.title}</h1>
         <button
           onClick={() => setTimeline(true)}
           aria-label="时间线"

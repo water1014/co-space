@@ -1,5 +1,7 @@
 /** 全站领域类型。UI 只认这些形状。 */
 
+import { MEAL_LABEL as MEAL_LABEL_COPY, PEOPLE } from "./content";
+
 export type Theme = "night" | "day";
 export type TabKey = "home" | "chat" | "memory" | "together" | "diary" | "mit";
 
@@ -152,8 +154,8 @@ export type Imprint = {
 export type Who = "wan" | "yan";
 
 export const WHO_LABEL: Record<Who, string> = {
-  wan: "婉莹",
-  yan: "阿晏",
+  wan: PEOPLE.wan,
+  yan: PEOPLE.yan,
 };
 
 /** 小圆点的颜色：婉莹绯红，阿晏月白。 */
@@ -164,11 +166,7 @@ export const WHO_DOT: Record<Who, string> = {
 
 export type MealKey = "breakfast" | "lunch" | "dinner";
 
-export const MEAL_LABEL: Record<MealKey, string> = {
-  breakfast: "早饭",
-  lunch: "午饭",
-  dinner: "晚饭",
-};
+export const MEAL_LABEL: Record<MealKey, string> = MEAL_LABEL_COPY;
 
 export type SleepLog = {
   /** 夜睡：入睡那天的 dayKey（凌晨两点睡算前一天）；午睡：当天 dayKey。 */

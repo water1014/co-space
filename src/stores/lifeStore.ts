@@ -13,6 +13,12 @@ import type {
   WrongWord,
 } from "../types";
 import { dayKeyOf, uid } from "../lib/utils/id";
+import {
+  WORD_BOOK,
+  rewardSeed,
+  todoSeed,
+  wrongWordSeed,
+} from "../content";
 
 export const todayKey = () => dayKeyOf(new Date());
 
@@ -22,33 +28,6 @@ const daysAgo = (n: number) => {
   return dayKeyOf(d);
 };
 
-/** 六级核心词表：单词 / 音标 / 释义。 */
-const WORD_SEED: [string, string, string][] = [
-  ["forehead", "/ˈfɔːhed/", "n. 前额"],
-  ["finger", "/ˈfɪŋɡə(r)/", "n. 手指 v. 告发，拨弄"],
-  ["nerve", "/nɜːv/", "n. 神经，勇气"],
-  ["applaud", "/əˈplɔːd/", "v. 鼓掌，称赞"],
-  ["bless", "/bles/", "v. 祝福"],
-  ["admire", "/ədˈmaɪə(r)/", "v. 仰慕，赞赏"],
-  ["astonish", "/əˈstɒnɪʃ/", "v. 使吃惊"],
-  ["consequence", "/ˈkɒnsɪkwəns/", "n. 后果，结果"],
-  ["deliberate", "/dɪˈlɪbərət/", "adj. 故意的 v. 仔细考虑"],
-  ["efficient", "/ɪˈfɪʃnt/", "adj. 效率高的"],
-  ["facility", "/fəˈsɪləti/", "n. 设施，便利"],
-  ["genuine", "/ˈdʒenjuɪn/", "adj. 真正的，真诚的"],
-  ["hesitate", "/ˈhezɪteɪt/", "v. 犹豫，踌躇"],
-  ["identical", "/aɪˈdentɪkl/", "adj. 完全相同的"],
-  ["justify", "/ˈdʒʌstɪfaɪ/", "v. 证明…正当"],
-  ["moderate", "/ˈmɒdərət/", "adj. 适度的 v. 缓和"],
-  ["obstacle", "/ˈɒbstəkl/", "n. 障碍，阻碍"],
-  ["precise", "/prɪˈsaɪs/", "adj. 精确的"],
-  ["reluctant", "/rɪˈlʌktənt/", "adj. 不情愿的"],
-  ["significant", "/sɪɡˈnɪfɪkənt/", "adj. 重要的，显著的"],
-  ["tremendous", "/trəˈmendəs/", "adj. 巨大的，极好的"],
-  ["ultimate", "/ˈʌltɪmət/", "adj. 最终的，根本的"],
-  ["virtue", "/ˈvɜːtʃuː/", "n. 美德，优点"],
-  ["witness", "/ˈwɪtnəs/", "n. 目击者 v. 目睹"],
-];
 
 type LifeState = {
   /** 在一起的第一天。大数字由它算。 */
@@ -180,27 +159,17 @@ const seed = () => {
     by: "wan" as Who,
   }));
 
-  const wrongWords: WrongWord[] = [
-    {
-      id: uid("w"),
-      word: "conscience",
-      reason: "和 conscious 混了",
-      times: 3,
-      at: now - 2 * DAY,
-      by: "yan" as Who,
-    },
-    {
-      id: uid("w"),
-      word: "restaurant",
-      reason: "中间少写了一个 a",
-      times: 2,
-      at: now - 1 * DAY,
-      by: "wan" as Who,
-    },
-  ];
+  const wrongWords: WrongWord[] = wrongWordSeed.map((w) => ({
+    id: uid("w"),
+    word: w.word,
+    reason: w.reason,
+    times: w.times,
+    at: now - w.times * DAY,
+    by: w.by,
+  }));
 
   // 词库：六级核心词，按组排。掌握状态从 0 开始慢慢积累。
-  const wordBook: WordEntry[] = WORD_SEED.map(([word, phonetic, meaning], i) => ({
+  const wordBook: WordEntry[] = WORD_BOOK.map(([word, phonetic, meaning], i) => ({
     id: `wb-${i}`,
     word,
     phonetic,
@@ -210,35 +179,15 @@ const seed = () => {
     wrongTimes: 0,
   }));
 
-  const rewards: RewardTask[] = [
-    {
-      id: uid("r"),
-      text: "三餐齐全连着三天",
-      kind: "reward",
-      points: 3,
-      done: false,
-      by: "yan" as Who,
-      at: now,
-    },
-    {
-      id: uid("r"),
-      text: "睡够七小时",
-      kind: "reward",
-      points: 2,
-      done: false,
-      by: "wan" as Who,
-      at: now,
-    },
-    {
-      id: uid("r"),
-      text: "奶茶超额",
-      kind: "penalty",
-      points: -1,
-      done: false,
-      by: "wan" as Who,
-      at: now,
-    },
-  ];
+  const rewards: RewardTask[] = rewardSeed.map((r) => ({
+    id: uid("r"),
+    text: r.text,
+    kind: r.kind,
+    points: r.points,
+    done: false,
+    by: r.by,
+    at: now,
+  }));
 
   return {
     anniversary: daysAgo(91),
@@ -252,17 +201,14 @@ const seed = () => {
     wordBook,
     wrongWords,
     rewards,
-    todos: [
-      {
-        id: uid("t"),
-        text: "一百天",
-        done: false,
-        at: now,
-        due: "09.13",
-        moon: true,
-      },
-      { id: uid("t"), text: "打印计算机准考证", done: false, at: now - 3600_000, due: "09.14" },
-    ],
+    todos: todoSeed.map((t, i) => ({
+      id: uid("t"),
+      text: t.text,
+      done: false,
+      at: now - i * 3600_000,
+      due: t.due,
+      moon: t.moon,
+    })),
     bobaBudget: 25,
     bobaQuota: 4,
     listeningTime: 12.7,

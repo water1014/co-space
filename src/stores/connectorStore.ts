@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { ConnectorId, ModelConfig } from "../types";
+import { PERSONA_DEFAULT } from "../content";
 
 type ConnectorState = {
   enabled: Record<ConnectorId, boolean>;
@@ -24,8 +25,7 @@ export const useConnectorStore = create<ConnectorState>()(
     (set, get) => ({
       enabled: { map: false, mail: false, files: false, mcp: false },
       model: { baseUrl: "", model: "gpt-4o-mini", hasKey: false },
-      persona:
-        "说话短。不讨好，也不用感叹号堆情绪。记得的事会提，不记得就说不知道。",
+      persona: PERSONA_DEFAULT,
       sessionKey: "",
 
       setConnector: (id, on) =>

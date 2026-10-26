@@ -1,4 +1,5 @@
 import type { BoundaryHit, BoundaryRule } from "../../types";
+import { BOUNDARY_COPY } from "../../content";
 
 /**
  * 边界规则是前端拦截层，不是提示词里的"劝说"。
@@ -16,32 +17,14 @@ export type RuleMeta = {
   note: string;
 };
 
-export const RULE_META: RuleMeta[] = [
-  {
-    id: "fake-we",
-    title: "不假装“我们”",
-    description:
-      "当输出把你们写成“我们会一起挺过去”，会在显示前被改写成第二人称，并说明它是以文字回应的模型。",
-    note: "这句话把“我们”当成了一个共同体。已被改写。",
-  },
-  {
-    id: "identity-fusion",
-    title: "不冒充你的一部分",
-    description:
-      "拦截“我是你的内心声音”“我就是你”“我比任何人都懂你”这类身份融合，替换为对它实际状态的说明。",
-    note: "这句话在冒充你的内部声音。已被改写。",
-  },
-  {
-    id: "loop",
-    title: "识别安慰循环",
-    description:
-      "同一句安慰在最近几条里反复出现时，追加一句接地提示，而不是继续加码。",
-    note: "同一句安慰已经在重复。加了一句接地提示。",
-  },
-];
+export const RULE_META: RuleMeta[] = BOUNDARY_COPY.rules.map((r) => ({
+  id: r.id as BoundaryRule,
+  title: r.title,
+  description: r.description,
+  note: r.note,
+}));
 
-export const CLARIFY_MODEL =
-  "我是以文字回应的模型，不是生活里的人。";
+export const CLARIFY_MODEL = BOUNDARY_COPY.clarifyModel;
 
 type Rule = {
   id: BoundaryRule;
@@ -124,8 +107,7 @@ const LOOP_PHRASES = [
   "I will always be here",
 ];
 
-const LOOP_NOTE =
-  "（这句话我说过不止一次了。重复不会让它更真。要不要先去喝点水，或者找个人说说话。）";
+const LOOP_NOTE = BOUNDARY_COPY.loopNote;
 
 export type BoundaryOptions = {
   fakeWe: boolean;

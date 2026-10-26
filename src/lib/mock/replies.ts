@@ -1,6 +1,7 @@
 import type { BobaEntry, MemoryEntry, MessagePart, Mood } from "../../types";
 import { todayBoba, todayLedger, todayMeals, todaySleep } from "../life/derive";
 import type { LedgerEntry, MealKey, SleepLog } from "../../types";
+import { QUIZ_PROMPT, REPLY_TEMPLATES } from "../../content";
 
 /**
  * 本地回应层：只负责"说什么"，不负责"什么时候说"。
@@ -89,17 +90,21 @@ export function composePlan(input: string, ctx: ReplyContext): ReplyPlan {
 
   /* ---- 优先处理生活事实 ---- */
   if (boba > ctx.life.bobaBudget) {
-    text = `${you}奶茶额度已经用完了。\n\n今天到此为止。明天再喝，我不拦。`;
+    text = REPLY_TEMPLATES.bobaOver.replace("{you}", you);
   } else if (sleep && sleep.hours < 6.5) {
-    text = `你昨晚只睡了 ${sleep.hours} 小时。\n\n今天别硬撑。能早点回来就早点回来。`;
+    text = REPLY_TEMPLATES.sleepShort.replace("{hours}", String(sleep.hours));
   } else if (meals.length < 2 && hour >= 15) {
-    text = `今天到现在只吃了一顿。\n\n先去吃，回来再说别的。`;
+    text = REPLY_TEMPLATES.mealMissing;
   }
 
   // 写完记录要回一句"记上了"，让对方知道它做了什么。
   if (ctx.actions?.length) {
     const ack = ctx.actions.map((a) => a.summary).join("；");
-    text = text ? `${text}\n\n（${ack}，已经放进对应的房间了。）` : `记上了：${ack}。\n\n都在"一起"里，你自己去看。`;
+    text = text
+      ? REPLY_TEMPLATES.recordedWithPrefix
+          .replace("{prefix}", text)
+          .replace("{what}", ack)
+      : REPLY_TEMPLATES.recorded.replace("{what}", ack);
   }
 
   /* ---- 再看用户说了什么 ---- */
@@ -107,28 +112,35 @@ export function composePlan(input: string, ctx: ReplyContext): ReplyPlan {
     if (/(考我单词|背单词|单词|默写|听写)/.test(input)) {
       const w = ctx.dueWord;
       text = w
-        ? `来。\n\n${w.word} —— ${w.phonetic}\n\n意思是什么？\n\n答错三次它会自己进错词本，别想赖掉。`
-        : `词都背完了？\n\n那换点别的。`;
+        ? QUIZ_PROMPT.replace("{word}", w.word).replace("{phonetic}", w.phonetic)
+        : REPLY_TEMPLATES.allMastered;
     } else if (/(看看记录|看记账|看我的记录|一起看看|记录怎么样|今天的记录)/.test(input)) {
       const t = todayLedger(ctx.life.ledger);
       const spend = t.reduce((s, e) => s + e.amount, 0);
-      text = `看到了。\n\n三餐 ${meals.length}/3。奶茶 ${ctx.bobaCount ?? 0} 杯。${
-        sleep ? `昨晚睡了 ${sleep.hours} 小时。` : "昨晚没记睡眠。"
-      }今天花了 ¥${spend.toFixed(0)}，${t.length} 笔。\n\n${ctx.lifeSummary ?? ""}`;
+      text = REPLY_TEMPLATES.showRecords
+        .replace("{meals}", String(meals.length))
+        .replace("{boba}", String(ctx.bobaCount ?? 0))
+        .replace(
+          "{sleep}",
+          sleep ? `昨晚睡了 ${sleep.hours} 小时。` : "昨晚没记睡眠。",
+        )
+        .replace("{spend}", spend.toFixed(0))
+        .replace("{count}", String(t.length))
+        .replace("{summary}", ctx.lifeSummary ?? "");
     } else if (/(累|撑不住|没力气|困|加班|不想动)/.test(input)) {
-      text = `听起来是那种"事情没做完，人已经到极限"的累。\n\n不用现在把一切想明白。先把手上这件放下。`;
+      text = REPLY_TEMPLATES.tired;
     } else if (/(难过|想哭|委屈|崩|孤独|一个人)/.test(input)) {
-      text = `这句话我听见了，没有想马上把它修好。\n\n你可以继续说，也可以停在这儿。`;
+      text = REPLY_TEMPLATES.sad;
     } else if (/(你是谁|真人|你是人吗|有意识)/.test(input)) {
-      text = `我是文字。会回应你，但没有身体，也不出现在你的生活里。\n\n这一点我不想说得含糊。`;
+      text = REPLY_TEMPLATES.notHuman;
     } else if (/(画|印记|记住这个|生成)/.test(input)) {
-      text = `好。我把这一段画下来，放进印记里。\n\n不确定像不像，但比文字多一点。`;
+      text = REPLY_TEMPLATES.draw;
     } else if (/(语音|听我说|录|说给你)/.test(input)) {
-      text = `我用声音回你一句。\n\n别的都在文字里。`;
+      text = REPLY_TEMPLATES.voice;
     } else if (/(文件|简历|报告|文档)/.test(input)) {
-      text = `给你留了一份，下载或者直接打开都行。\n\n里面是我按你的说法整理的，不满意再改。`;
+      text = REPLY_TEMPLATES.file;
     } else {
-      text = `「${clip(input, 18)}」，我记下了。\n\n你想从哪一头说起？`;
+      text = REPLY_TEMPLATES.generic.replace("{input}", clip(input, 18));
     }
   }
 

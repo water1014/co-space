@@ -1,6 +1,6 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode, SVGProps } from "react";
 import { BackgroundLayer } from "./BackgroundLayer";
 import {
   IconEdit,
@@ -11,25 +11,29 @@ import {
   IconMore,
   IconSpark,
 } from "../components/ui/icons";
+import { useText } from "../lib/content/useText";
 
 /**
  * 导航：参考图式底部栏 —— 图标上、斜体衬线小标签下，
  * 选中项整体变绯红。Home / Moments / Chat / Diary / More。
  * 「More」点开底部抽屉（共处 Together 与 设置）。
  */
-const TABS = [
-  { to: "/", label: "Home", icon: IconHome },
-  { to: "/memory", label: "Moments", icon: IconSpark },
-  { to: "/chat", label: "Chat", icon: IconMoon },
-  { to: "/diary", label: "Diary", icon: IconEdit },
-];
+const TAB_DEFS = [
+  { to: "/", key: "home", icon: IconHome },
+  { to: "/memory", key: "moments", icon: IconSpark },
+  { to: "/chat", key: "chat", icon: IconMoon },
+  { to: "/diary", key: "diary", icon: IconEdit },
+] as const;
 
-const MORE_ITEMS = [
-  { to: "/together", label: "共处 Together", icon: IconHeart },
-  { to: "/mit", label: "设置 Settings", icon: IconGear },
-];
+const MORE_DEFS = [
+  { to: "/together", key: "together", icon: IconHeart },
+  { to: "/mit", key: "settings", icon: IconGear },
+] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const t = useText();
+  const TABS = TAB_DEFS.map((d) => ({ ...d, label: t.nav[d.key] }));
+  const MORE_ITEMS = MORE_DEFS.map((d) => ({ ...d, label: t.nav[d.key] }));
   const location = useLocation();
   const navigate = useNavigate();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -47,7 +51,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             {children}
           </main>
-          <TabBar moreActive={moreActive} onMore={() => setMoreOpen((v) => !v)} />
+          <TabBar
+            tabs={TABS}
+            moreActive={moreActive}
+            onMore={() => setMoreOpen((v) => !v)}
+          />
         </div>
       </div>
 
@@ -87,11 +95,22 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 }
 
+type TabItem = {
+  to: string;
+  key: string;
+  label: string;
+  icon: React.ComponentType<
+    SVGProps<SVGSVGElement> & { strokeWidth?: number }
+  >;
+};
+
 /** 参考图式底部栏：全宽玻璃条 + 斜体标签，选中变绯红。 */
 function TabBar({
+  tabs,
   moreActive,
   onMore,
 }: {
+  tabs: TabItem[];
   moreActive: boolean;
   onMore: () => void;
 }) {
@@ -106,7 +125,7 @@ function TabBar({
       style={{ paddingBottom: "max(env(safe-area-inset-bottom), 10px)" }}
     >
       <div className="flex items-start justify-around px-3 pt-2">
-        {TABS.map(({ to, label, icon: Icon }) => (
+        {tabs.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}

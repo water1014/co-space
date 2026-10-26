@@ -4,6 +4,7 @@ import { Sheet } from "../components/ui/kit";
 import { IconCheck, IconClose, IconSearch } from "../components/ui/icons";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useProjectsStore } from "../stores/projectsStore";
+import { useText } from "../lib/content/useText";
 import { formatClock, formatDate } from "../lib/utils/id";
 import {
   MEMORY_DECAY_LABEL,
@@ -21,6 +22,7 @@ const TABS: { key: Tab; label: string }[] = [
 
 export function Memory() {
   const [tab, setTab] = useState<Tab>("library");
+  const t = useText();
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden">
@@ -33,8 +35,8 @@ export function Memory() {
             </svg>
           </span>
           <div className="flex-1">
-            <h1 className="page-head-title text-[30px] leading-none text-ink">Memory</h1>
-            <p className="page-head-sub mt-1 text-[12.5px]">Things I remember.</p>
+            <h1 className="page-head-title text-[30px] leading-none text-ink">{t.pages.memory.title}</h1>
+            <p className="page-head-sub mt-1 text-[12.5px]">{t.pages.memory.sub}</p>
           </div>
           <span className="mt-2 h-[7px] w-[7px] rounded-full bg-emerald-500" />
         </div>

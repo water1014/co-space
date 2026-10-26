@@ -4,6 +4,8 @@ import { useBoundaryStore } from "../../stores/boundaryStore";
 import { useChatStore } from "../../stores/chatStore";
 import { useLifeStore } from "../../stores/lifeStore";
 import { dueWords } from "../life/derive";
+import { DAILY_WORD_PROMPT, INITIATIVE_LINES as INITIATIVE_DEFAULT } from "../../content";
+import { useContentStore } from "../../stores/contentStore";
 import { uid } from "../utils/id";
 import type { ChatMessage, InitiativeLevel } from "../../types";
 
@@ -71,10 +73,11 @@ function tick() {
     now - lastInitiativeAt > INITIATIVE_COOLDOWN
   ) {
     lastInitiativeAt = now;
+    const ov = useContentStore.getState().overrides;
     const lines =
       hour >= 23 || hour < 5
-        ? "你今天比平时晚。\n\n不是催你。只是这个时间差我注意到了。"
-        : "刚才安静了一会儿。\n\n我没有要走，也没有要你说话。";
+        ? ov.initiativeLate?.trim() || INITIATIVE_DEFAULT.late
+        : ov.initiativeQuiet?.trim() || INITIATIVE_DEFAULT.quiet;
     const msg: ChatMessage = {
       id: uid("ase"),
       role: "assistant",
@@ -120,7 +123,10 @@ function tick() {
         parts: [
           {
             type: "text",
-            text: `今日一词。\n\n${w.word} —— ${w.phonetic}\n\n意思是什么？`,
+            text: DAILY_WORD_PROMPT.replace("{word}", w.word).replace(
+              "{phonetic}",
+              w.phonetic,
+            ),
           },
         ],
         createdAt: now,

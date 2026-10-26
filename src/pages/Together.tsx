@@ -21,22 +21,12 @@ import {
 } from "../lib/life/derive";
 import { dayKeyOf } from "../lib/utils/id";
 import { MEAL_LABEL, WHO_LABEL, type MealKey, type Who } from "../types";
+import { LEDGER_CATEGORIES, ROOM_COPY, type RoomKey } from "../content";
+import { useText } from "../lib/content/useText";
 
 /* ---------------- 配置 ---------------- */
 
-const ROOMS = [
-  { key: "meal", emoji: "🥚", label: "三餐", slogan: "吃了什么不重要,吃了就好。" },
-  { key: "sleep", emoji: "😅", label: "睡眠", slogan: "早点睡。你知道我会说这句话。" },
-  { key: "ledger", emoji: "¥", label: "记账", slogan: "花了就花了,记一下就行。" },
-  { key: "boba", emoji: "🧋", label: "奶茶", slogan: "这个月的额度我说了算。但你撒娇的话另说。" },
-  { key: "words", emoji: "📚", label: "单词", slogan: "一天三十个,我陪你考。" },
-  { key: "wrong", emoji: "×", label: "错词", slogan: "错过的，才记得牢。" },
-  { key: "reward", emoji: "✨", label: "奖惩", slogan: "做得好有赏，做不好……也有账。" },
-] as const;
-
-type RoomKey = (typeof ROOMS)[number]["key"];
 const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
-const CATEGORIES = ["餐饮", "奶茶", "交通", "日用", "房租", "其他"];
 
 const keyOfTs = (ts: number) => dayKeyOf(ts);
 const md = (key: string) => `${Number(key.slice(5, 7))}/${Number(key.slice(8, 10))}`;
@@ -55,6 +45,7 @@ const monthLabel = (monthKey: string) => {
 
 export function Together() {
   const life = useLifeStore();
+  const t = useText();
   const [room, setRoom] = useState<RoomKey>("meal");
   const [who, setWho] = useState<Who>("wan");
   const [selected, setSelected] = useState<string>(todayKey());
@@ -69,7 +60,7 @@ export function Together() {
     return s;
   }, [life.meals, life.sleep, life.ledger, life.bobas]);
 
-  const cfg = ROOMS.find((r) => r.key === room)!;
+  const cfg = t.rooms.find((r) => r.key === room)!;
 
   return (
     <div className="flex flex-col px-4 pb-12 pt-6">
@@ -79,14 +70,14 @@ export function Together() {
           <IconChevron width={16} height={16} className="rotate-180" />
         </Link>
         <div>
-          <h1 className="page-head-title text-[30px] leading-none text-ink">Together</h1>
-          <p className="page-head-sub mt-1 text-[12.5px]">life, kept</p>
+          <h1 className="page-head-title text-[30px] leading-none text-ink">{t.pages.together.title}</h1>
+          <p className="page-head-sub mt-1 text-[12.5px]">{t.pages.together.sub}</p>
         </div>
       </div>
 
       {/* 房间 pills */}
       <div className="scroll-area -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        {ROOMS.map((r) => {
+        {t.rooms.map((r) => {
           const on = r.key === room;
           return (
             <button
@@ -157,7 +148,7 @@ export function Together() {
             {WHO_LABEL[w]}
           </button>
         ))}
-        <span className="text-[11px] text-ink-faint">在记</span>
+        <span className="text-[11px] text-ink-faint">{ROOM_COPY.whoIsLogging}</span>
       </div>
     </div>
   );
@@ -201,7 +192,7 @@ function MealRoom({ selected, who }: { selected: string; who: Who }) {
   return (
     <>
       <SummaryBlock
-        title="本月总结"
+        title={ROOM_COPY.monthSummary}
         rows={[
           ["早餐", `${days.b}/5 天`],
           ["午餐", `${days.l}/5 天`],
@@ -261,7 +252,7 @@ function MealRoom({ selected, who }: { selected: string; who: Who }) {
                     <input
                       value={note}
                       onChange={(e) => life.setMealNote(m, e.target.value, selected)}
-                      placeholder="吃了什么..."
+                      placeholder={ROOM_COPY.notePlaceholder}
                       className="ghost-input mt-1 w-full rounded-lg bg-[var(--glass-hi)] px-2.5 py-1.5 text-[12.5px] text-ink placeholder:text-ink-faint"
                     />
                   ) : (
@@ -344,7 +335,7 @@ function SleepRoom({ selected, who }: { selected: string; who: Who }) {
   return (
     <>
       <SummaryBlock
-        title="本月总结"
+        title={ROOM_COPY.monthSummary}
         rows={[
           ["记录", `${monthNights.length}/5 晚`],
           ["平均睡眠", avg ? `${Math.floor(avg)}h${Math.round((avg % 1) * 60)}m` : "—"],
@@ -402,7 +393,7 @@ function SleepRoom({ selected, who }: { selected: string; who: Who }) {
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="备注:昨天有点困..."
+          placeholder={ROOM_COPY.sleepNotePlaceholder}
           className="ghost-input mt-3 w-full rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-faint"
         />
         <div className="mt-3 flex items-center justify-between">
@@ -581,13 +572,13 @@ function LedgerRoom({ who, selected }: { who: Who; selected: string }) {
           </div>
         ))}
         {days.length === 0 && (
-          <p className="py-3 text-center text-[12.5px] text-ink-faint">这个月还没有记录。</p>
+          <p className="py-3 text-center text-[12.5px] text-ink-faint">{ROOM_COPY.emptyLedger}</p>
         )}
       </div>
 
       <div className="glass mt-3 rounded-3xl px-5 py-4">
         <div className="flex flex-wrap gap-1.5">
-          {CATEGORIES.map((c) => (
+          {LEDGER_CATEGORIES.map((c) => (
             <button
               key={c}
               onClick={() => setCat(c)}
@@ -606,13 +597,13 @@ function LedgerRoom({ who, selected }: { who: Who; selected: string }) {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             inputMode="decimal"
-            placeholder="金额"
+            placeholder={ROOM_COPY.ledgerAmountPlaceholder}
             className="ghost-input w-20 flex-none rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
           />
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="备注"
+            placeholder={ROOM_COPY.ledgerNotePlaceholder}
             className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
           />
           <button
@@ -687,7 +678,7 @@ function BobaRoom({ selected, who }: { selected: string; who: Who }) {
             <input
               value={shop}
               onChange={(e) => setShop(e.target.value)}
-              placeholder="哪家(喜茶/霸王茶姬...)"
+              placeholder={ROOM_COPY.bobaShopPlaceholder}
               className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
             />
             <input
@@ -704,7 +695,7 @@ function BobaRoom({ selected, who }: { selected: string; who: Who }) {
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="备注:朋友请喝"
+            placeholder={ROOM_COPY.bobaNotePlaceholder}
             className="ghost-input w-full rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
           />
           <label className="flex items-center gap-2 text-[12.5px] text-ink-soft">
@@ -714,7 +705,7 @@ function BobaRoom({ selected, who }: { selected: string; who: Who }) {
               onChange={(e) => setOver(e.target.checked)}
               className="h-4 w-4 accent-[var(--accent-deep)]"
             />
-            这杯算超额
+            {ROOM_COPY.bobaOverLabel}
           </label>
           {willExceed && !over && (
             <p className="text-[11.5px] text-[var(--accent-deep)]">
@@ -767,7 +758,7 @@ function BobaRoom({ selected, who }: { selected: string; who: Who }) {
           </div>
         ))}
         {boba.list.length === 0 && (
-          <p className="py-3 text-center text-[12.5px] text-ink-faint">这个月还没喝过。</p>
+          <p className="py-3 text-center text-[12.5px] text-ink-faint">{ROOM_COPY.emptyBoba}</p>
         )}
       </div>
     </>
@@ -1013,20 +1004,20 @@ function WrongRoom({ who }: { who: Who }) {
           </div>
         ))}
         {life.wrongWords.length === 0 && (
-          <p className="py-4 text-center text-[12.5px] text-ink-faint">还没有错词。</p>
+          <p className="py-4 text-center text-[12.5px] text-ink-faint">{ROOM_COPY.emptyWrong}</p>
         )}
       </div>
       <div className="mt-3 flex gap-2">
         <input
           value={word}
           onChange={(e) => setWord(e.target.value)}
-          placeholder="单词"
+          placeholder={ROOM_COPY.wrongWordPlaceholder}
           className="ghost-input w-24 flex-none rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
         />
         <input
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          placeholder="错在哪"
+          placeholder={ROOM_COPY.wrongReasonPlaceholder}
           className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
         />
         <button
@@ -1112,7 +1103,7 @@ function RewardRoom({ who }: { who: Who }) {
           </div>
         ))}
         {life.rewards.length === 0 && (
-          <p className="py-4 text-center text-[12.5px] text-ink-faint">还没有奖惩卡。</p>
+          <p className="py-4 text-center text-[12.5px] text-ink-faint">{ROOM_COPY.emptyReward}</p>
         )}
       </div>
 
@@ -1150,7 +1141,7 @@ function RewardRoom({ who }: { who: Who }) {
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="写一条奖惩，比如：背完 30 个单词"
+            placeholder={ROOM_COPY.rewardPlaceholder}
             className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
           />
           <button
@@ -1160,7 +1151,7 @@ function RewardRoom({ who }: { who: Who }) {
             }}
             className="press flex-none rounded-full bg-[var(--accent-deep)] px-4 text-[13px] text-white"
           >
-            加
+            {ROOM_COPY.rewardAdd}
           </button>
         </div>
       </div>
