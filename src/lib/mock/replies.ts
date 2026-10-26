@@ -1,4 +1,4 @@
-import type { MemoryEntry, MessagePart, Mood } from "../../types";
+import type { BobaEntry, MemoryEntry, MessagePart, Mood } from "../../types";
 import { todayBoba, todayMeals, todaySleep } from "../life/derive";
 import type { LedgerEntry, MealKey, SleepLog } from "../../types";
 
@@ -18,6 +18,7 @@ export type ReplyContext = {
     meals: Record<string, MealKey[]>;
     sleep: SleepLog[];
     ledger: LedgerEntry[];
+    bobas: BobaEntry[];
     bobaBudget: number;
   };
 };
@@ -45,7 +46,7 @@ const hashOf = (s: string) =>
 export function composePlan(input: string, ctx: ReplyContext): ReplyPlan {
   const meals = todayMeals(ctx.life.meals);
   const sleep = todaySleep(ctx.life.sleep);
-  const boba = todayBoba(ctx.life.ledger);
+  const boba = todayBoba(ctx.life.bobas);
   const hour = new Date().getHours();
   const you = ctx.name ? `${ctx.name}，` : "";
 

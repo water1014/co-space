@@ -14,7 +14,7 @@ const Diary = lazy(() =>
 );
 import { Mit } from "./pages/Mit";
 import { useRelationEngine } from "./lib/relation/engine";
-import { useThemeStore } from "./stores/themeStore";
+import { useThemeStore, applyAppearanceVars } from "./stores/themeStore";
 import { useMemoryStore } from "./stores/memoryStore";
 import { useDiaryStore } from "./stores/diaryStore";
 import { seedIfEmpty } from "./lib/db/seed";
@@ -23,13 +23,13 @@ export default function App() {
   // 关系状态机只在这里挂一次：UI 不持有任何"该不该开口"的计时器。
   useRelationEngine();
 
-  const theme = useThemeStore((s) => s.theme);
+  const appearance = useThemeStore();
   const load = useMemoryStore((s) => s.load);
   const loadDiary = useDiaryStore((s) => s.load);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+    applyAppearanceVars(appearance);
+  }, [appearance]);
 
   useEffect(() => {
     void (async () => {

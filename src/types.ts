@@ -148,6 +148,20 @@ export type Imprint = {
 
 /* ---------------- 生活 ---------------- */
 
+/** 谁记的：婉莹在页面上点，阿晏通过工具调接口记。小圆点区分。 */
+export type Who = "wan" | "yan";
+
+export const WHO_LABEL: Record<Who, string> = {
+  wan: "婉莹",
+  yan: "阿晏",
+};
+
+/** 小圆点的颜色：婉莹绯红，阿晏月白。 */
+export const WHO_DOT: Record<Who, string> = {
+  wan: "var(--accent)",
+  yan: "#cfd8e3",
+};
+
 export type MealKey = "breakfast" | "lunch" | "dinner";
 
 export const MEAL_LABEL: Record<MealKey, string> = {
@@ -157,10 +171,16 @@ export const MEAL_LABEL: Record<MealKey, string> = {
 };
 
 export type SleepLog = {
+  /** 夜睡：入睡那天的 dayKey（凌晨两点睡算前一天）；午睡：当天 dayKey。 */
   date: string;
+  /** 夜睡 = 小时；午睡 = 分钟，hours 字段冗余存小时数便于统计。 */
   hours: number;
   bedAt: string;
   wakeAt: string;
+  kind?: "night" | "nap";
+  /** 午睡分钟数。 */
+  minutes?: number;
+  by?: Who;
 };
 
 export type LedgerEntry = {
@@ -169,6 +189,26 @@ export type LedgerEntry = {
   amount: number;
   category: string;
   note: string;
+  by?: Who;
+};
+
+/** 奶茶不并进记账——它有「额度」这个约定，值得单独一间房。 */
+export type BobaEntry = {
+  id: string;
+  at: number;
+  price: number;
+  note: string;
+  by?: Who;
+};
+
+/** 错词本：听写/对话里拼错或用错的词，阿晏每天会问。 */
+export type WrongWord = {
+  id: string;
+  word: string;
+  reason: string;
+  times: number;
+  at: number;
+  by?: Who;
 };
 
 export type Todo = {

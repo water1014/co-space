@@ -1,5 +1,11 @@
 import { todayBoba, todayMeals, todaySleep, todayWords } from "./derive";
-import type { LedgerEntry, MealKey, SleepLog, WordProgress } from "../../types";
+import type {
+  BobaEntry,
+  LedgerEntry,
+  MealKey,
+  SleepLog,
+  WordProgress,
+} from "../../types";
 
 /**
  * 首页那句"今天的话"。
@@ -9,13 +15,14 @@ export function dailyNote(input: {
   meals: Record<string, MealKey[]>;
   sleep: SleepLog[];
   ledger: LedgerEntry[];
+  bobas: BobaEntry[];
   words: WordProgress[];
   bobaBudget: number;
   name: string;
 }): string {
   const meals = todayMeals(input.meals);
   const sleep = todaySleep(input.sleep);
-  const boba = todayBoba(input.ledger);
+  const boba = todayBoba(input.bobas);
   const words = todayWords(input.words);
   const you = input.name ? `${input.name}，` : "";
 

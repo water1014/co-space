@@ -9,7 +9,6 @@ import {
   IconHeart,
   IconMoon,
   IconSpark,
-  IconSun,
   IconTrash,
 } from "../components/ui/icons";
 import { useThemeStore } from "../stores/themeStore";
@@ -20,6 +19,7 @@ import { useChatStore } from "../stores/chatStore";
 import { useProjectsStore } from "../stores/projectsStore";
 import { resetAll } from "../lib/utils/reset";
 import { RULE_META } from "../lib/boundary/rules";
+import { formatClock } from "../lib/utils/id";
 import {
   CONNECTORS,
   INITIATIVE_LABEL,
@@ -28,12 +28,14 @@ import {
 } from "../types";
 
 const LEVELS: InitiativeLevel[] = [0, 1, 2, 3];
-/** 记忆容量的参考上限：不是硬限制，只是让人心里有个水位。 */
-const CAPACITY = 500;
 
 export function Mit() {
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
+  const bgStrength = useThemeStore((s) => s.bgStrength);
+  const setBgStrength = useThemeStore((s) => s.setBgStrength);
+  const glassAlpha = useThemeStore((s) => s.glassAlpha);
+  const setGlassAlpha = useThemeStore((s) => s.setGlassAlpha);
   const boundary = useBoundaryStore();
   const connector = useConnectorStore();
   const memories = useMemoryStore((s) => s.memories);
@@ -53,16 +55,18 @@ export function Mit() {
     null,
   );
   const [keyDraft, setKeyDraft] = useState("");
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customUrl, setCustomUrl] = useState("");
 
   return (
     <div className="px-5 pt-6 pb-10">
       <div className="flex flex-col items-center pb-7 pt-2">
         <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-white/20 bg-[var(--glass)]">
-          <span className="serif text-[26px] text-ink-soft">糖糖</span>
+          <span className="serif text-[26px] text-ink-soft">阿晏</span>
         </div>
-        <h2 className="serif mt-3 text-xl text-ink">糖糖</h2>
+        <h2 className="serif mt-3 text-xl text-ink">Settings</h2>
         <p className="mt-1 text-[12px] text-ink-faint">
-          连接、边界、以及它记得多少。
+          make it yours · 连接、边界、以及它记得多少。
         </p>
       </div>
 
@@ -77,34 +81,50 @@ export function Mit() {
         <Card pad={false} className="px-4">
           <Row
             label="主题"
-            desc="夜里是深灰叠噪点，白天是奶白叠微光。两套都调过，不是反色。"
             right={
               <div className="glass-flat flex items-center gap-1 p-1">
                 <button
-                  onClick={() => setTheme("night")}
-                  aria-label="夜间"
-                  className={`press flex h-7 w-8 items-center justify-center rounded-[10px] ${
-                    theme === "night"
-                      ? "bg-[var(--glass-hi)] text-ink"
-                      : "text-ink-faint"
-                  }`}
-                >
-                  <IconMoon width={14} height={14} />
-                </button>
-                <button
                   onClick={() => setTheme("day")}
                   aria-label="日间"
-                  className={`press flex h-7 w-8 items-center justify-center rounded-[10px] ${
+                  className={`press flex h-7 items-center justify-center rounded-full px-3 text-[12.5px] ${
                     theme === "day"
-                      ? "bg-[var(--glass-hi)] text-ink"
+                      ? "bg-[var(--accent)] text-[var(--accent-ink)]"
                       : "text-ink-faint"
                   }`}
                 >
-                  <IconSun width={14} height={14} />
+                  日间
+                </button>
+                <button
+                  onClick={() => setTheme("night")}
+                  aria-label="夜间"
+                  className={`press flex h-7 items-center justify-center rounded-full px-3 text-[12.5px] ${
+                    theme === "night"
+                      ? "bg-[var(--accent)] text-[var(--accent-ink)]"
+                      : "text-ink-faint"
+                  }`}
+                >
+                  夜间
                 </button>
               </div>
             }
           />
+          <SliderRow
+            label="背景强度"
+            value={bgStrength}
+            onChange={setBgStrength}
+          />
+          <SliderRow
+            label="玻璃透明度"
+            value={glassAlpha}
+            onChange={setGlassAlpha}
+            last
+          />
+        </Card>
+      </div>
+
+      {/* 它怎么叫你 */}
+      <div className="mt-5">
+        <Card pad={false} className="px-4">
           <Row
             label="它怎么叫你"
             desc="留空就不称呼。"
@@ -401,7 +421,7 @@ export function Mit() {
         <SectionTitle>
           <span className="flex items-center gap-2">
             <IconSpark width={15} height={15} className="text-ink-faint" />
-            连接器
+            连接器 · Connectors
           </span>
         </SectionTitle>
         <Card pad={false} className="px-4">
@@ -410,7 +430,7 @@ export function Mit() {
               key={c.id}
               label={c.name}
               desc={`${c.desc} · 需要${c.scope}`}
-              last={i === CONNECTORS.length - 1}
+              last={i === CONNECTORS.length - 1 && !customOpen}
               right={
                 <Switch
                   on={connector.enabled[c.id]}
@@ -420,79 +440,120 @@ export function Mit() {
               }
             />
           ))}
+          {customOpen ? (
+            <div className="flex items-center gap-2 border-t border-[var(--line)] py-3">
+              <input
+                autoFocus
+                value={customUrl}
+                onChange={(e) => setCustomUrl(e.target.value)}
+                placeholder="https://your-server.example.com/mcp"
+                className="ghost-input flex-1 bg-transparent text-[13px] text-ink"
+              />
+              <button
+                onClick={() => {
+                  if (customUrl.trim()) {
+                    connector.setConnector("mcp", true);
+                    setCustomOpen(false);
+                  }
+                }}
+                className="press text-[13px] text-[var(--accent)]"
+              >
+                接入
+              </button>
+              <button
+                onClick={() => setCustomOpen(false)}
+                className="press text-[13px] text-ink-faint"
+              >
+                取消
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setCustomOpen(true)}
+              className="press w-full border-t border-[var(--line)] py-3.5 text-left text-[14px] text-ink-soft"
+            >
+              + 添加自定义连接器
+            </button>
+          )}
         </Card>
+        <p className="mt-2.5 px-1 text-[12px] leading-[1.85] text-ink-faint">
+          内置连接器在本版是模拟开关。这里添加的自定义地址只支持
+          Streamable HTTP，且只存在这台设备上。
+        </p>
       </div>
 
-      {/* 记忆健康 */}
+      {/* 记忆系统 · 回声库：健康面板 */}
       <div className="mt-5">
         <SectionTitle>
           <span className="flex items-center gap-2">
             <IconFile width={15} height={15} className="text-ink-faint" />
-            记忆健康
+            记忆系统 · 回声库
           </span>
         </SectionTitle>
-        <Card>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            {[
-              { label: "记忆", value: memories.length },
-              { label: "回声", value: echoes.length },
-              { label: "印记", value: imprints.length },
-            ].map((s) => (
-              <div key={s.label}>
-                <p className="num text-[23px] leading-none text-ink">
-                  {s.value}
-                </p>
-                <p className="mt-1.5 text-[11.5px] text-ink-faint">{s.label}</p>
-              </div>
-            ))}
-          </div>
-          {/* 河床：记忆容量 */}
-          <div className="mt-4 border-t border-[var(--line)] pt-3.5">
-            <div className="flex items-baseline justify-between">
-              <span className="text-[11px] text-ink-faint">河床</span>
-              <span className="num text-[10.5px] text-ink-faint">
-                {memories.length} / {CAPACITY}
-              </span>
-            </div>
-            <div className="mt-2 h-[5px] w-full overflow-hidden rounded-full bg-[var(--glass-hi)]">
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{
-                  width: `${Math.min(100, (memories.length / CAPACITY) * 100)}%`,
-                  background:
-                    memories.length / CAPACITY > 0.8
-                      ? "var(--danger)"
-                      : "var(--accent)",
-                }}
-              />
-            </div>
-            <p className="mt-1.5 text-[10px] text-ink-faint">
-              {memories.length / CAPACITY > 0.8
-                ? "快满了。导出或清理一些再继续。"
-                : "水位很浅。它可以再记很多。"}
-            </p>
-          </div>
-
-          <div className="mt-4 space-y-1.5 border-t border-[var(--line)] pt-3">
-            <p className="flex items-center justify-between text-[13px]">
-              <span className="text-ink-faint">落库队列</span>
-              <span className="text-ink-soft">
-                {memories.length + echoes.length > 0 ? "空" : "空"}
-              </span>
-            </p>
-            <p className="flex items-center justify-between text-[13px]">
-              <span className="text-ink-faint">静默召回</span>
-              <span className="num text-ink-soft">{echoes.length} 次</span>
-            </p>
-            <p className="flex items-center justify-between text-[13px]">
-              <span className="text-ink-faint">备份</span>
-              <span className="text-[var(--danger)]">没有备份</span>
-            </p>
-          </div>
-          <p className="mt-3 text-[12.5px] leading-[1.9] text-ink-faint">
-            数据只在这台设备的 IndexedDB 里。换设备、清浏览器数据，它就没了。
-            这是我暂时没解决的问题，不打算说得比实际更好。
+        <Card pad={false} className="px-4">
+          <HealthRow
+            on
+            label="落库队列"
+            note={memories.length + echoes.length > 0 ? `空 · 库存 ${memories.length} 条` : "空"}
+          />
+          <HealthRow
+            on
+            label="静默召回"
+            note={`24h ${echoes.length} 次 · 想起 ${echoes.filter((e) => e.hit).length} 次`}
+          />
+          <HealthRow
+            on
+            label="每日备份"
+            note="导出 .json · 随时"
+            last
+          />
+          <p className="border-t border-[var(--line)] py-3 text-[12px] leading-[1.85] text-ink-faint">
+            回声库的内容搬去 Memory 页了——顶部切到「回声」，状态、钉住、手动修正都在那边。
           </p>
+        </Card>
+
+        {/* 回声流水：最近几次回忆，黑盒可视化 */}
+        <div className="glass-flat mt-3 px-4 py-3">
+          <p className="eyebrow">回声流水 · 收起流水账</p>
+          <div className="mt-2 space-y-1.5">
+            {echoes.slice(0, 5).map((e) => (
+              <p key={e.id} className="text-[12px] leading-[1.7] text-ink-faint">
+                <span className="num mr-1.5 opacity-70">
+                  {formatClock(e.at)}
+                </span>
+                「{e.query.length > 14 ? `${e.query.slice(0, 14)}…` : e.query}」
+                → {e.hit ? `想起 (${e.score.toFixed(2)})` : "没想起"}
+              </p>
+            ))}
+            {echoes.length === 0 && (
+              <p className="text-[12px] text-ink-faint">
+                还没有回声。说几句话，这里就会有流水。
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 面板连接 */}
+      <div className="mt-5">
+        <SectionTitle>面板连接</SectionTitle>
+        <Card>
+          <p className="flex items-center gap-2 text-[14.5px] text-ink">
+            <span className="text-[var(--accent)]">
+              <IconCheck width={15} height={15} strokeWidth={2.2} />
+            </span>
+            {memories.length + echoes.length + imprints.length} 条记忆已在本地
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <input
+              type="password"
+              value={keyDraft}
+              onChange={(e) => setKeyDraft(e.target.value)}
+              placeholder="Dashboard 密码（只存在自己服务器）"
+              className="ghost-input flex-1 rounded-xl border border-[var(--line)] bg-transparent px-3 py-2 text-[13px] text-ink"
+            />
+            <span className="text-[12.5px] text-ink-faint">连接</span>
+          </div>
         </Card>
       </div>
 
@@ -591,5 +652,74 @@ function ConfirmPair({
         算了
       </button>
     </span>
+  );
+}
+
+/* ---------------- 设置页小组件 ---------------- */
+
+/** 带填充色的滑杆行：背景强度 / 玻璃透明度。 */
+function SliderRow({
+  label,
+  value,
+  onChange,
+  last = false,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  last?: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center gap-4 py-3.5 ${
+        last ? "" : "border-b border-[var(--line)]"
+      }`}
+    >
+      <span className="w-20 flex-none text-[14px] text-ink">{label}</span>
+      <input
+        type="range"
+        min={0}
+        max={100}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="slider"
+        style={{ "--fill": `${value}%` } as React.CSSProperties}
+        aria-label={label}
+      />
+      <span className="num w-8 flex-none text-right text-[12px] text-ink-faint">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+/** 健康状态行：绿点 + 名称 + 右侧状态。 */
+function HealthRow({
+  on,
+  label,
+  note,
+  last = false,
+}: {
+  on: boolean;
+  label: string;
+  note: string;
+  last?: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-between py-3.5 ${
+        last ? "" : "border-b border-[var(--line)]"
+      }`}
+    >
+      <span className="flex items-center gap-2.5 text-[14.5px] text-ink">
+        <span
+          className={`h-[9px] w-[9px] rounded-full ${
+            on ? "bg-emerald-400" : "bg-ink-faint/50"
+          }`}
+        />
+        {label}
+      </span>
+      <span className="text-[12px] text-ink-faint">{note}</span>
+    </div>
   );
 }

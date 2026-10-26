@@ -5,31 +5,33 @@
    夜间不是纯黑，日间不是纯白：两者都是「底色 + 三团微光 + 噪点」。
    --------------------------------------------------------------- */
 
-/* 冷月色卡：夜间是深蓝黑叠冷光，日间是冷调奶蓝叠微光。两套都重调过，不是反色。 */
+/* 绯红色卡：夜间是暖黑叠绯光，日间是玫瑰雾叠深绯。两套都重调过，不是反色。 */
 :root,
 [data-theme="night"] {
-  --bg: #07080c;
-  --bg-deep: #04050a;
-  --ink: #cad9f5;
-  --ink-soft: rgba(202, 217, 245, 0.74);
-  --ink-faint: rgba(202, 217, 245, 0.42);
+  --bg: #0d0709;
+  --bg-deep: #090506;
+  --ink: #f2ddd9;
+  --ink-soft: rgba(242, 221, 217, 0.74);
+  --ink-faint: rgba(242, 221, 217, 0.44);
   --line: rgba(255, 255, 255, 0.12);
   --line-strong: rgba(255, 255, 255, 0.26);
   --glass: rgba(255, 255, 255, 0.05);
   --glass-hi: rgba(255, 255, 255, 0.1);
-  --glass-solid: rgba(10, 13, 22, 0.9);
-  --glow-a: 40 56 96;
-  --glow-b: 86 112 160;
-  --glow-c: 120 142 186;
-  --glow-op: 0.58;
-  --accent: #9cb2e8;
-  --accent-ink: #0a0e18;
-  --danger: #e08a9c;
-  --user-bubble: rgba(84, 98, 130, 0.42);
+  --glass-solid: rgba(22, 10, 13, 0.9);
+  --glow-a: 118 36 48;
+  --glow-b: 158 66 78;
+  --glow-c: 196 106 112;
+  --glow-op: 0.5;
+  --accent: #d97b86;
+  --accent-deep: #a83a48;
+  --accent-ink: #210a0e;
+  --danger: #e0907f;
+  --user-bubble: rgba(126, 64, 76, 0.45);
   --user-bubble-line: rgba(255, 255, 255, 0.1);
   --shadow: 0 26px 64px -34px rgba(0, 0, 0, 0.9);
   --sheen: rgba(255, 255, 255, 0.14);
   --noise-op: 0.5;
+  --glass-k: 1;
   --f-display: "Playfair Display", "Noto Serif SC", "Songti SC",
     "Source Han Serif SC", "SimSun", serif;
   --f-serif: "Noto Serif SC", "Songti SC", "Source Han Serif SC",
@@ -40,28 +42,30 @@
 }
 
 [data-theme="day"] {
-  --bg: #e4ebf5;
-  --bg-deep: #d6dfec;
-  --ink: #1b2436;
-  --ink-soft: rgba(27, 36, 54, 0.76);
-  --ink-faint: rgba(27, 36, 54, 0.46);
-  --line: rgba(27, 36, 54, 0.13);
-  --line-strong: rgba(27, 36, 54, 0.28);
+  --bg: #f2e7e5;
+  --bg-deep: #ecdfdd;
+  --ink: #38222a;
+  --ink-soft: rgba(56, 34, 42, 0.76);
+  --ink-faint: rgba(56, 34, 42, 0.48);
+  --line: rgba(56, 34, 42, 0.13);
+  --line-strong: rgba(56, 34, 42, 0.28);
   --glass: rgba(255, 255, 255, 0.62);
   --glass-hi: rgba(255, 255, 255, 0.74);
-  --glass-solid: rgba(250, 252, 255, 0.92);
-  --glow-a: 130 158 206;
-  --glow-b: 156 178 214;
-  --glow-c: 186 204 228;
+  --glass-solid: rgba(252, 248, 248, 0.92);
+  --glow-a: 206 158 164;
+  --glow-b: 224 188 190;
+  --glow-c: 238 212 210;
   --glow-op: 0.46;
-  --accent: #5b78b0;
+  --accent: #b04a58;
+  --accent-deep: #8e2f3c;
   --accent-ink: #ffffff;
-  --danger: #c25e72;
-  --user-bubble: rgba(120, 138, 172, 0.4);
-  --user-bubble-line: rgba(27, 36, 54, 0.12);
-  --shadow: 0 22px 50px -34px rgba(70, 92, 130, 0.5);
+  --danger: #c05a4a;
+  --user-bubble: rgba(206, 156, 162, 0.42);
+  --user-bubble-line: rgba(56, 34, 42, 0.12);
+  --shadow: 0 22px 50px -34px rgba(140, 90, 96, 0.5);
   --sheen: rgba(255, 255, 255, 0.85);
   --noise-op: 0.32;
+  --glass-k: 1;
   color-scheme: light;
 }
 
@@ -75,13 +79,29 @@
   --font-serif: var(--f-serif);
   --font-sans: var(--f-sans);
 
-  /* 冷月色卡：全局禁用纯白纯黑，全部走这套命名令牌。 */
-  --color-shadow-navy: #07080c;
-  --color-foggy-navy: #333c50;
-  --color-midnight-blue: #546282;
-  --color-frost-blue: #9cb2e8;
-  --color-milk-blue: #cad9f5;
+  /* 绯红色卡：全局禁用纯白纯黑，全部走这套命名令牌（旧类名保留，值已换绯）。 */
+  --color-shadow-navy: #0d0709;
+  --color-foggy-navy: #4a2e36;
+  --color-midnight-blue: #7e4650;
+  --color-frost-blue: #d97b86;
+  --color-milk-blue: #f2ddd9;
   --color-danger: var(--danger);
+
+  /* spec 指定的命名令牌（与上面同一套色值，别名共存，方便按图索骥写类名） */
+  --color-navy-deep: #0d0709;
+  --color-navy-fog: #4a2e36;
+  --color-blue-mid: #7e4650;
+  --color-blue-frost: #d97b86;
+  --color-blue-milk: #f2ddd9;
+  --color-crimson: var(--accent);
+  --color-crimson-deep: var(--accent-deep);
+
+  /* 玻璃肌理：右下角提亮的一层薄光，叠在卡片底色上。 */
+  --background-image-glass-texture: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.01)
+  );
 }
 
 /* --------------------------------------------------------------- */
@@ -181,6 +201,19 @@ body {
   );
 }
 
+/* 日间：森林图变浅、遮罩翻成冷白，整体从夜色切到清晨雾感 */
+[data-theme="day"] .app-bg > img {
+  opacity: 0.16;
+  filter: saturate(0.9) brightness(1.06);
+}
+[data-theme="day"] .app-bg .bg-veil {
+  background: linear-gradient(
+    to bottom,
+    rgba(228, 235, 245, 0.42),
+    rgba(214, 223, 236, 0.66)
+  );
+}
+
 /* 内容区自身的噪点（印记、图片卡） */
 .grain-self::after {
   content: "";
@@ -200,12 +233,12 @@ body {
   overflow: hidden;
   background: linear-gradient(
     168deg,
-    rgba(214, 226, 250, 0.16) 0%,
-    rgba(214, 226, 250, 0.085) 48%,
-    rgba(214, 226, 250, 0.115) 100%
+    rgb(244 224 222 / calc(0.16 * var(--glass-k))) 0%,
+    rgb(244 224 222 / calc(0.085 * var(--glass-k))) 48%,
+    rgb(244 224 222 / calc(0.115 * var(--glass-k))) 100%
   );
-  backdrop-filter: blur(30px) saturate(1.7);
-  -webkit-backdrop-filter: blur(30px) saturate(1.7);
+  backdrop-filter: blur(calc(30px * var(--glass-k))) saturate(1.7);
+  -webkit-backdrop-filter: blur(calc(30px * var(--glass-k))) saturate(1.7);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 22px;
   box-shadow:
@@ -478,6 +511,55 @@ textarea:focus {
 .switch[data-on="true"] > span {
   transform: translateX(17px);
   background: var(--accent-ink);
+}
+
+/* ---------------- 滑杆（设置页：背景强度 / 玻璃透明度） ---------------- */
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--accent-deep) 0 var(--fill, 50%),
+    color-mix(in srgb, var(--ink) 16%, transparent) var(--fill, 50%) 100%
+  );
+  outline: none;
+  flex: 1;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: var(--ink);
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+.slider::-moz-range-thumb {
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: var(--ink);
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+/* ---------------- 红线：命运感的一根细线，用作装饰 ---------------- */
+
+.red-thread {
+  background-image: repeating-linear-gradient(
+    to right,
+    color-mix(in srgb, var(--accent-deep) 82%, transparent) 0 7px,
+    transparent 7px 12px
+  );
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 50%;
 }
 
 /* ---------------- 黑胶 ---------------- */

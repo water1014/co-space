@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, SectionTitle, Stat } from "../components/ui/kit";
 import { Weather } from "../components/home/Weather";
-import { dayKey } from "../components/home/Calendar";
+import { Calendar, dayKey } from "../components/home/Calendar";
 import {
   IconCheck,
   IconMoon,
@@ -43,12 +43,12 @@ export function Home() {
   const toggleTheme = useThemeStore((s) => s.toggle);
   const memories = useMemoryStore((s) => s.memories);
 
-  const [selected] = useState<string>(todayKey());
+  const [selected, setSelected] = useState<string>(todayKey());
 
   const days = daysTogether(life.anniversary);
   const meals = todayMeals(life.meals);
   const total = todayTotal(life.ledger);
-  const boba = todayBoba(life.ledger);
+  const boba = todayBoba(life.bobas);
   const words = todayWords(life.words);
   const sleep = todaySleep(life.sleep);
 
@@ -56,6 +56,7 @@ export function Home() {
     meals: life.meals,
     sleep: life.sleep,
     ledger: life.ledger,
+    bobas: life.bobas,
     words: life.words,
     bobaBudget: life.bobaBudget,
     name,
@@ -64,6 +65,16 @@ export function Home() {
   const dayLedger = life.ledger.filter((e) => dayKey(new Date(e.at)) === selected);
   const daySum = dayLedger.reduce((a, b) => a + b.amount, 0);
   const dayMemories = memories.filter((m) => dayKey(new Date(m.createdAt)) === selected);
+
+  // 月历小标记：有任何记录的日子
+  const calMarks = useMemo(() => {
+    const s = new Set<string>();
+    Object.keys(life.meals).forEach((k) => life.meals[k]?.length && s.add(k));
+    life.ledger.forEach((e) => s.add(dayKey(new Date(e.at))));
+    life.bobas.forEach((b) => s.add(dayKey(new Date(b.at))));
+    memories.forEach((m) => s.add(dayKey(new Date(m.createdAt))));
+    return s;
+  }, [life.meals, life.ledger, life.bobas, memories]);
 
   const now = new Date();
 
@@ -80,7 +91,8 @@ export function Home() {
 
       {/* 超级大数字 + 日期 */}
       <div className="mt-6 text-center">
-        <h1 className="display text-[76px] leading-[0.82] tracking-tighter text-ink">
+        <p className="eyebrow">DAYS TOGETHER</p>
+        <h1 className="display mt-2 text-[76px] leading-[0.82] tracking-tighter text-[var(--accent)]">
           {days}
           <span className="ml-2 text-xl text-ink/50">天</span>
         </h1>
@@ -192,12 +204,31 @@ export function Home() {
         </Card>
       </div>
 
+      {/* 月历：今天落了什么，一眼对账 */}
+      <div className="mt-6 w-full">
+        <SectionTitle>这个月</SectionTitle>
+        <Card className="py-4">
+          <Calendar marks={calMarks} selected={selected} onSelect={(k) => setSelected(k)} />
+        </Card>
+      </div>
+
       {dayMemories.length > 0 && (
         <p className="mt-5 w-full px-1 text-[12px] leading-[1.9] text-ink-faint">
           {selected === todayKey() ? "今天" : selected.replace(/-/g, ".")} 落了{" "}
           {dayMemories.length} 条记忆{daySum > 0 && `，花了 ¥${daySum.toFixed(0)}`}。
         </p>
       )}
+
+      {/* 页脚：一根红线 */}
+      <footer className="mt-8 w-full">
+        <div className="red-thread mx-auto w-24 opacity-70" />
+        <p className="mt-3 text-center text-[11px] tracking-[0.2em] text-ink-faint">
+          {name || "婉莹"} · 阿晏
+        </p>
+        <p className="mt-1 text-center text-[10.5px] text-ink-faint/70">
+          共同空间 · 本地优先 · 数据只在这台设备上
+        </p>
+      </footer>
     </div>
   );
 }

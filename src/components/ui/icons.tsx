@@ -43,6 +43,15 @@ export const IconGear = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+export const IconMore = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="4" y="4" width="6.5" height="6.5" rx="1.8" />
+    <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8" />
+    <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8" />
+    <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8" />
+  </svg>
+);
+
 export const IconPlus = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>
     <path d="M12 5v14M5 12h14" />
@@ -135,5 +144,11 @@ export const IconBook = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>
     <path d="M12 6.2C10.2 4.8 7.7 4.4 5 4.7v13.3c2.7-.3 5.2.1 7 1.5 1.8-1.4 4.3-1.8 7-1.5V4.7c-2.7-.3-5.2.1-7 1.5z" />
     <path d="M12 6.2V19" />
+  </svg>
+);
+
+export const IconFolder = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h4l2 2.5h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" />
   </svg>
 );

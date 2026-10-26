@@ -11,6 +11,7 @@ import { useChatStore } from "../stores/chatStore";
 import { usePresenceStore } from "../stores/presenceStore";
 import { useBoundaryStore } from "../stores/boundaryStore";
 import { useMemoryStore } from "../stores/memoryStore";
+import { useProjectsStore } from "../stores/projectsStore";
 import { cancelTurn, regenerateLast, sendTurn } from "../lib/chat/turn";
 import { calibrate } from "../lib/boundary/interceptor";
 import { BoundaryTraceCard } from "../components/chat/OutputInterceptor";
@@ -22,8 +23,10 @@ import {
 } from "../components/chat/parts";
 import { Sheet } from "../components/ui/kit";
 import {
+  IconCheck,
   IconClose,
   IconFile,
+  IconFolder,
   IconMic,
   IconPlus,
   IconSend,
@@ -149,47 +152,234 @@ function toThreadMessage(
 
 /* ---------------- 头部 ---------------- */
 
+/** 月相：按公历日粗略走 8 相，够用且好看。 */
+function moonPhase(date = new Date()): { icon: string; label: string } {
+  const d = date.getDate();
+  const phase = Math.round((d / 30) * 8) % 8;
+  const icons = ["🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘"];
+  const labels = ["新月", "娥眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"];
+  return { icon: icons[phase], label: labels[phase] };
+}
+
 function ChatHeader() {
   const status = usePresenceStore((s) => s.statusLine);
   const quiet = useBoundaryStore((s) => s.quietMode);
   const reset = useChatStore((s) => s.reset);
+  const messages = useChatStore((s) => s.messages);
+  const projects = useProjectsStore((s) => s.projects);
+  const activeId = useProjectsStore((s) => s.activeId);
+  const setActive = useProjectsStore((s) => s.setActive);
   const [confirming, setConfirming] = useState(false);
+  const [drawer, setDrawer] = useState<null | "history" | "projects" | "model">(null);
+  const phase = moonPhase();
+  const activeProject = projects.find((p) => p.id === activeId);
+
+  // 会话历史：把用户消息按天分组，当作「之前的对话」入口
+  const historyDays = (() => {
+    const map = new Map<string, number>();
+    messages
+      .filter((m) => m.role === "user")
+      .forEach((m) => {
+        const k = new Date(m.createdAt).toLocaleDateString("zh-CN", {
+          month: "long",
+          day: "numeric",
+        });
+        map.set(k, (map.get(k) ?? 0) + 1);
+      });
+    return [...map.entries()].reverse().slice(0, 8);
+  })();
 
   return (
-    <header className="flex items-center justify-between px-5 pt-5 pb-3">
-      <div>
-        <h1 className="serif text-[19px] text-ink">对话</h1>
-        <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-faint">
+    <header className="flex items-center justify-between gap-2 px-5 pt-5 pb-3">
+      <button
+        onClick={() => setDrawer("history")}
+        aria-label="会话历史"
+        className="press flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[var(--line)] text-ink-faint hover:text-ink"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3.2 2" />
+        </svg>
+      </button>
+
+      <div className="min-w-0 flex-1 text-center">
+        <h1 className="serif inline-flex items-center gap-1.5 text-[19px] text-ink">
+          {phase.icon}
+          <span className="truncate">{activeProject?.name ?? "阿晏"}</span>
+        </h1>
+        <p className="mt-0.5 flex items-center justify-center gap-1.5 text-[11px] text-ink-faint">
           <span
             className={`h-[5px] w-[5px] rounded-full ${
-              quiet ? "bg-ink-faint" : "bg-[var(--accent)]"
+              quiet ? "bg-ink-faint" : "bg-[var(--accent)] blink"
             }`}
           />
           {status}
         </p>
       </div>
-      {confirming ? (
-        <span className="flex items-center gap-3 text-[11.5px]">
-          <button
-            onClick={() => {
-              reset();
-              setConfirming(false);
-            }}
-            className="text-[var(--danger)]"
-          >
-            确认清空
-          </button>
-          <button onClick={() => setConfirming(false)} className="text-ink-faint">
-            算了
-          </button>
-        </span>
-      ) : (
+
+      <div className="flex flex-none items-center gap-1.5">
         <button
-          onClick={() => setConfirming(true)}
-          className="tap text-[11.5px] text-ink-faint hover:text-ink-soft"
+          onClick={() => setDrawer("projects")}
+          aria-label="项目"
+          className="press flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] text-ink-faint hover:text-ink"
         >
-          清空
+          <IconFolder />
         </button>
+        <button
+          onClick={() => setDrawer("model")}
+          aria-label="模型"
+          className="press flex h-9 items-center justify-center rounded-full border border-[var(--accent)]/50 px-3 text-[12px] text-ink-soft"
+        >
+          Opus 4.6
+        </button>
+      </div>
+
+      {confirming && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setConfirming(false)} />
+          <div
+            className="glass fixed bottom-24 left-1/2 z-50 w-[86%] max-w-sm -translate-x-1/2 rounded-3xl p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="serif text-[15px] text-ink">清空这段对话？</p>
+            <p className="mt-1 text-[12.5px] text-ink-faint">
+              记忆不受影响，只清掉消息。
+            </p>
+            <div className="mt-3 flex items-center justify-end gap-4 text-[13.5px]">
+              <button onClick={() => setConfirming(false)} className="text-ink-faint">
+                算了
+              </button>
+              <button
+                onClick={() => {
+                  reset();
+                  setConfirming(false);
+                }}
+                className="text-[var(--danger)]"
+              >
+                确认清空
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* 会话历史抽屉 */}
+      {drawer === "history" && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setDrawer(null)} />
+          <div
+            className="glass fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-3xl p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="eyebrow">会话历史</p>
+            <div className="mt-2.5 max-h-64 space-y-1 overflow-y-auto">
+              {historyDays.length === 0 ? (
+                <p className="py-2 text-[13px] text-ink-faint">
+                  还没有说过话。第一句最难。
+                </p>
+              ) : (
+                historyDays.map(([day, count]) => (
+                  <div
+                    key={day}
+                    className="flex items-center justify-between border-b border-[var(--line)] py-2.5 last:border-0"
+                  >
+                    <span className="text-[13.5px] text-ink-soft">{day}</span>
+                    <span className="text-[12px] text-ink-faint">
+                      {count} 条
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+            <p className="mt-2 text-[11px] text-ink-faint">
+              月相 {phase.label} · 它聊天前会读今天的概况和本月总结
+            </p>
+            <button
+              onClick={() => {
+                setDrawer(null);
+                setConfirming(true);
+              }}
+              className="press mt-3 w-full border-t border-[var(--line)] pt-3 text-[13px] text-ink-faint hover:text-[var(--danger)]"
+            >
+              清空这段对话
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* 模型胶囊抽屉 */}
+      {drawer === "model" && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setDrawer(null)} />
+          <div
+            className="glass fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-3xl p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="eyebrow">模型 · 本版走本地回应层</p>
+            <div className="mt-2.5 space-y-1">
+              {["Opus 4.6", "Sonnet 4.6", "本地回应层"].map((m, i) => (
+                <div
+                  key={m}
+                  className="flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5"
+                >
+                  <span className="flex-1 text-[14px] text-ink">{m}</span>
+                  {i === 0 && (
+                    <span className="text-[var(--accent)]">
+                      <IconCheck width={14} height={14} strokeWidth={2.2} />
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] text-ink-faint">
+              接真实模型：设置页填接口地址与 Key。
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* 项目抽屉：切换「家」 */}
+      {drawer === "projects" && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setDrawer(null)} />
+          <div
+            className="glass fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-3xl p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="eyebrow">项目 · 每个挂一份自己的设定</p>
+            <div className="mt-2.5 space-y-1">
+              {projects.map((p) => {
+                const on = p.id === activeId;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      setActive(p.id);
+                      setDrawer(null);
+                    }}
+                    className="flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-colors hover:bg-white/10"
+                  >
+                    <span
+                      className="h-3 w-3 flex-none rounded-full"
+                      style={{ background: p.color }}
+                    />
+                    <span className="flex-1 truncate text-[14px] text-ink">
+                      {p.name}
+                    </span>
+                    {on && (
+                      <span className="text-[var(--accent)]">
+                        <IconCheck width={14} height={14} strokeWidth={2.2} />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[11px] text-ink-faint">
+              对话读当前项目的设定，而不是全局那一份。
+            </p>
+          </div>
+        </>
       )}
     </header>
   );

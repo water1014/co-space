@@ -48,6 +48,7 @@ async function respond(userText: string): Promise<void> {
       meals: life.meals,
       sleep: life.sleep,
       ledger: life.ledger,
+      bobas: life.bobas,
       bobaBudget: life.bobaBudget,
     },
   });
