@@ -6,14 +6,23 @@ import { imprintStyle } from "../components/chat/parts";
 import { IconCheck, IconSearch, IconSpark, IconTrash } from "../components/ui/icons";
 import { useMemoryStore } from "../stores/memoryStore";
 import { formatClock, formatDate } from "../lib/utils/id";
-import { MEMORY_KIND_LABEL, type MemoryEntry, type MemoryKind } from "../types";
+import {
+  MEMORY_DECAY_LABEL,
+  MEMORY_KIND_LABEL,
+  MEMORY_STATUS_LABEL,
+  memoryStatusOf,
+  type MemoryDecay,
+  type MemoryEntry,
+  type MemoryStatus,
+} from "../types";
 
-type Tab = "echo" | "imprint" | "library";
+type Tab = "echo" | "imprint" | "library" | "fav";
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: "echo", label: "回声" },
-  { key: "imprint", label: "印记" },
-  { key: "library", label: "记忆库" },
+  { key: "echo", label: "记忆" },
+  { key: "imprint", label: "图片" },
+  { key: "library", label: "图库" },
+  { key: "fav", label: "收藏" },
 ];
 
 export function Memory() {
@@ -54,6 +63,7 @@ export function Memory() {
         {tab === "echo" && <EchoList query={query} />}
         {tab === "imprint" && <ImprintGrid query={query} />}
         {tab === "library" && <Library query={query} />}
+        {tab === "fav" && <Library query={query} pinnedOnly />}
       </div>
 
       <FloatingTabs value={tab} onChange={setTab} />
@@ -70,7 +80,7 @@ function FloatingTabs({
   onChange: (t: Tab) => void;
 }) {
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-4 z-20 flex justify-center">
+    <div className="pointer-events-none absolute inset-x-0 bottom-28 z-20 flex justify-center">
       <div
         className="pointer-events-auto flex items-center gap-0.5 rounded-full p-1"
         style={{
@@ -266,23 +276,31 @@ const FILTERS: { key: "all" | "pinned" | "todo"; label: string }[] = [
   { key: "todo", label: "待兑现" },
 ];
 
-function Library({ query }: { query: string }) {
+function Library({
+  query,
+  pinnedOnly = false,
+}: {
+  query: string;
+  pinnedOnly?: boolean;
+}) {
   const memories = useMemoryStore((s) => s.memories);
   const filter = useMemoryStore((s) => s.filter);
   const setFilter = useMemoryStore((s) => s.setFilter);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
-  const [kind, setKind] = useState<MemoryKind>("fact");
+  const [status, setStatus] = useState<MemoryStatus>("normal");
+  const [decay, setDecay] = useState<MemoryDecay>("natural");
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
     return memories.filter((m) => {
       if (q && !m.text.toLowerCase().includes(q)) return false;
+      if (pinnedOnly) return m.pinned;
       if (filter === "pinned") return m.pinned;
       if (filter === "todo") return m.kind === "todo" && !m.resolved;
       return true;
     });
-  }, [memories, filter, query]);
+  }, [memories, filter, query, pinnedOnly]);
 
   const parentRef = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
@@ -298,35 +316,44 @@ function Library({ query }: { query: string }) {
   const openEditor = (m: MemoryEntry) => {
     setEditing(m.id);
     setDraft(m.text);
-    setKind(m.kind);
+    setStatus(memoryStatusOf(m));
+    setDecay(m.decay ?? "natural");
   };
 
   return (
     <>
       <div className="flex h-full flex-col">
-        <div className="flex items-center gap-2 px-5 pb-3">
-          {FILTERS.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              className={`press rounded-full border px-3 py-1 text-[11.5px] transition-colors ${
-                filter === f.key
-                  ? "border-[var(--accent)] text-ink"
-                  : "border-[var(--line)] text-ink-faint"
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-          <span className="ml-auto text-[11px] text-ink-faint">
-            {list.length} 条
-          </span>
-        </div>
+        {!pinnedOnly && (
+          <div className="flex items-center gap-2 px-5 pb-3">
+            {FILTERS.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={`press rounded-full border px-3 py-1 text-[11.5px] transition-colors ${
+                  filter === f.key
+                    ? "border-[var(--accent)] text-ink"
+                    : "border-[var(--line)] text-ink-faint"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+            <span className="ml-auto text-[11px] text-ink-faint">
+              {list.length} 条
+            </span>
+          </div>
+        )}
 
         {list.length === 0 ? (
           <div className="scroll-area flex-1 px-5">
             <Empty
-              title={query ? `没有匹配「${query}」的记忆。` : "记忆库是空的。"}
+              title={
+                query
+                  ? `没有匹配「${query}」的记忆。`
+                  : pinnedOnly
+                    ? "还没有钉住任何一条。"
+                    : "记忆库是空的。"
+              }
               hint="对话里说过的、你自己写下的，会慢慢落在这里。"
             />
           </div>
@@ -374,28 +401,64 @@ function Library({ query }: { query: string }) {
               className="serif w-full resize-none bg-transparent text-[15px] leading-[1.95] text-ink"
             />
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              {(["fact", "feel", "todo"] as MemoryKind[]).map((k) => (
-                <button
-                  key={k}
-                  onClick={() => setKind(k)}
-                  className={`press rounded-full border px-3 py-1 text-[11.5px] ${
-                    kind === k
-                      ? "border-[var(--accent)] text-ink"
-                      : "border-[var(--line)] text-ink-faint"
-                  }`}
-                >
-                  {MEMORY_KIND_LABEL[k]}
-                </button>
-              ))}
+            {/* 状态：正常 / 待兑现 / 钉住 */}
+            <div className="mt-3">
+              <span className="eyebrow">状态</span>
+              <div className="mt-1.5 flex flex-wrap gap-2">
+                {(["normal", "todo", "pinned"] as MemoryStatus[]).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setStatus(s)}
+                    className={`press rounded-full border px-3 py-1 text-[11.5px] ${
+                      status === s
+                        ? "border-[var(--accent)] text-ink"
+                        : "border-[var(--line)] text-ink-faint"
+                    }`}
+                  >
+                    {MEMORY_STATUS_LABEL[s]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 生命期：自然来去 / 慢忘 */}
+            <div className="mt-3">
+              <span className="eyebrow">生命期</span>
+              <div className="mt-1.5 flex flex-wrap gap-2">
+                {(["natural", "slow"] as MemoryDecay[]).map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => setDecay(d)}
+                    className={`press rounded-full border px-3 py-1 text-[11.5px] ${
+                      decay === d
+                        ? "border-[var(--accent)] text-ink"
+                        : "border-[var(--line)] text-ink-faint"
+                    }`}
+                  >
+                    {MEMORY_DECAY_LABEL[d]}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-[var(--line)] pt-4">
               <button
                 onClick={() => {
-                  void useMemoryStore
-                    .getState()
-                    .patchMemory(current.id, { text: draft.trim(), kind });
+                  const patch: Partial<MemoryEntry> = {
+                    text: draft.trim(),
+                    decay,
+                  };
+                  if (status === "pinned") patch.pinned = true;
+                  else if (status === "todo") {
+                    patch.pinned = false;
+                    patch.kind = "todo";
+                    patch.resolved = false;
+                  } else {
+                    patch.pinned = false;
+                    patch.kind = "fact";
+                    patch.resolved = false;
+                  }
+                  void useMemoryStore.getState().patchMemory(current.id, patch);
                   setEditing(null);
                 }}
                 disabled={!draft.trim()}
@@ -403,24 +466,6 @@ function Library({ query }: { query: string }) {
               >
                 <IconCheck width={13} height={13} />
                 保存
-              </button>
-              <button
-                onClick={() => {
-                  void useMemoryStore.getState().togglePin(current.id);
-                  setEditing(null);
-                }}
-                className="text-[12px] text-ink-soft"
-              >
-                {current.pinned ? "取消钉选" : "钉在顶层"}
-              </button>
-              <button
-                onClick={() => {
-                  void useMemoryStore.getState().toggleResolved(current.id);
-                  setEditing(null);
-                }}
-                className="text-[12px] text-ink-soft"
-              >
-                {current.resolved ? "标为未解决" : "标为已解决"}
               </button>
               <button
                 onClick={() => {

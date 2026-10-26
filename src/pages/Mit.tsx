@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { Card, Row, SectionTitle, Switch } from "../components/ui/kit";
 import {
+  IconBook,
   IconCheck,
+  IconChat,
+  IconFile,
+  IconGear,
+  IconHeart,
   IconMoon,
+  IconSpark,
   IconSun,
   IconTrash,
 } from "../components/ui/icons";
@@ -11,6 +17,7 @@ import { useBoundaryStore } from "../stores/boundaryStore";
 import { useConnectorStore } from "../stores/connectorStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useChatStore } from "../stores/chatStore";
+import { useProjectsStore } from "../stores/projectsStore";
 import { resetAll } from "../lib/utils/reset";
 import { RULE_META } from "../lib/boundary/rules";
 import {
@@ -35,6 +42,12 @@ export function Mit() {
   const messages = useChatStore((s) => s.messages);
   const clearMemories = useMemoryStore((s) => s.clearAll);
   const resetChat = useChatStore((s) => s.reset);
+  const projects = useProjectsStore((s) => s.projects);
+  const activeId = useProjectsStore((s) => s.activeId);
+  const setActive = useProjectsStore((s) => s.setActive);
+  const add = useProjectsStore((s) => s.add);
+  const update = useProjectsStore((s) => s.update);
+  const remove = useProjectsStore((s) => s.remove);
 
   const [confirm, setConfirm] = useState<null | "memory" | "chat" | "all">(
     null,
@@ -43,16 +56,24 @@ export function Mit() {
 
   return (
     <div className="px-5 pt-6 pb-10">
-      <header>
-        <h1 className="serif text-[23px] text-ink">设置</h1>
-        <p className="mt-1.5 text-[13.5px] leading-[1.9] text-ink-faint">
-          连接、边界、以及它记得多少。这里的每一格都有对应的后果。
+      <div className="flex flex-col items-center pb-7 pt-2">
+        <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-white/20 bg-[var(--glass)]">
+          <span className="serif text-[26px] text-ink-soft">糖糖</span>
+        </div>
+        <h2 className="serif mt-3 text-xl text-ink">糖糖</h2>
+        <p className="mt-1 text-[12px] text-ink-faint">
+          连接、边界、以及它记得多少。
         </p>
-      </header>
+      </div>
 
       {/* 外观 */}
       <div className="mt-6">
-        <SectionTitle>外观</SectionTitle>
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconMoon width={15} height={15} className="text-ink-faint" />
+            外观
+          </span>
+        </SectionTitle>
         <Card pad={false} className="px-4">
           <Row
             label="主题"
@@ -102,7 +123,12 @@ export function Mit() {
 
       {/* 主动性 */}
       <div className="mt-5">
-        <SectionTitle>它可以先开口吗</SectionTitle>
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconSpark width={15} height={15} className="text-ink-faint" />
+            它可以先开口吗
+          </span>
+        </SectionTitle>
         <Card>
           <div className="space-y-3">
             {LEVELS.map((level) => {
@@ -158,7 +184,12 @@ export function Mit() {
 
       {/* 边界 */}
       <div className="mt-5">
-        <SectionTitle>表达边界</SectionTitle>
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconHeart width={15} height={15} className="text-ink-faint" />
+            表达边界
+          </span>
+        </SectionTitle>
         <Card>
           <div className="space-y-4">
             <Row
@@ -204,7 +235,12 @@ export function Mit() {
 
       {/* 模型 */}
       <div className="mt-5">
-        <SectionTitle>模型</SectionTitle>
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconGear width={15} height={15} className="text-ink-faint" />
+            模型
+          </span>
+        </SectionTitle>
         <Card>
           <label className="block">
             <span className="eyebrow">接口地址</span>
@@ -254,7 +290,12 @@ export function Mit() {
 
       {/* 人设 */}
       <div className="mt-5">
-        <SectionTitle>专属设定</SectionTitle>
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconChat width={15} height={15} className="text-ink-faint" />
+            专属设定
+          </span>
+        </SectionTitle>
         <Card>
           <textarea
             value={connector.persona}
@@ -270,9 +311,99 @@ export function Mit() {
         </Card>
       </div>
 
+      {/* 项目：像 Claude 的“家”，每个挂一份自己的 md 设定 */}
+      <div className="mt-5">
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconBook width={15} height={15} className="text-ink-faint" />
+            项目
+          </span>
+        </SectionTitle>
+        <Card pad={false} className="divide-y divide-[var(--line)] px-4">
+          {projects.map((p) => {
+            const active = p.id === activeId;
+            return (
+              <div key={p.id} className="py-3.5">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="h-3 w-3 flex-none rounded-full"
+                    style={{ background: p.color }}
+                  />
+                  <input
+                    value={p.name}
+                    onChange={(e) => update(p.id, { name: e.target.value })}
+                    placeholder="家的名字"
+                    className="ghost-input flex-1 bg-transparent text-[15px] text-ink"
+                  />
+                  {active ? (
+                    <span className="flex items-center gap-1 text-[11px] text-[var(--accent)]">
+                      <IconCheck width={12} height={12} /> 使用中
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => setActive(p.id)}
+                      className="press text-[12px] text-ink-faint hover:text-ink-soft"
+                    >
+                      设为当前
+                    </button>
+                  )}
+                  {projects.length > 1 && (
+                    <button
+                      onClick={() => remove(p.id)}
+                      aria-label="删除项目"
+                      className="press text-ink-faint hover:text-[var(--danger)]"
+                    >
+                      <IconTrash width={13} height={13} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="mt-2.5 flex items-center gap-2">
+                  {["#9cb2e8", "#7fb0a6", "#b9a6e0", "#e0a6b4", "#e0c79a"].map(
+                    (c) => (
+                      <button
+                        key={c}
+                        onClick={() => update(p.id, { color: c })}
+                        aria-label="选主题色"
+                        className={`h-4 w-4 rounded-full transition-transform ${
+                          p.color === c ? "scale-110 ring-1 ring-white/60" : ""
+                        }`}
+                        style={{ background: c }}
+                      />
+                    ),
+                  )}
+                </div>
+
+                <textarea
+                  value={p.personaMd}
+                  onChange={(e) => update(p.id, { personaMd: e.target.value })}
+                  rows={2}
+                  placeholder="这个家的人格设定（md），会作为对话的 system prompt 第一段"
+                  className="serif mt-2.5 w-full resize-none bg-transparent text-[13px] leading-[1.8] text-ink-faint"
+                />
+              </div>
+            );
+          })}
+        </Card>
+        <button
+          onClick={() => add()}
+          className="press mt-2 flex w-full items-center justify-center gap-1.5 rounded-2xl border border-[var(--line)] py-2.5 text-[13px] text-ink-soft"
+        >
+          + 新家
+        </button>
+        <p className="mt-2 text-[12.5px] leading-[1.9] text-ink-faint">
+          对话会读当前项目的设定，而不是全局那一份。同一个“它”，在不同家里说话不一样。
+        </p>
+      </div>
+
       {/* 连接器 */}
       <div className="mt-5">
-        <SectionTitle>连接器</SectionTitle>
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconSpark width={15} height={15} className="text-ink-faint" />
+            连接器
+          </span>
+        </SectionTitle>
         <Card pad={false} className="px-4">
           {CONNECTORS.map((c, i) => (
             <Row
@@ -294,7 +425,12 @@ export function Mit() {
 
       {/* 记忆健康 */}
       <div className="mt-5">
-        <SectionTitle>记忆健康</SectionTitle>
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconFile width={15} height={15} className="text-ink-faint" />
+            记忆健康
+          </span>
+        </SectionTitle>
         <Card>
           <div className="grid grid-cols-3 gap-2 text-center">
             {[
@@ -362,7 +498,12 @@ export function Mit() {
 
       {/* 危险区 */}
       <div className="mt-5">
-        <SectionTitle>清空</SectionTitle>
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconTrash width={15} height={15} className="text-ink-faint" />
+            清空
+          </span>
+        </SectionTitle>
         <Card pad={false} className="px-4">
           <Row
             label="清空记忆"

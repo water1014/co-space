@@ -150,6 +150,20 @@ export function FileCard({
       ? `${(part.size / 1024 / 1024).toFixed(1)} MB`
       : `${Math.max(1, Math.round(part.size / 1024))} KB`;
 
+  /** 下载：用 Blob 真的落一个文件到本地（占位正文，接后端后换成真字节）。 */
+  const download = () => {
+    const blob = new Blob(
+      [`这是「${part.name}」的本地占位文件。\n接入真实后端后，这里会是文件真正的字节。`],
+      { type: part.mime || "application/octet-stream" },
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = part.name;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="glass-flat flex items-center gap-3 p-3">
       <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-[var(--glass-hi)] text-ink-soft">
@@ -161,15 +175,23 @@ export function FileCard({
           {size} · {part.mime}
         </p>
       </div>
-      <button
-        onClick={() => {
-          setHint(true);
-          window.setTimeout(() => setHint(false), 2200);
-        }}
-        className="tap flex-none rounded-full border border-[var(--line)] px-3 py-1 text-[13px] text-ink-soft hover:text-ink"
-      >
-        {hint ? "未接入" : "打开"}
-      </button>
+      <div className="flex flex-none items-center gap-1.5">
+        <button
+          onClick={() => {
+            setHint(true);
+            window.setTimeout(() => setHint(false), 2200);
+          }}
+          className="tap rounded-full border border-[var(--line)] px-3 py-1 text-[13px] text-ink-soft hover:text-ink"
+        >
+          {hint ? "未接入" : "打开"}
+        </button>
+        <button
+          onClick={download}
+          className="tap rounded-full border border-[var(--line)] px-3 py-1 text-[13px] text-ink-soft hover:text-ink"
+        >
+          下载
+        </button>
+      </div>
     </div>
   );
 }

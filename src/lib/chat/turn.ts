@@ -3,6 +3,8 @@ import { useBoundaryStore } from "../../stores/boundaryStore";
 import { usePresenceStore } from "../../stores/presenceStore";
 import { useMemoryStore } from "../../stores/memoryStore";
 import { useLifeStore } from "../../stores/lifeStore";
+import { useConnectorStore } from "../../stores/connectorStore";
+import { useProjectsStore } from "../../stores/projectsStore";
 import { composePlan, streamText } from "../mock/replies";
 import { uid } from "../utils/id";
 import type { ChatMessage, MessagePart } from "../../types";
@@ -38,6 +40,10 @@ async function respond(userText: string): Promise<void> {
     energy: presence.energy,
     mood: presence.mood,
     memories: memory.memories.slice(0, 3),
+    // 激活项目的人格优先；没有就退回全局人设（connector.persona）。
+    persona:
+      useProjectsStore.getState().activePersona() ??
+      (useConnectorStore.getState().persona.trim() || undefined),
     life: {
       meals: life.meals,
       sleep: life.sleep,

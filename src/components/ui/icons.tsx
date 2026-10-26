@@ -130,3 +130,10 @@ export const IconEdit = (p: SVGProps<SVGSVGElement>) => (
     <path d="M4 20h4L19 9a2 2 0 0 0-3-3L5 17z" />
   </svg>
 );
+
+export const IconBook = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M12 6.2C10.2 4.8 7.7 4.4 5 4.7v13.3c2.7-.3 5.2.1 7 1.5 1.8-1.4 4.3-1.8 7-1.5V4.7c-2.7-.3-5.2.1-7 1.5z" />
+    <path d="M12 6.2V19" />
+  </svg>
+);

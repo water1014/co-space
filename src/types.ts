@@ -1,7 +1,7 @@
 /** 全站领域类型。UI 只认这些形状。 */
 
 export type Theme = "night" | "day";
-export type TabKey = "home" | "chat" | "memory" | "together" | "mit";
+export type TabKey = "home" | "chat" | "memory" | "together" | "diary" | "mit";
 
 export type Mood = "calm" | "warm" | "low" | "focused";
 
@@ -97,6 +97,31 @@ export type MemoryEntry = {
   weight: number;
   pinned: boolean;
   resolved: boolean;
+  /** 生命期：自然来去（默认）还是慢忘（衰减更慢，刻意留住）。 */
+  decay?: MemoryDecay;
+};
+
+/** 记忆的生命期：自然来去 vs 慢忘。 */
+export type MemoryDecay = "natural" | "slow";
+
+/** 记忆的可见状态：正常 / 待兑现 / 钉住。由 pinned + kind + resolved 推导。 */
+export type MemoryStatus = "normal" | "todo" | "pinned";
+
+export const memoryStatusOf = (m: MemoryEntry): MemoryStatus => {
+  if (m.pinned) return "pinned";
+  if (m.kind === "todo" && !m.resolved) return "todo";
+  return "normal";
+};
+
+export const MEMORY_STATUS_LABEL: Record<MemoryStatus, string> = {
+  normal: "正常",
+  todo: "待兑现",
+  pinned: "钉住",
+};
+
+export const MEMORY_DECAY_LABEL: Record<MemoryDecay, string> = {
+  natural: "自然来去",
+  slow: "慢忘",
 };
 
 /** 回声：它每次尝试回忆的流水，含得分。黑盒可视化。 */
@@ -198,4 +223,52 @@ export type ModelConfig = {
   baseUrl: string;
   model: string;
   hasKey: boolean;
+};
+
+/* ---------------- 日记与阅读 ---------------- */
+
+/** 一篇日记：按天记，一天一篇。 */
+export type DiaryEntry = {
+  id: string;
+  /** dayKey，如 2026-10-26 */
+  date: string;
+  text: string;
+  mood: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
+/** 正在读的一本书：按段落拆好，方便划线批注定位到某一句。 */
+export type Book = {
+  id: string;
+  title: string;
+  author: string;
+  paragraphs: string[];
+};
+
+/** 划线批注：用户选了一段文字，写下批注，AI 针对这段文字回一句。 */
+export type Annotation = {
+  id: string;
+  bookId: string;
+  paraIndex: number;
+  quote: string;
+  note: string;
+  reply: string;
+  createdAt: number;
+};
+
+/* ---------------- 项目（像 Claude 的“家”） ---------------- */
+
+/**
+ * 一个项目 = 一个独立的语境：自己的名字、自己的 md 设定。
+ * 激活哪一个，对话就去读哪一份人格，而不是全局那一份。
+ */
+export type Project = {
+  id: string;
+  name: string;
+  /** 主题色，用在导航与卡片上做区分。 */
+  color: string;
+  /** 挂载的 md 设定正文，会作为 system prompt 第一段发出去。 */
+  personaMd: string;
+  createdAt: number;
 };

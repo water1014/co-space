@@ -8,10 +8,15 @@ import { Memory } from "./pages/Memory";
 const Together = lazy(() =>
   import("./pages/Together").then((m) => ({ default: m.Together })),
 );
+// 日记页带阅读器，也懒加载。
+const Diary = lazy(() =>
+  import("./pages/Diary").then((m) => ({ default: m.Diary })),
+);
 import { Mit } from "./pages/Mit";
 import { useRelationEngine } from "./lib/relation/engine";
 import { useThemeStore } from "./stores/themeStore";
 import { useMemoryStore } from "./stores/memoryStore";
+import { useDiaryStore } from "./stores/diaryStore";
 import { seedIfEmpty } from "./lib/db/seed";
 
 export default function App() {
@@ -20,6 +25,7 @@ export default function App() {
 
   const theme = useThemeStore((s) => s.theme);
   const load = useMemoryStore((s) => s.load);
+  const loadDiary = useDiaryStore((s) => s.load);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -29,8 +35,9 @@ export default function App() {
     void (async () => {
       await load();
       await seedIfEmpty();
+      loadDiary();
     })();
-  }, [load]);
+  }, [load, loadDiary]);
 
   return (
     <AppShell>
@@ -41,10 +48,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/memory" element={<Memory />} />
-          <Route
-            path="/together"
-            element={<Together />}
-          />
+          <Route path="/together" element={<Together />} />
+          <Route path="/diary" element={<Diary />} />
           <Route path="/mit" element={<Mit />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

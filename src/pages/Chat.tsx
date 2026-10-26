@@ -238,7 +238,7 @@ function UserRow({ meta }: { meta: ChatMessage }) {
   return (
     <div className="rise mt-5 flex justify-end first:mt-0">
       <div className="max-w-[86%]">
-        <MessagePrimitive.Root className="glass rounded-[20px] rounded-br-[7px] px-4 py-2.5">
+        <MessagePrimitive.Root className="user-bubble px-4 py-2.5">
           <MessagePrimitive.Parts>
             {({ part }) => <PartView part={part} side="user" />}
           </MessagePrimitive.Parts>

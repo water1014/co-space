@@ -64,19 +64,14 @@ export function Together() {
         >
           在听
         </SectionTitle>
-        <Card className="flex items-center gap-4 py-4">
-          <VinylRecord
-            playing={life.currentSong.isPlaying}
-            onToggle={life.togglePlay}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="serif truncate text-[15.5px] text-ink">
+        <div className="glass relative flex h-48 flex-col justify-center overflow-hidden rounded-[32px] p-6">
+          <div className="relative z-10 w-1/2 space-y-2">
+            <span className="text-[11px] text-ink-faint">上次在听</span>
+            <h2 className="serif text-[18px] leading-tight text-ink">
               {life.currentSong.title}
-            </p>
-            <p className="mt-0.5 text-[11.5px] text-ink-faint">
-              {life.currentSong.artist}
-            </p>
-            <p className="mt-2 flex items-center gap-2 text-[11px] text-ink-faint">
+            </h2>
+            <p className="text-[12px] text-ink-soft">{life.currentSong.artist}</p>
+            <p className="mt-1 flex items-center gap-2 text-[11px] text-ink-faint">
               <span
                 className={`h-[5px] w-[5px] rounded-full ${
                   life.currentSong.isPlaying
@@ -87,7 +82,14 @@ export function Together() {
               {life.currentSong.isPlaying ? "正在放" : "暂停着"}
             </p>
           </div>
-        </Card>
+          <div className="absolute -right-10 top-1/2 -translate-y-1/2">
+            <VinylRecord
+              playing={life.currentSong.isPlaying}
+              onToggle={life.togglePlay}
+              size={168}
+            />
+          </div>
+        </div>
       </div>
 
       {/* 三餐 */}
@@ -125,6 +127,63 @@ export function Together() {
             {meals.length === 3
               ? "三餐齐了。今天这件事上没什么可说的。"
               : `还差 ${3 - meals.length} 顿。`}
+          </p>
+        </Card>
+      </div>
+
+      {/* 奶茶额度 */}
+      <div className="mt-4">
+        <SectionTitle
+          action={
+            <button
+              onClick={() =>
+                life.addLedger({ amount: 18, category: "奶茶", note: "三分糖" })
+              }
+              className="press rounded-full border border-[var(--line)] px-3 py-1 text-[12.5px] text-ink-soft"
+            >
+              + 一杯
+            </button>
+          }
+        >
+          奶茶额度
+        </SectionTitle>
+        <Card className="py-4">
+          <div className="flex items-end justify-between">
+            <div className="flex items-baseline gap-1.5">
+              <span className="num text-[31px] leading-none text-ink">
+                {boba.toFixed(0)}
+              </span>
+              <span className="text-[13px] text-ink-faint">
+                / ¥{life.bobaBudget} 今天
+              </span>
+            </div>
+            <span
+              className={`num text-[12px] ${
+                boba > life.bobaBudget ? "text-[var(--danger)]" : "text-ink-faint"
+              }`}
+            >
+              {boba > life.bobaBudget
+                ? "已超"
+                : `${Math.max(0, life.bobaBudget - boba).toFixed(0)} 剩`}
+            </span>
+          </div>
+          <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-[var(--glass-hi)]">
+            <div
+              className="h-full rounded-full transition-all duration-700"
+              style={{
+                width: `${Math.min(100, (boba / Math.max(1, life.bobaBudget)) * 100)}%`,
+                background: boba > life.bobaBudget ? "var(--danger)" : "var(--accent)",
+              }}
+            />
+          </div>
+          <p
+            className={`mt-2.5 text-[13px] ${
+              boba > life.bobaBudget ? "text-[var(--danger)]" : "text-ink-faint"
+            }`}
+          >
+            {boba > life.bobaBudget
+              ? `超了 ¥${(boba - life.bobaBudget).toFixed(0)}。它今天不会再替你点，也不会假装没看见。`
+              : "还剩一点，悠着点。"}
           </p>
         </Card>
       </div>

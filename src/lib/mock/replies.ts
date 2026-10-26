@@ -12,6 +12,8 @@ export type ReplyContext = {
   energy: number;
   mood: Mood;
   memories: MemoryEntry[];
+  /** 当前激活项目的人格正文（md 设定）。为空时退回全局人设。 */
+  persona?: string;
   life: {
     meals: Record<string, MealKey[]>;
     sleep: SleepLog[];
@@ -53,6 +55,10 @@ export function composePlan(input: string, ctx: ReplyContext): ReplyPlan {
   let text = "";
 
   /* ---- 判断依据，写进思考过程里，让人能核对 ---- */
+  if (ctx.persona) {
+    steps.push(`读当前项目人格：${ctx.persona.replace(/\s+/g, " ").slice(0, 22)}…`);
+    tools.push("project");
+  }
   steps.push(`读今日记录：三餐 ${meals.length}/3，奶茶 ¥${boba.toFixed(0)}`);
   tools.push("life");
 
