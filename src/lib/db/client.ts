@@ -1,18 +1,23 @@
 import type { DbOp, DbRequest, DbResponse } from "./worker";
 import {
-  clearMemories,
+  clearAll,
   decayMemories,
+  deleteImprint,
   deleteMemory,
+  listEchoes,
+  listImprints,
   listMemories,
   patchMemory,
+  putEcho,
+  putImprint,
   putMemory,
   searchMemories,
 } from "./repo";
-import type { MemoryEntry } from "../../types";
+import type { Echo, Imprint, MemoryEntry } from "../../types";
 
 /**
  * 主线程只拿一个异步门面，真正的 IndexedDB 读写发生在 Worker 里，
- * 避免记忆多起来之后阻塞输入与粒子动画。
+ * 避免记忆多起来之后阻塞输入与动画。
  * Worker 不可用（部分隐私模式）时退回主线程直连，功能不丢。
  */
 class DbClient {
@@ -65,50 +70,75 @@ class DbClient {
 
   private async direct(op: DbOp, payload?: unknown): Promise<unknown> {
     switch (op) {
-      case "list":
+      case "memory:list":
         return listMemories();
-      case "put":
+      case "memory:put":
         return putMemory(payload as MemoryEntry);
-      case "patch": {
+      case "memory:patch": {
         const { id, patch } = payload as {
           id: string;
           patch: Partial<MemoryEntry>;
         };
         return patchMemory(id, patch);
       }
-      case "delete":
+      case "memory:delete":
         return deleteMemory(payload as string);
-      case "clear":
-        return clearMemories();
-      case "search":
+      case "memory:search":
         return searchMemories(payload as string);
-      case "decay":
+      case "memory:decay":
         return decayMemories();
+      case "echo:list":
+        return listEchoes();
+      case "echo:put":
+        return putEcho(payload as Echo);
+      case "imprint:list":
+        return listImprints();
+      case "imprint:put":
+        return putImprint(payload as Imprint);
+      case "imprint:delete":
+        return deleteImprint(payload as string);
+      case "all:clear":
+        return clearAll();
       default:
         throw new Error(`unknown op: ${op}`);
     }
   }
 
-  list() {
-    return this.call<MemoryEntry[]>("list");
+  listMemories() {
+    return this.call<MemoryEntry[]>("memory:list");
   }
-  put(entry: MemoryEntry) {
-    return this.call<MemoryEntry>("put", entry);
+  putMemory(entry: MemoryEntry) {
+    return this.call<MemoryEntry>("memory:put", entry);
   }
-  patch(id: string, patch: Partial<MemoryEntry>) {
-    return this.call<MemoryEntry | null>("patch", { id, patch });
+  patchMemory(id: string, patch: Partial<MemoryEntry>) {
+    return this.call<MemoryEntry | null>("memory:patch", { id, patch });
   }
-  remove(id: string) {
-    return this.call<void>("delete", id);
+  deleteMemory(id: string) {
+    return this.call<void>("memory:delete", id);
   }
-  clear() {
-    return this.call<void>("clear");
+  searchMemories(q: string) {
+    return this.call<MemoryEntry[]>("memory:search", q);
   }
-  search(q: string) {
-    return this.call<MemoryEntry[]>("search", q);
+  decayMemories() {
+    return this.call<MemoryEntry[]>("memory:decay");
   }
-  decay() {
-    return this.call<MemoryEntry[]>("decay");
+  listEchoes() {
+    return this.call<Echo[]>("echo:list");
+  }
+  putEcho(echo: Echo) {
+    return this.call<Echo>("echo:put", echo);
+  }
+  listImprints() {
+    return this.call<Imprint[]>("imprint:list");
+  }
+  putImprint(imprint: Imprint) {
+    return this.call<Imprint>("imprint:put", imprint);
+  }
+  deleteImprint(id: string) {
+    return this.call<void>("imprint:delete", id);
+  }
+  clearAll() {
+    return this.call<void>("all:clear");
   }
 }
 

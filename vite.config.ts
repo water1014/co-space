@@ -16,7 +16,6 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          pixi: ["pixi.js"],
           assistant: ["@assistant-ui/react"],
         },
       },

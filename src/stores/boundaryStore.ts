@@ -1,24 +1,22 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { InitiativeLevel } from "../types";
+import { dayKeyOf } from "../lib/utils/id";
 
-type RelationState = {
-  /** 它怎么叫你。空字符串 = 不称呼。 */
+type BoundaryState = {
+  /** 它怎么叫你。 */
   name: string;
   /** 它怎么称呼自己。 */
   selfName: string;
-  /** 主动性档位：决定什么时候允许开口。 */
   initiative: InitiativeLevel;
-  /** 安静模式：不主动、粒子更沉。 */
   quietMode: boolean;
-  /** 禁止融合表达（"我们会一起…"这类）总开关。关掉即不再拦截。 */
+  /** 禁止融合表达总开关。关掉即不再拦截。 */
   boundaryEnabled: boolean;
   /** 安慰循环的接地提示。 */
   loopGuard: boolean;
-  /** 今天已经聊了多少轮，用于依赖度提醒。 */
+  /** 今天聊了多少轮，用于依赖度提醒。 */
   todayTurns: number;
   today: string;
-  /** 提醒被温柔拒绝的时间戳，避免反复打扰。 */
   reminderSnoozedAt: number;
 
   setName: (v: string) => void;
@@ -29,13 +27,12 @@ type RelationState = {
   setLoopGuard: (v: boolean) => void;
   bumpTurn: () => void;
   snoozeReminder: () => void;
-  /** 降级：把关系参数回到初始，不删除任何记忆。 */
   degrade: () => void;
 };
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
+const todayKey = () => dayKeyOf(new Date());
 
-export const useRelationStore = create<RelationState>()(
+export const useBoundaryStore = create<BoundaryState>()(
   persist(
     (set, get) => ({
       name: "",
@@ -76,19 +73,8 @@ export const useRelationStore = create<RelationState>()(
         }),
     }),
     {
-      name: "co-space::relation",
+      name: "co-space::boundary",
       storage: createJSONStorage(() => localStorage),
-      partialize: (s) => ({
-        name: s.name,
-        selfName: s.selfName,
-        initiative: s.initiative,
-        quietMode: s.quietMode,
-        boundaryEnabled: s.boundaryEnabled,
-        loopGuard: s.loopGuard,
-        todayTurns: s.todayTurns,
-        today: s.today,
-        reminderSnoozedAt: s.reminderSnoozedAt,
-      }),
     },
   ),
 );

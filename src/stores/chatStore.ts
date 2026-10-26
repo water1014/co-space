@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { ChatMessage } from "../types";
+import type { ChatMessage, MessagePart } from "../types";
 
 type ChatState = {
   messages: ChatMessage[];
@@ -10,9 +10,11 @@ type ChatState = {
   setDraft: (v: string) => void;
   append: (msg: ChatMessage) => void;
   appendStreaming: (msg: ChatMessage) => void;
-  appendChunk: (id: string, chunk: string) => void;
+  appendPart: (id: string, part: MessagePart) => void;
+  appendText: (id: string, chunk: string) => void;
+  replaceLastText: (id: string, text: string) => void;
   finish: (id: string, status?: "complete" | "cancelled") => void;
-  setMessages: (messages: ChatMessage[]) => void;
+  setMessages: (m: ChatMessage[]) => void;
   setRunning: (v: boolean) => void;
   reset: () => void;
 };
@@ -31,11 +33,46 @@ export const useChatStore = create<ChatState>()(
       appendStreaming: (msg) =>
         set((s) => ({ messages: [...s.messages, msg], isRunning: true })),
 
-      appendChunk: (id, chunk) =>
+      appendPart: (id, part) =>
         set((s) => ({
           messages: s.messages.map((m) =>
-            m.id === id ? { ...m, text: m.text + chunk } : m,
+            m.id === id ? { ...m, parts: [...m.parts, part] } : m,
           ),
+        })),
+
+      /** 流式增量：有 text 段就往最后一段追加，没有就新开一段。 */
+      appendText: (id, chunk) =>
+        set((s) => ({
+          messages: s.messages.map((m) => {
+            if (m.id !== id) return m;
+            const parts = [...m.parts];
+            const last = parts[parts.length - 1];
+            if (last && last.type === "text") {
+              parts[parts.length - 1] = {
+                type: "text",
+                text: last.text + chunk,
+              };
+            } else {
+              parts.push({ type: "text", text: chunk });
+            }
+            return { ...m, parts };
+          }),
+        })),
+
+      replaceLastText: (id, text) =>
+        set((s) => ({
+          messages: s.messages.map((m) => {
+            if (m.id !== id) return m;
+            const parts = [...m.parts];
+            for (let i = parts.length - 1; i >= 0; i--) {
+              if (parts[i].type === "text") {
+                parts[i] = { type: "text", text };
+                return { ...m, parts };
+              }
+            }
+            parts.push({ type: "text", text });
+            return { ...m, parts };
+          }),
         })),
 
       finish: (id, status = "complete") =>
@@ -47,9 +84,7 @@ export const useChatStore = create<ChatState>()(
         })),
 
       setMessages: (messages) => set({ messages }),
-
       setRunning: (isRunning) => set({ isRunning }),
-
       reset: () => set({ messages: [], isRunning: false, draft: "" }),
     }),
     {
