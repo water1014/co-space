@@ -165,14 +165,14 @@ export function FileCard({
   };
 
   return (
-    <div className="glass-flat flex items-center gap-3 p-3">
-      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-[var(--glass-hi)] text-ink-soft">
+    <div className="flex items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--glass-hi)] px-3 py-2.5">
+      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--glass-solid)] text-ink-soft">
         <IconFile width={17} height={17} />
       </span>
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] text-ink">{part.name}</p>
-        <p className="mt-0.5 text-[12.5px] text-ink-faint">
-          {size} · {part.mime}
+        <p className="mt-0.5 truncate text-[12px] text-ink-faint">
+          {part.mime.includes("html") ? "网页" : part.mime.includes("word") || part.name.endsWith(".docx") ? "DOCX" : "文件"} · {size}
         </p>
       </div>
       <div className="flex flex-none items-center gap-1.5">
@@ -181,13 +181,13 @@ export function FileCard({
             setHint(true);
             window.setTimeout(() => setHint(false), 2200);
           }}
-          className="tap rounded-full border border-[var(--line)] px-3 py-1 text-[13px] text-ink-soft hover:text-ink"
+          className="press rounded-full bg-[var(--accent-deep)] px-3 py-1 text-[12.5px] text-white"
         >
           {hint ? "未接入" : "打开"}
         </button>
         <button
           onClick={download}
-          className="tap rounded-full border border-[var(--line)] px-3 py-1 text-[13px] text-ink-soft hover:text-ink"
+          className="press rounded-full border border-[var(--accent-deep)]/60 px-3 py-1 text-[12.5px] text-[var(--accent-deep)]"
         >
           下载
         </button>

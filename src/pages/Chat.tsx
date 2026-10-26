@@ -8,7 +8,6 @@ import {
   type ThreadMessageLike,
 } from "@assistant-ui/react";
 import { useChatStore } from "../stores/chatStore";
-import { usePresenceStore } from "../stores/presenceStore";
 import { useBoundaryStore } from "../stores/boundaryStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useProjectsStore } from "../stores/projectsStore";
@@ -23,15 +22,20 @@ import {
 } from "../components/chat/parts";
 import { Sheet } from "../components/ui/kit";
 import {
+  IconChevron,
   IconCheck,
   IconClose,
+  IconEdit,
   IconFile,
   IconFolder,
   IconMic,
+  IconMoon,
   IconPlus,
+  IconSearch,
   IconSend,
   IconSpark,
 } from "../components/ui/icons";
+import { useThemeStore } from "../stores/themeStore";
 import { formatClock } from "../lib/utils/id";
 import type { BoundaryHit, ChatMessage, MessagePart } from "../types";
 
@@ -162,10 +166,10 @@ function moonPhase(date = new Date()): { icon: string; label: string } {
 }
 
 function ChatHeader() {
-  const status = usePresenceStore((s) => s.statusLine);
   const quiet = useBoundaryStore((s) => s.quietMode);
   const reset = useChatStore((s) => s.reset);
   const messages = useChatStore((s) => s.messages);
+  const toggleTheme = useThemeStore((s) => s.toggle);
   const projects = useProjectsStore((s) => s.projects);
   const activeId = useProjectsStore((s) => s.activeId);
   const setActive = useProjectsStore((s) => s.setActive);
@@ -176,7 +180,7 @@ function ChatHeader() {
 
   // 会话历史：把用户消息按天分组，当作「之前的对话」入口
   const historyDays = (() => {
-    const map = new Map<string, number>();
+    const map = new Map<string, { count: number; snippet: string; at: number }>();
     messages
       .filter((m) => m.role === "user")
       .forEach((m) => {
@@ -184,53 +188,56 @@ function ChatHeader() {
           month: "long",
           day: "numeric",
         });
-        map.set(k, (map.get(k) ?? 0) + 1);
+        const text = m.parts
+          .filter((p): p is { type: "text"; text: string } => p.type === "text")
+          .map((p) => p.text)
+          .join("");
+        const prev = map.get(k);
+        map.set(k, {
+          count: (prev?.count ?? 0) + 1,
+          snippet: prev?.snippet ?? text,
+          at: m.createdAt,
+        });
       });
     return [...map.entries()].reverse().slice(0, 8);
   })();
 
   return (
-    <header className="flex items-center justify-between gap-2 px-5 pt-5 pb-3">
+    <header className="flex items-center justify-between gap-2 px-4 pt-4 pb-2">
       <button
         onClick={() => setDrawer("history")}
-        aria-label="会话历史"
-        className="press flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[var(--line)] text-ink-faint hover:text-ink"
+        aria-label="我们说过的话"
+        className="press flex h-9 w-9 flex-none items-center justify-center text-ink-faint hover:text-ink"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 7v5l3.2 2" />
-        </svg>
+        <IconChevron width={17} height={17} className="rotate-180" />
       </button>
 
-      <div className="min-w-0 flex-1 text-center">
-        <h1 className="serif inline-flex items-center gap-1.5 text-[19px] text-ink">
-          {phase.icon}
-          <span className="truncate">{activeProject?.name ?? "阿晏"}</span>
+      <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
+        <IconMoon width={16} height={16} className="flex-none text-ink-soft" />
+        <h1 className="truncate text-[19px] italic text-ink">
+          {activeProject?.name ?? "阿晏"}
         </h1>
-        <p className="mt-0.5 flex items-center justify-center gap-1.5 text-[11px] text-ink-faint">
-          <span
-            className={`h-[5px] w-[5px] rounded-full ${
-              quiet ? "bg-ink-faint" : "bg-[var(--accent)] blink"
-            }`}
-          />
-          {status}
-        </p>
+        <span
+          className={`h-[7px] w-[7px] flex-none rounded-full ${
+            quiet ? "bg-ink-faint" : "bg-emerald-500"
+          }`}
+        />
       </div>
 
-      <div className="flex flex-none items-center gap-1.5">
+      <div className="flex flex-none items-center gap-1">
         <button
-          onClick={() => setDrawer("projects")}
-          aria-label="项目"
-          className="press flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] text-ink-faint hover:text-ink"
+          onClick={() => setDrawer("history")}
+          aria-label="搜索"
+          className="press flex h-9 w-9 items-center justify-center text-ink-soft hover:text-ink"
         >
-          <IconFolder />
+          <IconSearch width={18} height={18} />
         </button>
         <button
-          onClick={() => setDrawer("model")}
-          aria-label="模型"
-          className="press flex h-9 items-center justify-center rounded-full border border-[var(--accent)]/50 px-3 text-[12px] text-ink-soft"
+          onClick={toggleTheme}
+          aria-label="切换主题"
+          className="press flex h-9 w-9 items-center justify-center text-ink-soft hover:text-ink"
         >
-          Opus 4.6
+          <IconMoon width={18} height={18} />
         </button>
       </div>
 
@@ -263,46 +270,87 @@ function ChatHeader() {
         </>
       )}
 
-      {/* 会话历史抽屉 */}
+      {/* 会话历史抽屉：从右侧滑出，参考图「我们说过的话」 */}
       {drawer === "history" && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setDrawer(null)} />
+          <div className="fixed inset-0 z-40 bg-black/10" onClick={() => setDrawer(null)} />
           <div
-            className="glass fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-3xl p-4"
+            className="glass-solid fixed inset-y-0 right-0 z-50 flex w-[88%] max-w-sm flex-col border-l border-[var(--line)] bg-[var(--glass-solid)] px-4 pb-6 pt-6 backdrop-blur-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="eyebrow">会话历史</p>
-            <div className="mt-2.5 max-h-64 space-y-1 overflow-y-auto">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setDrawer(null)}
+                className="press text-ink-faint"
+                aria-label="收起"
+              >
+                <IconChevron width={16} height={16} className="rotate-180" />
+              </button>
+              <h2 className="flex-1 text-[17px] italic text-ink">我们说过的话</h2>
+              <button
+                onClick={() => setDrawer("projects")}
+                aria-label="项目"
+                className="press flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] text-ink-soft"
+              >
+                <IconFolder width={15} height={15} />
+              </button>
+              <button
+                onClick={() => {
+                  reset();
+                  setDrawer(null);
+                }}
+                className="press rounded-full border border-[var(--line-strong)] px-3 py-1 text-[12px] text-ink-soft"
+              >
+                + 新对话
+              </button>
+            </div>
+
+            <div className="scroll-area mt-4 min-h-0 flex-1">
               {historyDays.length === 0 ? (
                 <p className="py-2 text-[13px] text-ink-faint">
                   还没有说过话。第一句最难。
                 </p>
               ) : (
-                historyDays.map(([day, count]) => (
-                  <div
-                    key={day}
-                    className="flex items-center justify-between border-b border-[var(--line)] py-2.5 last:border-0"
-                  >
-                    <span className="text-[13.5px] text-ink-soft">{day}</span>
-                    <span className="text-[12px] text-ink-faint">
-                      {count} 条
-                    </span>
-                  </div>
-                ))
+                <>
+                  <p className="mb-1 text-[11px] text-ink-faint">今天</p>
+                  {historyDays.map(([day, info], i) => (
+                    <div
+                      key={day}
+                      className={`rounded-2xl px-3 py-2.5 ${
+                        i === 0 ? "bg-[var(--glass-hi)]" : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[14px] text-ink">
+                          {activeProject?.name ?? "home"}
+                        </span>
+                        <span className="flex items-center gap-0.5 rounded bg-[var(--glass-hi)] px-1.5 text-[10px] text-ink-faint">
+                          <IconFolder width={9} height={9} /> home
+                        </span>
+                        <span className="ml-auto flex items-center gap-2 text-ink-faint">
+                          <IconEdit width={11} height={11} />
+                          <button
+                            onClick={() => setConfirming(true)}
+                            aria-label="删除"
+                            className="press"
+                          >
+                            <IconClose width={11} height={11} />
+                          </button>
+                        </span>
+                      </div>
+                      <p className="mt-1 truncate text-[12px] text-ink-faint">
+                        {info.snippet || day} · {info.count} 条
+                      </p>
+                    </div>
+                  ))}
+                  {phase.label && (
+                    <p className="mt-3 text-[10.5px] text-ink-faint">
+                      月相 {phase.label} · 它聊天前会读今天的概况和本月总结
+                    </p>
+                  )}
+                </>
               )}
             </div>
-            <p className="mt-2 text-[11px] text-ink-faint">
-              月相 {phase.label} · 它聊天前会读今天的概况和本月总结
-            </p>
-            <button
-              onClick={() => {
-                setDrawer(null);
-                setConfirming(true);
-              }}
-              className="press mt-3 w-full border-t border-[var(--line)] pt-3 text-[13px] text-ink-faint hover:text-[var(--danger)]"
-            >
-              清空这段对话
-            </button>
           </div>
         </>
       )}
@@ -341,43 +389,89 @@ function ChatHeader() {
       {/* 项目抽屉：切换「家」 */}
       {drawer === "projects" && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setDrawer(null)} />
+          <div className="fixed inset-0 z-40 bg-black/10" onClick={() => setDrawer(null)} />
           <div
-            className="glass fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-3xl p-4"
+            className="glass-solid fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[600px] rounded-t-3xl border-t border-[var(--line)] bg-[var(--glass-solid)] px-5 pb-8 pt-4 backdrop-blur-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="eyebrow">项目 · 每个挂一份自己的设定</p>
-            <div className="mt-2.5 space-y-1">
-              {projects.map((p) => {
-                const on = p.id === activeId;
-                return (
+            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[var(--line-strong)]" />
+            <h2 className="flex items-center justify-center gap-2 text-[17px] italic text-ink">
+              <IconFolder width={16} height={16} /> Projects
+            </h2>
+
+            {/* 全局地基 */}
+            <div className="mt-4 rounded-2xl bg-[var(--glass-hi)] px-3.5 py-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[15px]">🌐</span>
+                <span className="text-[14.5px] text-ink">全局地基</span>
+                <span className="text-[11.5px] text-ink-faint">所有会话共用</span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <span className="rounded-md border border-[var(--line)] px-2 py-0.5 text-[11px] text-ink-soft">
+                  CLAUDE.md
+                </span>
+              </div>
+            </div>
+
+            {/* 当前项目 */}
+            <div className="mt-2.5 rounded-2xl bg-[var(--glass-hi)] px-3.5 py-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[14.5px] text-ink">
+                  {activeProject?.name ?? "home"}
+                </span>
+                <span className="text-[11.5px] text-ink-faint">
+                  {projects.length} 个会话
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {["CLAUDE.md", "about wanying.md", "memory-manual.md", "monopoly.md", "nest.md"].map(
+                  (d) => (
+                    <span
+                      key={d}
+                      className="rounded-md border border-[var(--line)] px-2 py-0.5 text-[11px] text-ink-soft"
+                    >
+                      {d}
+                    </span>
+                  ),
+                )}
+                <span className="rounded-md border border-[var(--line)] px-2 py-0.5 text-[11px] text-ink-faint">
+                  + 文档
+                </span>
+              </div>
+            </div>
+
+            <button
+              className="mt-3 w-full rounded-xl border border-[var(--accent-deep)] py-2 text-[13px] text-[var(--accent-deep)]"
+              onClick={() => setDrawer(null)}
+            >
+              ✓ 当前会话在这里 · 点击移出
+            </button>
+
+            {/* 其他项目 */}
+            <div className="mt-3 space-y-1">
+              {projects
+                .filter((p) => p.id !== activeId)
+                .map((p) => (
                   <button
                     key={p.id}
                     onClick={() => {
                       setActive(p.id);
                       setDrawer(null);
                     }}
-                    className="flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-colors hover:bg-white/10"
+                    className="flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left hover:bg-[var(--glass-hi)]"
                   >
                     <span
-                      className="h-3 w-3 flex-none rounded-full"
+                      className="h-2.5 w-2.5 flex-none rounded-full"
                       style={{ background: p.color }}
                     />
-                    <span className="flex-1 truncate text-[14px] text-ink">
-                      {p.name}
-                    </span>
-                    {on && (
-                      <span className="text-[var(--accent)]">
-                        <IconCheck width={14} height={14} strokeWidth={2.2} />
-                      </span>
-                    )}
+                    <span className="flex-1 truncate text-[13.5px] text-ink">{p.name}</span>
                   </button>
-                );
-              })}
+                ))}
             </div>
-            <p className="mt-2 text-[11px] text-ink-faint">
-              对话读当前项目的设定，而不是全局那一份。
-            </p>
+
+            <button className="mt-3 w-full text-left text-[13.5px] text-ink-soft">
+              + 新建 project
+            </button>
           </div>
         </>
       )}
@@ -426,16 +520,16 @@ function MessageRow({ id }: { id: string }) {
 
 function UserRow({ meta }: { meta: ChatMessage }) {
   return (
-    <div className="rise mt-5 flex justify-end first:mt-0">
-      <div className="max-w-[86%]">
-        <MessagePrimitive.Root className="user-bubble px-4 py-2.5">
+    <div className="rise mt-4 flex flex-col items-end first:mt-0">
+      <span className="mb-1 pr-1.5 text-[10px] text-ink-faint">
+        {formatClock(meta.createdAt)}
+      </span>
+      <div className="max-w-[84%]">
+        <MessagePrimitive.Root className="user-bubble px-3.5 py-2.5">
           <MessagePrimitive.Parts>
             {({ part }) => <PartView part={part} side="user" />}
           </MessagePrimitive.Parts>
         </MessagePrimitive.Root>
-        <p className="mt-1 pr-1 text-right text-[10px] text-ink-faint">
-          {formatClock(meta.createdAt)}
-        </p>
       </div>
     </div>
   );
@@ -446,18 +540,23 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
   const initiative = meta.origin === "initiative";
 
   return (
-    <div className="rise mt-7 first:mt-0">
-      <MessagePrimitive.Root>
-        <MessagePrimitive.Parts>
-          {({ part }) => (
-            <PartView part={part} side="assistant" initiative={initiative} />
-          )}
-        </MessagePrimitive.Parts>
-      </MessagePrimitive.Root>
+    <div className="rise mt-5 first:mt-0">
+      <div className="mb-1 flex items-center gap-1.5 pl-1">
+        <CloudDot />
+        <span className="text-[10px] text-ink-faint">{formatClock(meta.createdAt)}</span>
+      </div>
+      <div className="max-w-[90%]">
+        <MessagePrimitive.Root className="assistant-bubble px-3.5 py-2.5">
+          <MessagePrimitive.Parts>
+            {({ part }) => (
+              <PartView part={part} side="assistant" initiative={initiative} />
+            )}
+          </MessagePrimitive.Parts>
+        </MessagePrimitive.Root>
+      </div>
 
       {!streaming && (
-        <div className="mt-1 flex items-center gap-4 pl-4 text-[10px] text-ink-faint">
-          <span>{formatClock(meta.createdAt)}</span>
+        <div className="mt-1 flex items-center gap-4 pl-2 text-[10px] text-ink-faint opacity-0 transition-opacity hover:opacity-100">
           <button
             onClick={() => void regenerateLast()}
             className="transition-colors hover:text-ink-soft"
@@ -467,6 +566,15 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
         </div>
       )}
     </div>
+  );
+}
+
+/** 小云朵头像：参考图里 AI 消息上方那只 */
+function CloudDot() {
+  return (
+    <svg width="14" height="10" viewBox="0 0 24 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="text-ink-faint">
+      <path d="M6 13h11a4 4 0 0 0 .6-7.96A5.5 5.5 0 0 0 7.2 6.2 3.4 3.4 0 0 0 6 13z" />
+    </svg>
   );
 }
 
@@ -503,13 +611,13 @@ function PartView({
     }
 
     return (
-      <div className="border-l border-[var(--line-strong)] pl-4">
+      <div>
         {initiative && (
-          <p className="mb-1.5 text-[10px] tracking-[0.2em] text-[var(--accent)] uppercase">
+          <p className="mb-1.5 text-[10px] uppercase tracking-[0.2em] text-[var(--accent)]">
             它先开口的
           </p>
         )}
-        <div className="serif whitespace-pre-wrap break-words text-[15.5px] leading-[1.98] text-ink">
+        <div className="whitespace-pre-wrap break-words text-[15px] leading-[1.95] text-ink">
           {text.split(/\n{2,}/).map((para, i) => {
             const aside = para.trimStart().startsWith("（");
             return (
@@ -517,7 +625,7 @@ function PartView({
                 key={i}
                 className={
                   aside
-                    ? "mt-3 text-[13.5px] leading-[1.9] text-ink-faint"
+                    ? "mt-3 text-[13px] leading-[1.9] text-ink-faint"
                     : i > 0
                       ? "mt-3"
                       : undefined
@@ -545,7 +653,7 @@ function PartView({
 
   if (part.type === "data" && part.name === "voice") {
     return (
-      <div className={side === "assistant" ? "mt-3 pl-4" : "mt-2"}>
+      <div className={side === "assistant" ? "mt-2" : "mt-2"}>
         <VoiceBubble
           part={part.data as Extract<MessagePart, { type: "voice" }>}
         />
@@ -555,7 +663,7 @@ function PartView({
 
   if (part.type === "data" && part.name === "file") {
     return (
-      <div className={side === "assistant" ? "mt-3 pl-4" : "mt-2"}>
+      <div className={side === "assistant" ? "mt-2" : "mt-2"}>
         <FileCard part={part.data as Extract<MessagePart, { type: "file" }>} />
       </div>
     );
@@ -564,7 +672,7 @@ function PartView({
   if (part.type === "data" && part.name === "imprint") {
     const data = part.data as Extract<MessagePart, { type: "image" }>;
     return (
-      <div className={side === "assistant" ? "mt-3 pl-4" : "mt-2"}>
+      <div className={side === "assistant" ? "mt-2" : "mt-2"}>
         <ImageBubble
           part={data}
           compact={side === "user"}
@@ -582,7 +690,7 @@ function PartView({
   if (part.type === "data" && part.name === "boundary") {
     const data = part.data as { hits: BoundaryHit[] };
     return (
-      <div className="pl-4">
+      <div className="mt-2">
         <BoundaryTraceCard hits={data.hits} />
       </div>
     );
@@ -600,6 +708,7 @@ function Composer() {
   const quiet = useBoundaryStore((s) => s.quietMode);
   const [pending, setPending] = useState<MessagePart[]>([]);
   const [sheet, setSheet] = useState(false);
+  const [model, setModel] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   const canSend = draft.trim().length > 0 || pending.length > 0;
@@ -723,15 +832,7 @@ function Composer() {
 
       {notice && <p className="mb-2 px-1 text-[11px] text-ink-faint">{notice}</p>}
 
-      <div className="glass edge flex items-end gap-2 p-2">
-        <button
-          onClick={() => setSheet(true)}
-          aria-label="添加附件"
-          className="press flex h-9 w-9 flex-none items-center justify-center rounded-full text-ink-soft hover:text-ink"
-        >
-          <IconPlus width={18} height={18} />
-        </button>
-
+      <div className="glass edge rounded-[26px] px-3 py-2.5">
         <textarea
           rows={1}
           value={draft}
@@ -742,35 +843,73 @@ function Composer() {
               submit();
             }
           }}
-          placeholder={quiet ? "它今天不太说话。你仍然可以写。" : "说点什么"}
-          className="ghost-input max-h-28 flex-1 resize-none bg-transparent py-2 text-[14.5px] leading-[1.6] text-ink"
+          placeholder={quiet ? "它今天不太说话。你仍然可以写。" : "Message..."}
+          className="ghost-input max-h-28 w-full resize-none bg-transparent px-1 py-1 text-[14.5px] leading-[1.6] text-ink"
         />
 
-        <button
-          onClick={record}
-          aria-label="语音输入"
-          className="press flex h-9 w-9 flex-none items-center justify-center rounded-full text-ink-soft hover:text-ink"
-        >
-          <IconMic width={17} height={17} />
-        </button>
+        <div className="mt-1 flex items-center gap-2">
+          <button
+            onClick={() => setSheet(true)}
+            aria-label="添加附件"
+            className="press flex h-8 w-8 flex-none items-center justify-center rounded-full text-ink-soft hover:text-ink"
+          >
+            <IconPlus width={18} height={18} />
+          </button>
 
-        {isRunning ? (
+          <div className="relative">
+            <button
+              onClick={() => setModel((v) => !v)}
+              className="press rounded-full border border-[var(--line)] px-3 py-1 text-[12px] text-ink-soft"
+            >
+              Opus 4.6
+            </button>
+            {model && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setModel(false)} />
+                <div className="glass absolute bottom-10 left-0 z-50 w-52 rounded-2xl p-2">
+                  {["Opus 4.6", "Sonnet 4.6", "本地回应层"].map((m, i) => (
+                    <button
+                      key={m}
+                      onClick={() => setModel(false)}
+                      className="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left hover:bg-[var(--glass-hi)]"
+                    >
+                      <span className="flex-1 text-[13px] text-ink">{m}</span>
+                      {i === 0 && <IconCheck width={13} height={13} className="text-[var(--accent-deep)]" />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <span className="flex-1" />
+
           <button
-            onClick={() => cancelTurn()}
-            className="press flex h-9 flex-none items-center justify-center rounded-full bg-[var(--glass-hi)] px-3 text-[12px] text-ink"
+            onClick={record}
+            aria-label="语音"
+            className="press flex h-8 w-8 flex-none items-center justify-center rounded-full text-ink-faint hover:text-ink-soft"
           >
-            停下
+            <IconMic width={16} height={16} />
           </button>
-        ) : (
-          <button
-            onClick={submit}
-            disabled={!canSend}
-            aria-label="发送"
-            className="press flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] disabled:opacity-30"
-          >
-            <IconSend width={17} height={17} />
-          </button>
-        )}
+
+          {isRunning ? (
+            <button
+              onClick={() => cancelTurn()}
+              className="press flex h-9 flex-none items-center justify-center rounded-full border border-[var(--line-strong)] px-3 text-[12px] text-ink"
+            >
+              停下
+            </button>
+          ) : (
+            <button
+              onClick={submit}
+              disabled={!canSend}
+              aria-label="发送"
+              className="press flex h-9 w-9 flex-none items-center justify-center rounded-full border-[1.5px] border-[var(--accent-deep)] text-[var(--accent-deep)] disabled:opacity-30"
+            >
+              <IconSend width={16} height={16} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

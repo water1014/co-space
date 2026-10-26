@@ -1,914 +1,927 @@
 import { useMemo, useState } from "react";
-import { Card, SectionTitle, Sheet } from "../components/ui/kit";
-import { IconCheck, IconPlus, IconTrash } from "../components/ui/icons";
+import { Link } from "react-router-dom";
+import {
+  IconCheck,
+  IconChevron,
+  IconClose,
+  IconMoon,
+  IconPlus,
+} from "../components/ui/icons";
+import { Calendar } from "../components/home/Calendar";
 import { useLifeStore, todayKey } from "../stores/lifeStore";
-import { TrendChart } from "../components/together/TrendChart";
-import {
-  ByDot,
-  CalendarSheet,
-  RoomShell,
-  dayKeyOf,
-} from "../components/together/Room";
-import {
-  last7,
-  monthSummary,
-  nightSleeps,
-  naps,
-} from "../lib/life/derive";
-import { formatClock } from "../lib/utils/id";
+import { monthSummary, naps, nightSleeps } from "../lib/life/derive";
+import { dayKeyOf } from "../lib/utils/id";
 import { MEAL_LABEL, WHO_LABEL, type MealKey, type Who } from "../types";
 
-const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
-const CATEGORIES = ["午饭", "晚饭", "交通", "日用", "其他"];
+/* ---------------- 配置 ---------------- */
 
-/**
- * 一个页面，七个房间。奖惩留白，以后由任务完成情况自动喂进来。
- * 每个房间共用一套骨架：猫 + 标语 + 月亮按钮 + 一周切换条 + 自己的卡片。
- */
 const ROOMS = [
-  { key: "meals", label: "三餐", slogan: "到饭点了。别让我问第二遍。" },
-  { key: "sleep", label: "睡眠", slogan: "早点睡。你知道我会说这句话。" },
-  { key: "ledger", label: "记账", slogan: "花了就记。数字不会自己长出来。" },
-  { key: "boba", label: "奶茶", slogan: "额度是我给的，也是我会收回的。" },
-  { key: "words", label: "单词", slogan: "今天背了吗？我每天都会问。" },
-  { key: "wrong", label: "错词", slogan: "错过的词，别让它再错第二次。" },
-  { key: "rewards", label: "奖惩", slogan: "还没想好。留白也是一种规则。" },
+  { key: "meal", emoji: "🥚", label: "三餐", slogan: "吃了什么不重要,吃了就好。" },
+  { key: "sleep", emoji: "😅", label: "睡眠", slogan: "早点睡。你知道我会说这句话。" },
+  { key: "ledger", emoji: "¥", label: "记账", slogan: "花了就花了,记一下就行。" },
+  { key: "boba", emoji: "🧋", label: "奶茶", slogan: "这个月的额度我说了算。但你撒娇的话另说。" },
+  { key: "words", emoji: "📚", label: "单词", slogan: "一天三十个,我陪你考。" },
+  { key: "wrong", emoji: "×", label: "错词", slogan: "错过的，才记得牢。" },
+  { key: "reward", emoji: "✨", label: "奖惩", slogan: "做得好有赏，做不好……也有账。" },
 ] as const;
 
 type RoomKey = (typeof ROOMS)[number]["key"];
+const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
 
-/** 时间戳 → dayKey（Room 里的 dayKeyOf 只收 Date）。 */
-const keyOfTs = (t: number) => dayKeyOf(new Date(t));
+const keyOfTs = (ts: number) => dayKeyOf(ts);
+const md = (key: string) => `${Number(key.slice(5, 7))}/${Number(key.slice(8, 10))}`;
+
+/* ---------------- 页面 ---------------- */
 
 export function Together() {
   const life = useLifeStore();
-  const [room, setRoom] = useState<RoomKey>("meals");
-  const [selected, setSelected] = useState(todayKey());
-  const [calMonth, setCalMonth] = useState(new Date());
-  const [calOpen, setCalOpen] = useState(false);
-  /** 现在是谁在记：切换后，所有按钮都以这个身份落记录。 */
+  const [room, setRoom] = useState<RoomKey>("meal");
   const [who, setWho] = useState<Who>("wan");
+  const [selected, setSelected] = useState<string>(todayKey());
+  const [calOpen, setCalOpen] = useState(true);
 
-  const active = ROOMS.find((r) => r.key === room)!;
-
-  /** 月历上的小标记：这天有任何记录就算记了。 */
   const marks = useMemo(() => {
     const s = new Set<string>();
     Object.keys(life.meals).forEach((k) => life.meals[k]?.length && s.add(k));
-    nightSleeps(life.sleep).forEach((x) => s.add(x.date));
-    naps(life.sleep).forEach((x) => s.add(x.date));
+    life.sleep.forEach((x) => s.add(x.date));
     life.ledger.forEach((e) => s.add(keyOfTs(e.at)));
     life.bobas.forEach((b) => s.add(keyOfTs(b.at)));
-    life.words.forEach((w) => w.learned > 0 && s.add(w.date));
     return s;
-  }, [life.meals, life.sleep, life.ledger, life.bobas, life.words]);
+  }, [life.meals, life.sleep, life.ledger, life.bobas]);
 
-  const month = useMemo(
-    () =>
-      monthSummary({
-        month: calMonth,
-        meals: life.meals,
-        sleep: life.sleep,
-        ledger: life.ledger,
-        bobas: life.bobas,
-        wrongWords: life.wrongWords,
-        words: life.words,
-      }),
-    [calMonth, life],
-  );
+  const cfg = ROOMS.find((r) => r.key === room)!;
 
   return (
-    <div className="px-5 pt-6 pb-10">
-      <header>
-        <div className="flex items-end justify-between">
-          <div>
-            <h1 className="serif text-[23px] text-ink">共处</h1>
-            <p className="mt-1 text-[12.5px] text-ink-faint">
-              一个页面，七个房间。记录存在一处，两个人都能写。
+    <div className="flex flex-col px-4 pb-12 pt-6">
+      {/* 头部：‹ Together / life, kept */}
+      <div className="flex items-start gap-2 px-1">
+        <Link to="/" className="press mt-2 text-ink-faint hover:text-ink-soft" aria-label="返回">
+          <IconChevron width={16} height={16} className="rotate-180" />
+        </Link>
+        <div>
+          <h1 className="page-head-title text-[30px] leading-none text-ink">Together</h1>
+          <p className="page-head-sub mt-1 text-[12.5px]">life, kept</p>
+        </div>
+      </div>
+
+      {/* 房间 pills */}
+      <div className="scroll-area -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        {ROOMS.map((r) => {
+          const on = r.key === room;
+          return (
+            <button
+              key={r.key}
+              onClick={() => setRoom(r.key)}
+              className={`press flex flex-none items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] ${
+                on
+                  ? "border-[var(--accent-deep)] bg-[var(--glass-solid)] text-[var(--accent-deep)]"
+                  : "border-[var(--line)] text-ink-soft"
+              }`}
+            >
+              <span className="text-[13px]">{r.emoji}</span>
+              {r.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 猫 + 标语 + 月亮 */}
+      <div className="mt-4 flex items-center gap-3 px-1">
+        <PixelCat />
+        <p className="kai flex-1 text-[15px] leading-[1.7] text-ink">{cfg.slogan}</p>
+        <button
+          onClick={() => setCalOpen((v) => !v)}
+          aria-label="日历"
+          className={`press flex h-9 w-9 flex-none items-center justify-center rounded-full border ${
+            calOpen
+              ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
+              : "border-[var(--line-strong)] text-ink-faint"
+          }`}
+        >
+          <IconMoon width={15} height={15} />
+        </button>
+      </div>
+
+      {/* 月历 */}
+      {calOpen && (
+        <div className="glass mt-3 rounded-3xl px-4 py-4">
+          <Calendar marks={marks} selected={selected} onSelect={(k) => setSelected(k)} />
+        </div>
+      )}
+
+      {/* 房间内容 */}
+      <div className="mt-4">
+        {room === "meal" && <MealRoom selected={selected} who={who} />}
+        {room === "sleep" && <SleepRoom selected={selected} who={who} />}
+        {room === "ledger" && <LedgerRoom />}
+        {room === "boba" && <BobaRoom selected={selected} who={who} />}
+        {room === "words" && <WordsRoom />}
+        {room === "wrong" && <WrongRoom who={who} />}
+        {room === "reward" && (
+          <div className="glass rounded-3xl px-5 py-8 text-center">
+            <p className="kai text-[14px] text-ink-faint">
+              奖惩还空着。等任务卡跑起来，它会自己长出来。
             </p>
           </div>
-          {/* 谁在记：婉莹绯红点，阿晏月白点 */}
-          <div className="glass-flat flex flex-none items-center gap-0.5 p-1">
-            {(["wan", "yan"] as Who[]).map((w) => (
-              <button
-                key={w}
-                onClick={() => setWho(w)}
-                className={`press flex flex-none items-center gap-1 whitespace-nowrap rounded-full px-2 py-1 text-[11.5px] ${
-                  who === w ? "bg-[var(--glass-hi)] text-ink" : "text-ink-faint"
-                }`}
-              >
-                <span
-                  className="h-[7px] w-[7px] rounded-full"
-                  style={{
-                    background: w === "wan" ? "var(--accent)" : "#cfd8e3",
-                  }}
-                />
-                {WHO_LABEL[w]}
-              </button>
-            ))}
-          </div>
-        </div>
-      </header>
+        )}
+      </div>
 
-      {/* 七个房间的门牌 */}
-      <nav className="scroll-area -mx-1 mt-4 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        {ROOMS.map((r) => (
+      {/* 谁在记 */}
+      <div className="mt-5 flex items-center justify-center gap-2">
+        {(["wan", "yan"] as Who[]).map((w) => (
           <button
-            key={r.key}
-            onClick={() => setRoom(r.key)}
-            className={`press flex-none rounded-full border px-4 py-1.5 text-[13px] transition-colors ${
-              room === r.key
-                ? "border-[var(--accent)] bg-[var(--accent)]/15 text-ink"
-                : "border-[var(--line)] text-ink-faint"
+            key={w}
+            onClick={() => setWho(w)}
+            className={`press flex items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] ${
+              who === w ? "border-[var(--accent-deep)] text-ink" : "border-transparent text-ink-faint"
             }`}
           >
-            {r.label}
-            {r.key === "rewards" && (
-              <span className="ml-1 text-[10px] text-ink-faint">待做</span>
-            )}
+            <span
+              className="h-[7px] w-[7px] rounded-full"
+              style={{ background: w === "wan" ? "var(--accent-deep)" : "var(--ink-faint)" }}
+            />
+            {WHO_LABEL[w]}
           </button>
         ))}
-      </nav>
-
-      <div className="mt-5">
-        <RoomShell
-          key={room}
-          slogan={active.slogan}
-          selected={selected}
-          onSelectDay={setSelected}
-          onOpenCalendar={() => setCalOpen(true)}
-        >
-          {room === "meals" && <MealsRoom life={life} selected={selected} who={who} />}
-          {room === "sleep" && <SleepRoom life={life} selected={selected} who={who} />}
-          {room === "ledger" && <LedgerRoom life={life} selected={selected} who={who} />}
-          {room === "boba" && <BobaRoom life={life} selected={selected} who={who} />}
-          {room === "words" && <WordsRoom life={life} selected={selected} who={who} />}
-          {room === "wrong" && <WrongRoom life={life} who={who} />}
-          {room === "rewards" && <RewardsRoom />}
-        </RoomShell>
+        <span className="text-[11px] text-ink-faint">在记</span>
       </div>
-
-      {/* 本月总结：每个房间底下都能看，跟随月历切换的年月 */}
-      <div className="mt-8">
-        <SectionTitle>
-          {calMonth.getFullYear()} 年 {calMonth.getMonth() + 1} 月 · 总结
-        </SectionTitle>
-        <Card className="py-4">
-          <div className="grid grid-cols-3 gap-y-4 text-center">
-            <MonthStat label="几顿饭" value={`${month.meals}`} />
-            <MonthStat label="平均睡" value={`${month.avgSleep}`} unit="h" />
-            <MonthStat label="花了" value={`¥${month.spend}`} />
-            <MonthStat label="奶茶" value={`${month.bobas}`} unit="杯" />
-            <MonthStat label="单词" value={`${month.learned}`} />
-            <MonthStat label="错词" value={`${month.wrong}`} unit="个" />
-          </div>
-        </Card>
-      </div>
-
-      {/* 联动说明：他每次聊天前能读到今天的概况和本月总结 */}
-      <p className="mt-5 px-1 text-[12.5px] leading-[1.95] text-ink-faint">
-        约定里写了：阿晏要主动帮我记、每天问我单词。
-        他每次聊天前能读到今天的概况和本月总结，
-        所以他会知道「你今天还没吃午饭」或「这个月奶茶超了」。
-        这个页面不是我一个人在填。
-      </p>
-
-      <CalendarSheet
-        open={calOpen}
-        onClose={() => setCalOpen(false)}
-        month={calMonth}
-        setMonth={setCalMonth}
-        selected={selected}
-        onSelect={setSelected}
-        marks={marks}
-      />
-    </div>
-  );
-}
-
-function MonthStat({
-  label,
-  value,
-  unit,
-}: {
-  label: string;
-  value: string;
-  unit?: string;
-}) {
-  return (
-    <div>
-      <p className="num text-[19px] leading-none text-ink">
-        {value}
-        {unit && <span className="ml-0.5 text-[11px] text-ink-faint">{unit}</span>}
-      </p>
-      <p className="mt-1.5 text-[11px] text-ink-faint">{label}</p>
     </div>
   );
 }
 
 /* ---------------- 三餐 ---------------- */
 
-function MealsRoom({
-  life,
-  selected,
-  who,
-}: {
-  life: ReturnType<typeof useLifeStore.getState>;
-  selected: string;
-  who: Who;
-}) {
-  const dayMeals = life.meals[selected] ?? [];
-  const dayBy = life.mealBy[selected] ?? {};
-  const isToday = selected === todayKey();
+function MealRoom({ selected, who }: { selected: string; who: Who }) {
+  const life = useLifeStore();
+  const list = life.meals[selected] ?? [];
+  const by = life.mealBy[selected] ?? {};
+
+  const month = monthSummary({
+    month: new Date(`${selected}T00:00:00`),
+    meals: life.meals,
+    sleep: life.sleep,
+    ledger: life.ledger,
+    bobas: life.bobas,
+    wrongWords: life.wrongWords,
+    words: life.words,
+  });
+
+  const days = useMemo(() => {
+    const prefix = selected.slice(0, 7);
+    const keys = Object.keys(life.meals).filter((k) => k.startsWith(prefix));
+    const per = (m: MealKey) => keys.filter((k) => life.meals[k]?.includes(m)).length;
+    const full = keys.filter((k) => MEALS.every((m) => life.meals[k]?.includes(m))).length;
+    const missing = keys
+      .filter((k) => MEALS.some((m) => !life.meals[k]?.includes(m)))
+      .sort()
+      .map(
+        (k) =>
+          `${md(k)}${MEALS.filter((m) => !life.meals[k]?.includes(m))
+            .map((m) => MEAL_LABEL[m][1])
+            .join("")}`,
+      );
+    return { b: per("breakfast"), l: per("lunch"), d: per("dinner"), full, missing };
+  }, [life.meals, selected]);
 
   return (
-    <Card className="py-4">
-      <div className="flex items-center gap-2">
-        {MEALS.map((m) => {
-          const on = dayMeals.includes(m);
+    <>
+      <SummaryBlock
+        title="本月总结"
+        rows={[
+          ["早餐", `${days.b}/5 天`],
+          ["午餐", `${days.l}/5 天`],
+          ["晚餐", `${days.d}/5 天`],
+          ["三餐齐全", `${days.full} 天`],
+        ]}
+        foot={days.missing.length ? `没吃齐:${days.missing.join(" · ")}` : "这个月都吃齐了。"}
+        extra={`共 ${month.meals} 顿`}
+      />
+
+      <WeekStrip
+        selected={selected}
+        render={(k) => {
+          const l = life.meals[k] ?? [];
           return (
-            <button
-              key={m}
-              onClick={() => life.toggleMeal(m, who, selected)}
-              className={`press flex flex-1 flex-col items-center gap-2 rounded-2xl border py-3 transition-colors ${
-                on
-                  ? "border-transparent bg-[var(--accent)] text-[var(--accent-ink)]"
-                  : "border-[var(--line)] text-ink-faint"
-              }`}
-            >
-              <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full border ${
-                  on
-                    ? "border-[var(--accent-ink)]/30 bg-[var(--accent-ink)]/10"
-                    : "border-[var(--line-strong)]"
-                }`}
-              >
-                {on && <IconCheck width={12} height={12} strokeWidth={2.4} />}
-              </span>
-              <span className="text-[13px]">{MEAL_LABEL[m]}</span>
-              {on && <ByDot by={dayBy[m]} />}
-            </button>
+            <span className="num flex gap-[2px] text-[8px]">
+              {MEALS.map((m) => (
+                <span
+                  key={m}
+                  className={l.includes(m) ? "text-[var(--accent-deep)]" : "text-ink-faint/50"}
+                >
+                  {l.includes(m) ? "●" : "○"}
+                </span>
+              ))}
+            </span>
           );
-        })}
-      </div>
-      <p className="mt-3 text-[12.5px] text-ink-faint">
-        {dayMeals.length === 3
-          ? "三餐齐了。今天这件事上没什么可说的。"
-          : isToday
-            ? `还差 ${3 - dayMeals.length} 顿。`
-            : `${selected.replace(/-/g, ".")} 记了 ${dayMeals.length} 顿。`}
-      </p>
-    </Card>
-  );
-}
+        }}
+      />
 
-/* ---------------- 睡眠：夜睡 + 午睡 ---------------- */
-
-function SleepRoom({
-  life,
-  selected,
-  who,
-}: {
-  life: ReturnType<typeof useLifeStore.getState>;
-  selected: string;
-  who: Who;
-}) {
-  const [open, setOpen] = useState(false);
-  const night = nightSleeps(life.sleep).find((s) => s.date === selected);
-  const dayNaps = naps(life.sleep).filter((s) => s.date === selected);
-  const week = last7(life.ledger, life.sleep);
-
-  return (
-    <div className="space-y-3">
-      <Card className="py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="flex items-center gap-1.5 text-[11px] text-ink-faint">
-              夜睡 <ByDot by={night?.by} />
-            </p>
-            <div className="mt-1 flex items-baseline gap-1.5">
-              <span className="num text-[31px] leading-none text-ink">
-                {night ? night.hours.toFixed(1) : "—"}
-              </span>
-              <span className="text-[13px] text-ink-faint">小时</span>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-[13.5px] text-ink-soft">
-              {night ? `${night.bedAt} — ${night.wakeAt}` : "没记"}
-            </p>
-            <p className="mt-0.5 text-[11.5px] text-ink-faint">
-              入睡日期 · {selected.replace(/-/g, ".")}
-              {night?.bedAt && Number(night.bedAt.split(":")[0]) < 6
-                ? "（凌晨，算前一晚）"
-                : ""}
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={() => setOpen(true)}
-          className="press mt-3 w-full rounded-2xl border border-[var(--line)] py-2 text-[13px] text-ink-soft"
-        >
-          {night ? "改这一晚" : "记这一晚"}
-        </button>
-        <p className="mt-2 text-[11.5px] text-ink-faint">
-          凌晨两点睡的算前一天——入睡日期以躺下的那一刻为准。
-        </p>
-      </Card>
-
-      <Card className="py-4">
-        <div className="flex items-center justify-between">
-          <p className="flex items-center gap-1.5 text-[11px] text-ink-faint">
-            午睡 {dayNaps.length > 0 && <ByDot by={dayNaps[0]?.by} />}
-          </p>
-          <p className="num text-[13px] text-ink-soft">
-            {dayNaps.length
-              ? `${dayNaps.reduce((s, x) => s + (x.minutes ?? 0), 0)} 分钟`
-              : "没睡"}
-          </p>
-        </div>
-        <div className="mt-3 flex gap-2">
-          {[20, 30, 45, 60].map((m) => (
-            <button
-              key={m}
-              onClick={() => life.logNap({ minutes: m, by: who, dateKey: selected })}
-              className="press flex-1 rounded-2xl border border-[var(--line)] py-2 text-[13px] text-ink-soft hover:border-[var(--accent)]"
-            >
-              {m}′
-            </button>
-          ))}
-        </div>
-      </Card>
-
-      <Card className="py-4">
-        <p className="text-[11px] text-ink-faint">最近七天 · 夜睡</p>
+      <div className="glass mt-3 rounded-3xl px-5 py-4">
+        <h3 className="num text-[20px] italic text-ink">{md(selected)}</h3>
         <div className="mt-2">
-          <TrendChart
-            data={week.map((d) => ({ label: d.label, value: d.hours }))}
-            color="var(--accent)"
-            unit="h"
-          />
+          {MEALS.map((m) => {
+            const eaten = list.includes(m);
+            return (
+              <div
+                key={m}
+                className="flex items-start gap-3 border-b border-[var(--line)] py-3.5 last:border-0"
+              >
+                <button
+                  onClick={() => life.toggleMeal(m, who, selected)}
+                  aria-label={MEAL_LABEL[m]}
+                  className={`press mt-0.5 flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full border ${
+                    eaten
+                      ? "border-[var(--accent-deep)] bg-[var(--accent-deep)] text-white"
+                      : "border-[var(--line-strong)] text-transparent"
+                  }`}
+                >
+                  <IconCheck width={12} height={12} strokeWidth={2.6} />
+                </button>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-[15px] ${eaten ? "text-ink" : "text-ink-faint"}`}>
+                    {MEAL_LABEL[m]}
+                  </p>
+                  <p
+                    className={`mt-0.5 truncate text-[12.5px] ${
+                      eaten ? "text-ink-soft" : "text-ink-faint/70"
+                    }`}
+                  >
+                    {eaten ? "吃了。" : "备注..."}
+                  </p>
+                  {eaten && (
+                    <p className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-faint">
+                      <span
+                        className="h-[6px] w-[6px] rounded-full"
+                        style={{
+                          background:
+                            (by[m] ?? "wan") === "wan"
+                              ? "var(--accent-deep)"
+                              : "var(--ink-faint)",
+                        }}
+                      />
+                      {WHO_LABEL[by[m] ?? "wan"]} · {md(selected)}
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </Card>
-
-      <SleepSheet open={open} onClose={() => setOpen(false)} selected={selected} who={who} />
-    </div>
+      </div>
+    </>
   );
 }
 
-function SleepSheet({
-  open,
-  onClose,
-  selected,
-  who,
-}: {
-  open: boolean;
-  onClose: () => void;
-  selected: string;
-  who: Who;
-}) {
-  const logSleep = useLifeStore((s) => s.logSleep);
-  const current = nightSleeps(useLifeStore((s) => s.sleep)).find(
-    (s) => s.date === selected,
-  );
-  const [hours, setHours] = useState(String(current?.hours ?? 7));
-  const [bedAt, setBedAt] = useState(current?.bedAt ?? "01:00");
-  const [wakeAt, setWakeAt] = useState(current?.wakeAt ?? "08:00");
+/* ---------------- 睡眠 ---------------- */
 
-  // 入睡日期：凌晨（6 点前）躺下算前一天
-  const [h] = bedAt.split(":").map(Number);
-  const bedDay = Number.isFinite(h) && h < 6 ? -1 : 0;
-  const dateKey = useMemo(() => {
-    const d = new Date(`${selected}T12:00:00`);
-    d.setDate(d.getDate() + bedDay);
-    return dayKeyOf(d);
-  }, [selected, bedDay]);
+function SleepRoom({ selected, who }: { selected: string; who: Who }) {
+  const life = useLifeStore();
+  const nights = nightSleeps(life.sleep);
+  const night = nights.find((s) => s.date === selected);
+  const nap = naps(life.sleep).find((s) => s.date === selected);
 
-  const save = () => {
-    const n = Number(hours);
-    if (!Number.isFinite(n) || n <= 0) return;
-    logSleep({
-      date: dateKey,
-      hours: n,
-      bedAt,
-      wakeAt,
-      kind: "night",
-      by: who,
-    });
-    onClose();
+  const [bed, setBed] = useState(night?.bedAt || "01:30");
+  const [wake, setWake] = useState(night?.wakeAt || "07:50");
+  const [napDown, setNapDown] = useState("13:09");
+  const [napUp, setNapUp] = useState("14:07");
+
+  const minutesBetween = (a: string, b: string) => {
+    const [ah, am] = a.split(":").map(Number);
+    const [bh, bm] = b.split(":").map(Number);
+    let mins = bh * 60 + bm - (ah * 60 + am);
+    if (mins < 0) mins += 24 * 60;
+    return mins;
   };
+  const nightMin = minutesBetween(bed, wake);
+  const napMin = minutesBetween(napDown, napUp);
+
+  const monthNights = nights.filter((s) => s.date.startsWith(selected.slice(0, 7)));
+  const avg = monthNights.length
+    ? monthNights.reduce((s, x) => s + x.hours, 0) / monthNights.length
+    : 0;
+  const monthNaps = naps(life.sleep).filter((s) => s.date.startsWith(selected.slice(0, 7)));
+  const avgNap = monthNaps.length
+    ? Math.round(monthNaps.reduce((s, x) => s + (x.minutes ?? 0), 0) / monthNaps.length)
+    : 0;
 
   return (
-    <Sheet open={open} onClose={onClose} title="这一晚睡了多久">
-      <div className="flex items-baseline gap-2 border-b border-[var(--line)] pb-2">
+    <>
+      <SummaryBlock
+        title="本月总结"
+        rows={[
+          ["记录", `${monthNights.length}/5 晚`],
+          ["平均睡眠", avg ? `${Math.floor(avg)}h${Math.round((avg % 1) * 60)}m` : "—"],
+          ["不足6小时", `${monthNights.filter((s) => s.hours < 6).length} 晚`],
+          [
+            "最晚入睡",
+            [...monthNights].sort((a, b) => b.bedAt.localeCompare(a.bedAt))[0]?.bedAt ?? "—",
+          ],
+          ["午睡", `${monthNaps.length} 次 · 平均${avgNap}分钟`],
+        ]}
+      />
+
+      <WeekStrip
+        selected={selected}
+        render={(k) => {
+          const s = nights.find((x) => x.date === k);
+          return s ? (
+            <span className="num text-[8.5px] text-ink-soft">
+              {Math.floor(s.hours)}h{Math.round((s.hours % 1) * 60)}m
+            </span>
+          ) : (
+            <span className="text-[8px] text-ink-faint/50">·</span>
+          );
+        }}
+      />
+
+      <div className="glass mt-3 rounded-3xl px-5 py-4">
+        <div className="flex items-baseline justify-between">
+          <h3 className="text-[17px] italic text-ink">
+            <span className="num">{md(selected)}</span> 晚上
+          </h3>
+          <span className="text-[11.5px] text-ink-faint">入睡 · 起床</span>
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <span className="text-[12.5px] text-ink-faint">入睡日期</span>
+          <span className="rounded-lg bg-[var(--glass-hi)] px-2.5 py-1 text-[12.5px] text-ink">
+            {selected.replace(/-/g, "/")}
+          </span>
+          <span className="text-[12px] text-ink-faint">→ {md(selected)} 起床</span>
+        </div>
+        <div className="mt-3 flex items-end gap-3">
+          <TimeField label="入睡" value={bed} onChange={setBed} />
+          <TimeField label="起床" value={wake} onChange={setWake} />
+          <span className="num mb-1 ml-auto text-[19px] italic text-ink">
+            {Math.floor(nightMin / 60)}h{String(nightMin % 60).padStart(2, "0")}m
+          </span>
+        </div>
         <input
-          autoFocus
-          value={hours}
-          onChange={(e) => setHours(e.target.value)}
-          inputMode="decimal"
-          className="num ghost-input w-24 bg-transparent text-[31px] text-ink"
+          placeholder="备注:昨天有点困..."
+          className="ghost-input mt-3 w-full rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-faint"
         />
-        <span className="text-[14.5px] text-ink-faint">小时</span>
+        <div className="mt-3 flex items-center justify-between">
+          <AuthorStamp who={who} date={selected} />
+          <button
+            onClick={() =>
+              life.logSleep({
+                date: selected,
+                hours: Math.round((nightMin / 60) * 10) / 10,
+                bedAt: bed,
+                wakeAt: wake,
+                kind: "night",
+                by: who,
+              })
+            }
+            className="press rounded-full bg-[var(--accent-deep)] px-5 py-1.5 text-[13px] text-white"
+          >
+            保存
+          </button>
+        </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-3">
-        <label className="flex-1">
-          <span className="eyebrow">躺下</span>
-          <input
-            value={bedAt}
-            onChange={(e) => setBedAt(e.target.value)}
-            placeholder="01:40"
-            className="mt-1 w-full border-b border-[var(--line)] bg-transparent pb-2 text-[15.5px] text-ink"
-          />
-        </label>
-        <span className="pt-5 text-ink-faint">—</span>
-        <label className="flex-1">
-          <span className="eyebrow">起来</span>
-          <input
-            value={wakeAt}
-            onChange={(e) => setWakeAt(e.target.value)}
-            placeholder="08:05"
-            className="mt-1 w-full border-b border-[var(--line)] bg-transparent pb-2 text-[15.5px] text-ink"
-          />
-        </label>
+      <div className="glass mt-3 rounded-3xl px-5 py-4">
+        <div className="flex items-baseline justify-between">
+          <h3 className="text-[17px] italic text-ink">
+            午睡 · <span className="num">{md(selected)}</span>
+          </h3>
+          <span className="text-[11.5px] text-ink-faint">躺下 · 醒来</span>
+        </div>
+        <div className="mt-3 flex items-end gap-3">
+          <TimeField label="躺下" value={napDown} onChange={setNapDown} />
+          <TimeField label="醒来" value={napUp} onChange={setNapUp} />
+          <span className="num mb-1 ml-auto text-[19px] italic text-ink">
+            {Math.floor(napMin / 60)}h{String(napMin % 60).padStart(2, "0")}m
+          </span>
+        </div>
+        <p className="mt-2 text-[12px] text-ink-faint">
+          {nap ? `已记：${nap.minutes} 分钟` : "午睡!"}
+        </p>
+        <div className="mt-3 flex items-center justify-between">
+          <AuthorStamp who={who} date={selected} />
+          <button
+            onClick={() => life.logNap({ minutes: napMin, by: who, dateKey: selected })}
+            className="press rounded-full bg-[var(--accent-deep)] px-5 py-1.5 text-[13px] text-white"
+          >
+            保存
+          </button>
+        </div>
       </div>
-      <p className="mt-2 text-[11.5px] text-ink-faint">
-        入睡日期 · {dateKey.replace(/-/g, ".")}
-        {bedDay < 0 ? "（凌晨躺下，记到前一天）" : ""} · 记的人{" "}
-        {WHO_LABEL[who]}
-      </p>
-
-      <button
-        onClick={save}
-        className="press mt-6 w-full rounded-full bg-[var(--accent)] py-2.5 text-[14.5px] text-[var(--accent-ink)]"
-      >
-        记下
-      </button>
-    </Sheet>
+    </>
   );
 }
 
 /* ---------------- 记账 ---------------- */
 
-function LedgerRoom({
-  life,
-  selected,
-  who,
-}: {
-  life: ReturnType<typeof useLifeStore.getState>;
-  selected: string;
-  who: Who;
-}) {
-  const [open, setOpen] = useState(false);
-  const dayLedger = life.ledger.filter((e) => keyOfTs(e.at) === selected);
-  const sum = dayLedger.reduce((a, b) => a + b.amount, 0);
-  const week = last7(life.ledger, life.sleep);
+function LedgerRoom() {
+  const life = useLifeStore();
+  const [amount, setAmount] = useState("");
+  const [cat, setCat] = useState("餐饮");
+  const [note, setNote] = useState("");
+
+  const month = new Date();
+  const inMonth = life.ledger.filter((e) => {
+    const d = new Date(e.at);
+    return d.getFullYear() === month.getFullYear() && d.getMonth() === month.getMonth();
+  });
+  const total = inMonth.reduce((s, e) => s + e.amount, 0);
+  const byCat = Object.entries(
+    inMonth.reduce<Record<string, number>>((m, e) => {
+      m[e.category] = (m[e.category] ?? 0) + e.amount;
+      return m;
+    }, {}),
+  ).sort((a, b) => b[1] - a[1]);
+  const perDay = inMonth.reduce<Record<string, number>>((m, e) => {
+    const k = dayKeyOf(e.at);
+    m[k] = (m[k] ?? 0) + e.amount;
+    return m;
+  }, {});
+  const top = Object.entries(perDay).sort((a, b) => b[1] - a[1])[0];
 
   return (
-    <div className="space-y-3">
-      <Card className="py-4">
-        <div className="flex items-end justify-between">
-          <div className="flex items-baseline gap-1">
-            <span className="text-[13.5px] text-ink-faint">¥</span>
-            <span className="num text-[31px] leading-none text-ink">
-              {sum.toFixed(0)}
-            </span>
-            <span className="ml-1 text-[12.5px] text-ink-faint">
-              {selected === todayKey() ? "今天" : selected.replace(/-/g, ".")}
-            </span>
-          </div>
-          <button
-            onClick={() => setOpen(true)}
-            className="press flex items-center gap-1 rounded-full border border-[var(--line)] px-3 py-1.5 text-[12.5px] text-ink-soft"
-          >
-            <IconPlus width={11} height={11} /> 记一笔
-          </button>
-        </div>
-        <div className="mt-3">
-          <TrendChart
-            data={week.map((d) => ({ label: d.label, value: d.amount }))}
-            color="var(--accent)"
-            unit=" 元"
-          />
-        </div>
-      </Card>
+    <>
+      <SummaryBlock
+        title="本月总结"
+        rows={[
+          ["总支出", `¥${total.toFixed(2)}`],
+          ["笔数", `${inMonth.length} 笔 · 日均 ¥${(total / 30).toFixed(1)}`],
+          ["最高一天", top ? `${md(top[0])} ¥${top[1].toFixed(0)}` : "—"],
+          ["最大类别", byCat[0] ? `${byCat[0][0]} ¥${byCat[0][1].toFixed(0)}` : "—"],
+        ]}
+      />
 
-      <Card pad={false} className="px-4">
-        {dayLedger.length === 0 ? (
-          <p className="py-4 text-[13px] text-ink-faint">这天还没记账。</p>
-        ) : (
-          dayLedger.map((e) => (
+      <div className="glass mt-3 rounded-3xl px-5 py-4">
+        <div className="flex items-center justify-between">
+          <IconChevron width={14} height={14} className="rotate-180 text-ink-faint" />
+          <span className="num text-[16px] italic text-ink">
+            {month.getFullYear()} · {String(month.getMonth() + 1).padStart(2, "0")}
+          </span>
+          <IconChevron width={14} height={14} className="text-ink-faint" />
+        </div>
+        <p className="num mt-2 text-[34px] italic text-ink">¥{total.toFixed(2)}</p>
+        <div className="mt-2">
+          {byCat.map(([c, v]) => (
             <div
-              key={e.id}
+              key={c}
               className="flex items-center gap-3 border-b border-[var(--line)] py-2.5 last:border-0"
             >
-              <span className="num w-10 flex-none text-[12px] text-ink-faint">
-                {formatClock(e.at)}
+              <span className="w-12 flex-none text-[13px] text-ink-soft">{c}</span>
+              <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-[var(--glass-hi)]">
+                <div
+                  className="h-full rounded-full bg-[var(--accent-deep)]"
+                  style={{ width: `${total ? (v / total) * 100 : 0}%` }}
+                />
+              </div>
+              <span className="num w-14 flex-none text-right text-[12.5px] text-ink">
+                ¥{v.toFixed(0)}
               </span>
-              <span className="flex-1 truncate text-[13.5px] text-ink">
-                {e.category}
-                {e.note && (
-                  <span className="ml-1.5 text-[12.5px] text-ink-faint">
-                    {e.note}
-                  </span>
-                )}
-              </span>
-              <ByDot by={e.by} />
-              <span className="num text-[13.5px] text-ink-soft">
-                ¥{e.amount.toFixed(0)}
-              </span>
-              <button
-                onClick={() => life.removeLedger(e.id)}
-                aria-label="删除这一笔"
-                className="text-ink-faint/60 hover:text-[var(--danger)]"
-              >
-                <IconTrash width={12} height={12} />
-              </button>
             </div>
-          ))
-        )}
-      </Card>
-
-      <LedgerSheet
-        open={open}
-        onClose={() => setOpen(false)}
-        selected={selected}
-        who={who}
-      />
-    </div>
-  );
-}
-
-function LedgerSheet({
-  open,
-  onClose,
-  selected,
-  who,
-}: {
-  open: boolean;
-  onClose: () => void;
-  selected: string;
-  who: Who;
-}) {
-  const addLedger = useLifeStore((s) => s.addLedger);
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("午饭");
-  const [note, setNote] = useState("");
-
-  const save = () => {
-    const n = Number(amount);
-    if (!Number.isFinite(n) || n <= 0) return;
-    addLedger({ amount: n, category, note, by: who });
-    setAmount("");
-    setNote("");
-    onClose();
-  };
-
-  return (
-    <Sheet open={open} onClose={onClose} title="记一笔">
-      <div className="flex items-baseline gap-2 border-b border-[var(--line)] pb-2">
-        <span className="text-[17px] text-ink-faint">¥</span>
-        <input
-          autoFocus
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          inputMode="decimal"
-          placeholder="0"
-          className="num ghost-input w-full bg-transparent text-[31px] text-ink"
-        />
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCategory(c)}
-            className={`press rounded-full border px-3 py-1 text-[13.5px] ${
-              category === c
-                ? "border-[var(--accent)] text-ink"
-                : "border-[var(--line)] text-ink-faint"
-            }`}
-          >
-            {c}
-          </button>
-        ))}
-      </div>
-
-      <input
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        placeholder="备注（可不填）"
-        className="ghost-input mt-4 w-full border-b border-[var(--line)] bg-transparent pb-2 text-[14.5px] text-ink"
-      />
-      <p className="mt-2 text-[11.5px] text-ink-faint">
-        记到 {selected.replace(/-/g, ".")} · 记的人 {WHO_LABEL[who]}
-      </p>
-
-      <button
-        onClick={save}
-        disabled={!Number(amount)}
-        className="press mt-5 w-full rounded-full bg-[var(--accent)] py-2.5 text-[14.5px] text-[var(--accent-ink)] disabled:opacity-35"
-      >
-        记下
-      </button>
-    </Sheet>
-  );
-}
-
-/* ---------------- 奶茶：独立房间，带额度 ---------------- */
-
-function BobaRoom({
-  life,
-  selected,
-  who,
-}: {
-  life: ReturnType<typeof useLifeStore.getState>;
-  selected: string;
-  who: Who;
-}) {
-  const [price, setPrice] = useState("");
-  const [note, setNote] = useState("");
-  const isToday = selected === todayKey();
-
-  const dayBobas = life.bobas.filter((b) => keyOfTs(b.at) === selected);
-  const spent = dayBobas.reduce((s, b) => s + b.price, 0);
-  const over = spent > life.bobaBudget;
-
-  return (
-    <Card className="py-4">
-      <div className="flex items-end justify-between">
-        <div className="flex items-baseline gap-1.5">
-          <span className="num text-[31px] leading-none text-ink">
-            ¥{spent.toFixed(0)}
-          </span>
-          <span className="text-[13px] text-ink-faint">
-            / ¥{life.bobaBudget} 额度
-          </span>
+          ))}
+          {byCat.length === 0 && (
+            <p className="py-4 text-center text-[12.5px] text-ink-faint">这个月还没记账。</p>
+          )}
         </div>
-        <span
-          className={`num text-[12px] ${
-            over ? "text-[var(--danger)]" : "text-ink-faint"
-          }`}
-        >
-          {over
-            ? `已超 ¥${(spent - life.bobaBudget).toFixed(0)}`
-            : `${dayBobas.length} 杯`}
-        </span>
-      </div>
-      <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-[var(--glass-hi)]">
-        <div
-          className="h-full rounded-full transition-all duration-700"
-          style={{
-            width: `${Math.min(100, (spent / Math.max(1, life.bobaBudget)) * 100)}%`,
-            background: over ? "var(--danger)" : "var(--accent)",
-          }}
-        />
-      </div>
-      {over && (
-        <p className="mt-2.5 text-[13px] text-[var(--danger)]">
-          超了。我不会替你点，也不会假装没看见。
-        </p>
-      )}
-
-      <div className="mt-4 flex gap-2">
-        <input
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          inputMode="decimal"
-          placeholder="¥ 18"
-          className="ghost-input num w-20 rounded-xl border border-[var(--line)] bg-transparent px-3 py-2 text-[14px] text-ink"
-        />
-        <input
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="三分糖"
-          className="ghost-input flex-1 rounded-xl border border-[var(--line)] bg-transparent px-3 py-2 text-[14px] text-ink"
-        />
-        <button
-          onClick={() => {
-            const n = Number(price) || 18;
-            life.addBoba({ price: n, note, by: who, dateKey: isToday ? undefined : selected });
-            setPrice("");
-            setNote("");
-          }}
-          className="press flex-none rounded-xl bg-[var(--accent)] px-4 text-[13.5px] text-[var(--accent-ink)]"
-        >
-          + 一杯
-        </button>
       </div>
 
-      <div className="mt-2">
-        {dayBobas.map((b) => (
-          <div
-            key={b.id}
-            className="flex items-center gap-3 border-t border-[var(--line)] py-2.5"
+      <div className="glass mt-3 rounded-3xl px-5 py-4">
+        <div className="flex gap-2">
+          <input
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            inputMode="decimal"
+            placeholder="金额"
+            className="ghost-input w-20 flex-none rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
+          />
+          <input
+            value={cat}
+            onChange={(e) => setCat(e.target.value)}
+            placeholder="类别"
+            className="ghost-input w-20 flex-none rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
+          />
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="备注"
+            className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
+          />
+          <button
+            onClick={() => {
+              life.addLedger({ amount: Number(amount), category: cat || "其他", note });
+              setAmount("");
+              setNote("");
+            }}
+            className="press flex-none rounded-full bg-[var(--accent-deep)] px-4 text-[13px] text-white"
           >
-            <span className="num w-10 flex-none text-[12px] text-ink-faint">
-              {formatClock(b.at)}
+            记
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ---------------- 奶茶 ---------------- */
+
+function BobaRoom({ selected, who }: { selected: string; who: Who }) {
+  const life = useLifeStore();
+  const prefix = selected.slice(0, 7);
+  const monthBobas = life.bobas.filter((b) => keyOfTs(b.at).startsWith(prefix));
+  const quota = 1;
+  const used = monthBobas.length;
+  const [shop, setShop] = useState("");
+  const [note, setNote] = useState("");
+  const [over, setOver] = useState(false);
+
+  return (
+    <>
+      <div className="glass mt-3 rounded-3xl px-5 py-5">
+        <div className="flex items-baseline justify-between">
+          <span className="num text-[16px] italic text-ink">{prefix.replace("-", " · ")}</span>
+          <span className="text-[12.5px] text-ink-faint">额度 {quota}</span>
+        </div>
+        <p className="num mt-4 text-center text-[40px] italic text-ink">
+          {used}
+          <span className="text-[26px] text-ink-faint">/{quota}</span>
+        </p>
+        <p className="mt-1 text-center text-[12px] text-ink-faint">
+          {used >= quota ? "额度用完啦" : `还能喝 ${quota - used} 杯`}
+        </p>
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={() => setOver(used >= quota)}
+            className="press flex items-center gap-1 rounded-full bg-[var(--accent-deep)] px-4 py-1.5 text-[13px] text-white"
+          >
+            <IconPlus width={13} height={13} /> 喝了一杯
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-2 border-t border-[var(--line)] pt-4">
+          <div className="flex gap-2">
+            <input
+              value={shop}
+              onChange={(e) => setShop(e.target.value)}
+              placeholder="哪家(喜茶/霸王茶姬...)"
+              className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
+            />
+            <span className="flex-none rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[12.5px] text-ink-soft">
+              {md(selected)}
             </span>
-            <span className="flex-1 truncate text-[13.5px] text-ink">
-              奶茶
-              {b.note && (
-                <span className="ml-1.5 text-[12.5px] text-ink-faint">
-                  {b.note}
-                </span>
-              )}
-            </span>
-            <ByDot by={b.by} />
-            <span className="num text-[13.5px] text-ink-soft">
-              ¥{b.price.toFixed(0)}
-            </span>
+          </div>
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="备注:朋友请喝"
+            className="ghost-input w-full rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
+          />
+          <label className="flex items-center gap-2 text-[12.5px] text-ink-soft">
+            <input
+              type="checkbox"
+              checked={over}
+              onChange={(e) => setOver(e.target.checked)}
+              className="h-4 w-4 accent-[var(--accent-deep)]"
+            />
+            这杯算超额
+          </label>
+          <div className="flex justify-end gap-2 pt-1">
             <button
-              onClick={() => life.removeBoba(b.id)}
-              aria-label="删除这杯"
-              className="text-ink-faint/60 hover:text-[var(--danger)]"
+              onClick={() => {
+                setShop("");
+                setNote("");
+                setOver(false);
+              }}
+              className="press rounded-full border border-[var(--line-strong)] px-4 py-1.5 text-[13px] text-ink-soft"
             >
-              <IconTrash width={12} height={12} />
+              取消
+            </button>
+            <button
+              onClick={() => {
+                life.addBoba({
+                  price: 22,
+                  note: [shop, note].filter(Boolean).join(" · "),
+                  by: who,
+                  dateKey: selected,
+                });
+                setShop("");
+                setNote("");
+              }}
+              className="press rounded-full bg-[var(--accent-deep)] px-4 py-1.5 text-[13px] text-white"
+            >
+              记上
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {monthBobas.map((b) => (
+          <div key={b.id} className="glass flex items-center gap-3 rounded-2xl px-4 py-3">
+            <span className="text-[12px] text-ink-faint">{md(keyOfTs(b.at))}</span>
+            <IconCheck width={13} height={13} className="text-[var(--accent-deep)]" />
+            <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink">
+              {b.note || "奶茶"} · ¥{b.price}
+            </span>
+            <AuthorDot who={b.by} />
+            <button onClick={() => life.removeBoba(b.id)} className="press text-ink-faint/70">
+              <IconClose width={12} height={12} />
             </button>
           </div>
         ))}
-        {dayBobas.length === 0 && (
-          <p className="border-t border-[var(--line)] pt-3 text-[13px] text-ink-faint">
-            这天还没喝。挺好的。
-          </p>
-        )}
       </div>
-    </Card>
+    </>
   );
 }
 
 /* ---------------- 单词 ---------------- */
 
-function WordsRoom({
-  life,
-  selected,
-  who: _who,
-}: {
-  life: ReturnType<typeof useLifeStore.getState>;
-  selected: string;
-  who: Who;
-}) {
-  const dayWords = life.words.find((w) => w.date === selected);
-  const learned = dayWords?.learned ?? 0;
-  const goal = dayWords?.goal ?? 20;
+const WORD_GROUPS = [1, 2, 3, 4, 5, 6, 7, 8];
+const SAMPLE_WORDS: [string, string, string][] = [
+  ["forehead", "/ˈfɔːhed/", "n.前额"],
+  ["finger", "/ˈfɪŋɡə(r)/", "n.手指 v.告发，拨弄"],
+  ["nerve", "/nɜːv/", "n.神经，勇气"],
+  ["applaud", "/əˈplɔːd/", "v.鼓掌，称赞"],
+  ["bless", "/bles/", "v.祝福"],
+  ["admire", "/ədˈmaɪə(r)/", "v.仰慕，赞赏"],
+  ["astonish", "/əˈstɒnɪʃ/", "v.使吃惊"],
+];
+
+function WordsRoom() {
+  const life = useLifeStore();
+  const today = life.words.find((w) => w.date === todayKey());
+  const [open, setOpen] = useState<number | null>(1);
 
   return (
-    <Card className="py-4">
-      <div className="flex items-end justify-between">
-        <div className="flex items-baseline gap-1.5">
-          <span className="num text-[31px] leading-none text-ink">
-            {learned}
-          </span>
-          <span className="text-[13px] text-ink-faint">/ {goal}</span>
+    <>
+      <div className="glass mt-3 rounded-3xl px-5 py-4">
+        <div className="flex items-baseline justify-between">
+          <h3 className="text-[17px] italic text-ink">六级核心1500词</h3>
+          <span className="text-[12px] text-ink-faint">当前 第1组</span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => life.setWords(learned + 5, selected)}
-            className="press rounded-full border border-[var(--line)] px-3 py-1 text-[13px] text-ink-soft"
-          >
-            +5
-          </button>
-          <button
-            onClick={() => life.setWords(Math.max(0, learned - 5), selected)}
-            className="press rounded-full border border-[var(--line)] px-3 py-1 text-[13px] text-ink-faint"
-          >
-            −5
-          </button>
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          {[
+            ["0", "已掌握 / 1499"],
+            [String(today?.learned ?? 0), "今日待考"],
+            [String(today?.goal ?? 30), "重点复习"],
+          ].map(([v, l]) => (
+            <div key={l} className="rounded-xl bg-[var(--glass-hi)] py-2.5">
+              <p className="num text-[20px] text-ink">{v}</p>
+              <p className="mt-0.5 text-[10.5px] text-ink-faint">{l}</p>
+            </div>
+          ))}
         </div>
+        <p className="mt-3 text-[12px] leading-[1.8] text-ink-faint">
+          聊天里说"考我单词",他会按今日词单考你;结果自动记进这里。
+        </p>
       </div>
-      <div className="mt-3 h-[3px] w-full overflow-hidden rounded-full bg-[var(--glass-hi)]">
-        <div
-          className="h-full rounded-full bg-[var(--accent)] transition-all duration-700"
-          style={{
-            width: `${Math.min(100, (learned / Math.max(1, goal)) * 100)}%`,
-          }}
-        />
+
+      <div className="glass mt-3 rounded-3xl px-5 py-4">
+        {open === null ? (
+          <div>
+            {WORD_GROUPS.map((g) => (
+              <button
+                key={g}
+                onClick={() => setOpen(g)}
+                className="press flex w-full items-center justify-between border-b border-[var(--line)] py-3.5 text-left last:border-0"
+              >
+                <span className="text-[15px] text-ink">第{g}天</span>
+                <span className="text-[12px] text-ink-faint">0 / 30 已掌握</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between">
+              <button onClick={() => setOpen(null)} className="press text-[12.5px] text-ink-faint">
+                ‹ 目录
+              </button>
+              <span className="text-[16px] italic text-ink">第{open}天 · 第1组</span>
+              <span className="rounded-full border border-[var(--accent-deep)] px-2.5 py-0.5 text-[11px] text-[var(--accent-deep)]">
+                今天考这组
+              </span>
+            </div>
+            <div className="mt-2">
+              {SAMPLE_WORDS.map(([w, ph, mean]) => (
+                <div
+                  key={w}
+                  className="flex items-center gap-3 border-b border-[var(--line)] py-3 last:border-0"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[15px] text-ink">{w}</p>
+                    <p className="text-[11px] text-ink-faint">{ph}</p>
+                  </div>
+                  <span className="text-[12.5px] text-ink-soft">{mean}</span>
+                  <span className="text-[11px] text-ink-faint">未考</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
-      <p className="mt-3 text-[12.5px] text-ink-faint">
-        约定里写了：他每天问我单词。答不上来的时候，别装忙。
-      </p>
-    </Card>
+    </>
   );
 }
 
-/* ---------------- 错词本 ---------------- */
+/* ---------------- 错词 ---------------- */
 
-function WrongRoom({
-  life,
-  who,
-}: {
-  life: ReturnType<typeof useLifeStore.getState>;
-  who: Who;
-}) {
+function WrongRoom({ who }: { who: Who }) {
+  const life = useLifeStore();
   const [word, setWord] = useState("");
   const [reason, setReason] = useState("");
 
   return (
-    <div className="space-y-3">
-      <Card className="py-4">
-        <div className="flex gap-2">
-          <input
-            value={word}
-            onChange={(e) => setWord(e.target.value)}
-            placeholder="错词"
-            className="ghost-input w-28 rounded-xl border border-[var(--line)] bg-transparent px-3 py-2 text-[14px] text-ink"
-          />
-          <input
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="怎么错的"
-            className="ghost-input flex-1 rounded-xl border border-[var(--line)] bg-transparent px-3 py-2 text-[14px] text-ink"
-          />
-          <button
-            onClick={() => {
-              if (!word.trim()) return;
-              life.addWrongWord({ word, reason, by: who });
-              setWord("");
-              setReason("");
-            }}
-            className="press flex-none rounded-xl bg-[var(--accent)] px-4 text-[13.5px] text-[var(--accent-ink)]"
+    <div className="glass mt-3 rounded-3xl px-5 py-4">
+      <h3 className="text-[16px] italic text-ink">错词本 · {life.wrongWords.length}</h3>
+      <div className="mt-2">
+        {life.wrongWords.map((w) => (
+          <div
+            key={w.id}
+            className="flex items-center gap-2 border-b border-[var(--line)] py-3 last:border-0"
           >
-            收进本子
-          </button>
-        </div>
-      </Card>
-
-      <Card pad={false} className="px-4">
-        {life.wrongWords.length === 0 ? (
-          <p className="py-4 text-[13px] text-ink-faint">
-            本子还空着。空着最好。
-          </p>
-        ) : (
-          life.wrongWords.map((w) => (
-            <div
-              key={w.id}
-              className="flex items-center gap-3 border-b border-[var(--line)] py-3 last:border-0"
-            >
-              <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[var(--accent)]/15 text-[11px] text-[var(--accent)]">
-                {w.times}
-              </span>
-              <span className="flex-1 truncate text-[14px] text-ink">
-                {w.word}
-                {w.reason && (
-                  <span className="ml-1.5 text-[12px] text-ink-faint">
-                    {w.reason}
-                  </span>
-                )}
-              </span>
-              <ByDot by={w.by} />
-              <button
-                onClick={() => life.removeWrongWord(w.id)}
-                aria-label="划掉这个词"
-                className="text-ink-faint/60 hover:text-[var(--danger)]"
-              >
-                <IconTrash width={12} height={12} />
-              </button>
-            </div>
-          ))
+            <span className="text-[15px] text-ink">{w.word}</span>
+            <span className="min-w-0 flex-1 truncate text-[12px] text-ink-faint">{w.reason}</span>
+            <span className="num text-[11px] text-[var(--accent-deep)]">×{w.times}</span>
+            <AuthorDot who={w.by} />
+            <button onClick={() => life.bumpWrongWord(w.id)} className="press text-[11px] text-ink-faint">
+              +1
+            </button>
+            <button onClick={() => life.removeWrongWord(w.id)} className="press text-ink-faint/70">
+              <IconClose width={12} height={12} />
+            </button>
+          </div>
+        ))}
+        {life.wrongWords.length === 0 && (
+          <p className="py-4 text-center text-[12.5px] text-ink-faint">还没有错词。</p>
         )}
-      </Card>
+      </div>
+      <div className="mt-3 flex gap-2">
+        <input
+          value={word}
+          onChange={(e) => setWord(e.target.value)}
+          placeholder="单词"
+          className="ghost-input w-24 flex-none rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
+        />
+        <input
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="错在哪"
+          className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2.5 text-[13px] text-ink"
+        />
+        <button
+          onClick={() => {
+            life.addWrongWord({ word, reason, by: who });
+            setWord("");
+            setReason("");
+          }}
+          className="press flex-none rounded-full bg-[var(--accent-deep)] px-4 text-[13px] text-white"
+        >
+          收
+        </button>
+      </div>
     </div>
   );
 }
 
-/* ---------------- 奖惩：留白 ---------------- */
+/* ---------------- 通用件 ---------------- */
 
-function RewardsRoom() {
+function SummaryBlock({
+  title,
+  rows,
+  foot,
+  extra,
+}: {
+  title: string;
+  rows: [string, string][];
+  foot?: string;
+  extra?: string;
+}) {
   return (
-    <Card className="flex flex-col items-center py-10">
-      <span className="text-ink-faint/60">
-        <PixelCatQuiet />
-      </span>
-      <p className="serif mt-4 text-[15px] text-ink-soft">奖惩 · 待做</p>
-      <p className="mt-2 max-w-[260px] text-center text-[12.5px] leading-[1.9] text-ink-faint">
-        这间房留白。以后由任务完成情况自动喂进来——
-        规则没想好之前，不放一个空架子在这里。
-      </p>
-    </Card>
+    <div className="px-1">
+      <div className="flex items-baseline justify-between">
+        <span className="text-[12.5px] italic text-ink-faint">{title}</span>
+        {extra && <span className="text-[11px] text-ink-faint">{extra}</span>}
+      </div>
+      <div className="mt-2">
+        {rows.map(([k, v]) => (
+          <div key={k} className="flex items-baseline justify-between py-[5px]">
+            <span className="text-[13.5px] text-ink-soft">{k}</span>
+            <span className="num text-[13.5px] text-ink">{v}</span>
+          </div>
+        ))}
+      </div>
+      {foot && <p className="mt-2 text-[11px] leading-[1.7] text-ink-faint">{foot}</p>}
+    </div>
   );
 }
 
-function PixelCatQuiet() {
+/** 一周快速切换条：以选中日为最后一天，往前 6 天。 */
+function WeekStrip({
+  selected,
+  render,
+}: {
+  selected: string;
+  render: (key: string) => React.ReactNode;
+}) {
+  const days = useMemo(() => {
+    const base = new Date(`${selected}T00:00:00`);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(base);
+      d.setDate(d.getDate() - (6 - i));
+      return dayKeyOf(d);
+    });
+  }, [selected]);
+
   return (
-    <svg width="36" height="40" viewBox="0 0 9 10" aria-hidden>
-      {[
-        ".X.....X.",
-        ".XX...XX.",
-        "..XXXXX..",
-        ".XXXXXXX.",
-        ".XXXXXXX.",
-        ".XXXXXXX.",
-        "..XXXXX..",
-        "..XXXXX..",
-        ".XX.X.XX.",
-        ".X.....X.",
-      ].flatMap((row, y) =>
-        [...row].map((c, x) =>
-          c === "X" ? (
-            <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill="currentColor" opacity="0.7" />
-          ) : null,
-        ),
-      )}
+    <div className="mt-3 flex gap-1.5">
+      {days.map((k) => {
+        const on = k === selected;
+        return (
+          <div
+            key={k}
+            className={`flex flex-1 flex-col items-center gap-1 rounded-xl border py-2 ${
+              on ? "border-[var(--accent-deep)]" : "border-transparent"
+            }`}
+          >
+            <span
+              className={`num text-[11px] ${on ? "text-[var(--accent-deep)]" : "text-ink-faint"}`}
+            >
+              {md(k)}
+            </span>
+            {render(k)}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TimeField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="flex flex-col gap-1">
+      <span className="text-[11px] text-ink-faint">{label}</span>
+      <input
+        type="time"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-[86px] rounded-lg bg-[var(--glass-hi)] px-2 py-1.5 text-center text-[15px] text-ink"
+      />
+    </label>
+  );
+}
+
+function AuthorStamp({ who, date }: { who: Who; date: string }) {
+  return (
+    <span className="flex items-center gap-1.5 text-[11px] text-ink-faint">
+      <span
+        className="h-[6px] w-[6px] rounded-full"
+        style={{ background: who === "wan" ? "var(--accent-deep)" : "var(--ink-faint)" }}
+      />
+      {WHO_LABEL[who]} · {md(date)}
+    </span>
+  );
+}
+
+function AuthorDot({ who }: { who?: Who }) {
+  return (
+    <span
+      className="h-[6px] w-[6px] flex-none rounded-full"
+      style={{ background: (who ?? "wan") === "wan" ? "var(--accent-deep)" : "var(--ink-faint)" }}
+    />
+  );
+}
+
+/** 像素猫：每间房门口那只。SVG 方块拼，不依赖 emoji 字体。 */
+function PixelCat() {
+  const px = 2.2;
+  const cells: [number, number][] = [
+    [3, 0], [8, 0],
+    [2, 1], [3, 1], [4, 1], [7, 1], [8, 1], [9, 1],
+    [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2],
+    [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3],
+    [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4],
+    [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5],
+    [3, 6], [4, 6], [5, 6], [6, 6], [7, 6], [8, 6],
+    [3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [8, 7],
+    [9, 6], [10, 6], [10, 5], [11, 5],
+  ];
+  return (
+    <svg
+      width={12 * px}
+      height={8 * px}
+      viewBox={`0 0 ${12 * px} ${8 * px}`}
+      aria-hidden
+      className="flex-none"
+    >
+      {cells.map(([x, y], i) => (
+        <rect key={i} x={x * px} y={y * px} width={px} height={px} fill="var(--ink)" opacity="0.86" />
+      ))}
+      <rect x={4 * px} y={3 * px} width={px} height={px} fill="var(--bg)" />
+      <rect x={7 * px} y={3 * px} width={px} height={px} fill="var(--bg)" />
     </svg>
   );
 }

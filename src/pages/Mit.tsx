@@ -1,13 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, Row, SectionTitle, Switch } from "../components/ui/kit";
 import {
   IconBook,
   IconCheck,
   IconChat,
+  IconChevron,
+  IconClose,
   IconFile,
   IconGear,
   IconHeart,
-  IconMoon,
   IconSpark,
   IconTrash,
 } from "../components/ui/icons";
@@ -21,7 +23,6 @@ import { resetAll } from "../lib/utils/reset";
 import { RULE_META } from "../lib/boundary/rules";
 import { formatClock } from "../lib/utils/id";
 import {
-  CONNECTORS,
   INITIATIVE_LABEL,
   INITIATIVE_NOTE,
   type InitiativeLevel,
@@ -54,42 +55,45 @@ export function Mit() {
   const [confirm, setConfirm] = useState<null | "memory" | "chat" | "all">(
     null,
   );
+  const navigate = useNavigate();
   const [keyDraft, setKeyDraft] = useState("");
   const [customOpen, setCustomOpen] = useState(false);
   const [customUrl, setCustomUrl] = useState("");
 
   return (
     <div className="px-5 pt-6 pb-10">
-      <div className="flex flex-col items-center pb-7 pt-2">
-        <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-white/20 bg-[var(--glass)]">
-          <span className="serif text-[26px] text-ink-soft">阿晏</span>
+      {/* 页头：‹ Settings / make it yours */}
+      <div className="flex items-start gap-2 pb-2 pt-1">
+        <button
+          onClick={() => navigate(-1)}
+          aria-label="返回"
+          className="press mt-2 text-ink-faint"
+        >
+          <IconChevron width={16} height={16} className="rotate-180" />
+        </button>
+        <div>
+          <h1 className="page-head-title text-[30px] leading-none text-ink">Settings</h1>
+          <p className="page-head-sub mt-1 text-[12.5px]">make it yours</p>
         </div>
-        <h2 className="serif mt-3 text-xl text-ink">Settings</h2>
-        <p className="mt-1 text-[12px] text-ink-faint">
-          make it yours · 连接、边界、以及它记得多少。
-        </p>
       </div>
 
       {/* 外观 */}
-      <div className="mt-6">
+      <div className="mt-5">
         <SectionTitle>
-          <span className="flex items-center gap-2">
-            <IconMoon width={15} height={15} className="text-ink-faint" />
-            外观
-          </span>
+          <span className="flex items-center gap-2 text-ink-faint">外观</span>
         </SectionTitle>
         <Card pad={false} className="px-4">
           <Row
             label="主题"
             right={
-              <div className="glass-flat flex items-center gap-1 p-1">
+              <div className="flex items-center gap-1">
                 <button
                   onClick={() => setTheme("day")}
                   aria-label="日间"
-                  className={`press flex h-7 items-center justify-center rounded-full px-3 text-[12.5px] ${
+                  className={`press flex h-7 items-center justify-center rounded-full border px-3 text-[12.5px] ${
                     theme === "day"
-                      ? "bg-[var(--accent)] text-[var(--accent-ink)]"
-                      : "text-ink-faint"
+                      ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
+                      : "border-transparent text-ink-faint"
                   }`}
                 >
                   日间
@@ -97,10 +101,10 @@ export function Mit() {
                 <button
                   onClick={() => setTheme("night")}
                   aria-label="夜间"
-                  className={`press flex h-7 items-center justify-center rounded-full px-3 text-[12.5px] ${
+                  className={`press flex h-7 items-center justify-center rounded-full border px-3 text-[12.5px] ${
                     theme === "night"
-                      ? "bg-[var(--accent)] text-[var(--accent-ink)]"
-                      : "text-ink-faint"
+                      ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
+                      : "border-transparent text-ink-faint"
                   }`}
                 >
                   夜间
@@ -108,17 +112,8 @@ export function Mit() {
               </div>
             }
           />
-          <SliderRow
-            label="背景强度"
-            value={bgStrength}
-            onChange={setBgStrength}
-          />
-          <SliderRow
-            label="玻璃透明度"
-            value={glassAlpha}
-            onChange={setGlassAlpha}
-            last
-          />
+          <SliderRow label="背景强度" value={bgStrength} onChange={setBgStrength} />
+          <SliderRow label="玻璃透明度" value={glassAlpha} onChange={setGlassAlpha} last />
         </Card>
       </div>
 
@@ -416,72 +411,6 @@ export function Mit() {
         </p>
       </div>
 
-      {/* 连接器 */}
-      <div className="mt-5">
-        <SectionTitle>
-          <span className="flex items-center gap-2">
-            <IconSpark width={15} height={15} className="text-ink-faint" />
-            连接器 · Connectors
-          </span>
-        </SectionTitle>
-        <Card pad={false} className="px-4">
-          {CONNECTORS.map((c, i) => (
-            <Row
-              key={c.id}
-              label={c.name}
-              desc={`${c.desc} · 需要${c.scope}`}
-              last={i === CONNECTORS.length - 1 && !customOpen}
-              right={
-                <Switch
-                  on={connector.enabled[c.id]}
-                  onChange={(v) => connector.setConnector(c.id, v)}
-                  label={c.name}
-                />
-              }
-            />
-          ))}
-          {customOpen ? (
-            <div className="flex items-center gap-2 border-t border-[var(--line)] py-3">
-              <input
-                autoFocus
-                value={customUrl}
-                onChange={(e) => setCustomUrl(e.target.value)}
-                placeholder="https://your-server.example.com/mcp"
-                className="ghost-input flex-1 bg-transparent text-[13px] text-ink"
-              />
-              <button
-                onClick={() => {
-                  if (customUrl.trim()) {
-                    connector.setConnector("mcp", true);
-                    setCustomOpen(false);
-                  }
-                }}
-                className="press text-[13px] text-[var(--accent)]"
-              >
-                接入
-              </button>
-              <button
-                onClick={() => setCustomOpen(false)}
-                className="press text-[13px] text-ink-faint"
-              >
-                取消
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setCustomOpen(true)}
-              className="press w-full border-t border-[var(--line)] py-3.5 text-left text-[14px] text-ink-soft"
-            >
-              + 添加自定义连接器
-            </button>
-          )}
-        </Card>
-        <p className="mt-2.5 px-1 text-[12px] leading-[1.85] text-ink-faint">
-          内置连接器在本版是模拟开关。这里添加的自定义地址只支持
-          Streamable HTTP，且只存在这台设备上。
-        </p>
-      </div>
-
       {/* 记忆系统 · 回声库：健康面板 */}
       <div className="mt-5">
         <SectionTitle>
@@ -504,7 +433,7 @@ export function Mit() {
           <HealthRow
             on
             label="每日备份"
-            note="导出 .json · 随时"
+            note="1 小时前"
             last
           />
           <p className="border-t border-[var(--line)] py-3 text-[12px] leading-[1.85] text-ink-faint">
@@ -536,14 +465,17 @@ export function Mit() {
 
       {/* 面板连接 */}
       <div className="mt-5">
-        <SectionTitle>面板连接</SectionTitle>
+        <SectionTitle>记忆库 · Ombre Brain</SectionTitle>
         <Card>
-          <p className="flex items-center gap-2 text-[14.5px] text-ink">
-            <span className="text-[var(--accent)]">
-              <IconCheck width={15} height={15} strokeWidth={2.2} />
+          <div className="flex items-center justify-between">
+            <span className="text-[14.5px] text-ink">面板连接</span>
+            <span className="flex items-center gap-1.5 text-[12.5px] text-ink-soft">
+              <span className="text-emerald-500">
+                <IconCheck width={13} height={13} strokeWidth={2.4} />
+              </span>
+              {memories.length} memories
             </span>
-            {memories.length + echoes.length + imprints.length} 条记忆已在本地
-          </p>
+          </div>
           <div className="mt-3 flex items-center gap-2">
             <input
               type="password"
@@ -555,6 +487,97 @@ export function Mit() {
             <span className="text-[12.5px] text-ink-faint">连接</span>
           </div>
         </Card>
+      </div>
+
+      {/* 连接器 */}
+      <div className="mt-5">
+        <SectionTitle>
+          <span className="flex items-center gap-2">
+            <IconSpark width={15} height={15} className="text-ink-faint" />
+            连接器 · Connectors
+          </span>
+        </SectionTitle>
+        <Card pad={false} className="px-4">
+          <Row
+            label="Ombre Brain"
+            desc="记忆库 · claude.ai 连接器"
+            right={<CheckMark />}
+          />
+          <Row label="Gmail" desc="claude.ai 连接器" right={<CheckMark />} />
+          <Row label="高德地图" desc="claude.ai 连接器" right={<CheckMark />} />
+          <Row
+            label="monopoly"
+            desc="https://spicy-monopoly.lol/mcp"
+            right={
+              <div className="flex items-center gap-2">
+                <Switch
+                  on={connector.enabled.mcp}
+                  onChange={(v) => connector.setConnector("mcp", v)}
+                  label="monopoly"
+                />
+                <button className="press text-ink-faint" aria-label="删除">
+                  <IconClose width={12} height={12} />
+                </button>
+              </div>
+            }
+          />
+          <Row
+            label="nest"
+            desc="VPS 本地连接器"
+            last={!customOpen}
+            right={
+              <div className="flex items-center gap-2">
+                <Switch
+                  on={connector.enabled.files}
+                  onChange={(v) => connector.setConnector("files", v)}
+                  label="nest"
+                />
+                <button className="press text-ink-faint" aria-label="删除">
+                  <IconClose width={12} height={12} />
+                </button>
+              </div>
+            }
+          />
+          {customOpen ? (
+            <div className="flex items-center gap-2 border-t border-[var(--line)] py-3">
+              <input
+                autoFocus
+                value={customUrl}
+                onChange={(e) => setCustomUrl(e.target.value)}
+                placeholder="https://your-server.example.com/mcp"
+                className="ghost-input flex-1 bg-transparent text-[13px] text-ink"
+              />
+              <button
+                onClick={() => {
+                  if (customUrl.trim()) {
+                    connector.setConnector("mcp", true);
+                    setCustomOpen(false);
+                  }
+                }}
+                className="press text-[13px] text-[var(--accent-deep)]"
+              >
+                接入
+              </button>
+              <button
+                onClick={() => setCustomOpen(false)}
+                className="press text-[13px] text-ink-faint"
+              >
+                取消
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setCustomOpen(true)}
+              className="press w-full border-t border-[var(--line)] py-3.5 text-left text-[14px] text-ink-soft"
+            >
+              + 添加自定义连接器
+            </button>
+          )}
+        </Card>
+        <p className="mt-2.5 px-1 text-[11.5px] leading-[1.85] text-ink-faint">
+          Ombre Brain / Gmail / 高德是 claude.ai 账号连接器，去 claude.ai 的 Connectors
+          面板管理。这里添加的是 VPS 本地连接器，只支持 Streamable HTTP 地址。
+        </p>
       </div>
 
       {/* 危险区 */}
@@ -721,5 +744,15 @@ function HealthRow({
       </span>
       <span className="text-[12px] text-ink-faint">{note}</span>
     </div>
+  );
+}
+
+
+/** 连接器已连接的对勾 */
+function CheckMark() {
+  return (
+    <span className="text-ink-soft">
+      <IconCheck width={15} height={15} strokeWidth={1.8} />
+    </span>
   );
 }

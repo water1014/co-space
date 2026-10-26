@@ -216,6 +216,10 @@ export type Todo = {
   text: string;
   done: boolean;
   at: number;
+  /** 截止日 MM.DD，参考图右缘那种 */
+  due?: string;
+  /** 里程碑（百日/生日）前的月亮标记 */
+  moon?: boolean;
 };
 
 export type WordProgress = {

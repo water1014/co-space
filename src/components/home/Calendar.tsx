@@ -1,7 +1,12 @@
 import { useMemo, useState } from "react";
 import { IconChevron } from "../ui/icons";
 
-const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
+/** 参考图式月历：周一起始，「Sep 2026」衬线斜体居中，选中是红描边圆角方块，有记录的日子带小点。 */
+const WEEK = ["一", "二", "三", "四", "五", "六", "日"];
+const MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
 const keyOf = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -14,7 +19,7 @@ export function Calendar({
   selected,
 }: {
   /** 有记录的日子：日期键集合。 */
-  marks: Set<string>;
+  marks?: Set<string>;
   onSelect?: (key: string, date: Date) => void;
   selected?: string;
 }) {
@@ -25,7 +30,8 @@ export function Calendar({
     const year = cursor.getFullYear();
     const month = cursor.getMonth();
     const first = new Date(year, month, 1);
-    const startPad = first.getDay();
+    // 周一起始
+    const startPad = (first.getDay() + 6) % 7;
     const total = new Date(year, month + 1, 0).getDate();
     const list: (Date | null)[] = Array.from({ length: startPad }, () => null);
     for (let d = 1; d <= total; d++) list.push(new Date(year, month, d));
@@ -41,38 +47,32 @@ export function Calendar({
 
   return (
     <div>
-      <div className="mb-3 flex items-center justify-between px-1">
-        <div className="flex items-baseline gap-2">
-          <span className="num text-[16px] text-ink">
-            {cursor.getMonth() + 1}
-          </span>
-          <span className="text-[13px] text-ink-faint">
-            {cursor.getFullYear()} 年
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => shift(-1)}
-            aria-label="上个月"
-            className="press rounded-full p-1.5 text-ink-faint hover:text-ink-soft"
-          >
-            <IconChevron width={15} height={15} className="rotate-180" />
-          </button>
-          <button
-            onClick={() => shift(1)}
-            aria-label="下个月"
-            className="press rounded-full p-1.5 text-ink-faint hover:text-ink-soft"
-          >
-            <IconChevron width={15} height={15} />
-          </button>
-        </div>
+      {/* 头部：‹  Sep 2026  › */}
+      <div className="mb-2 flex items-center justify-between px-1">
+        <button
+          onClick={() => shift(-1)}
+          aria-label="上个月"
+          className="press rounded-full p-1.5 text-ink-faint hover:text-ink-soft"
+        >
+          <IconChevron width={15} height={15} className="rotate-180" />
+        </button>
+        <span className="num text-[19px] italic text-ink">
+          {MONTHS[cursor.getMonth()]} {cursor.getFullYear()}
+        </span>
+        <button
+          onClick={() => shift(1)}
+          aria-label="下个月"
+          className="press rounded-full p-1.5 text-ink-faint hover:text-ink-soft"
+        >
+          <IconChevron width={15} height={15} />
+        </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-y-1">
+      <div className="grid grid-cols-7 gap-y-0.5">
         {WEEK.map((w) => (
           <div
             key={w}
-            className="pb-1 text-center text-[12px] tracking-[0.1em] text-ink-faint"
+            className="pb-1.5 text-center text-[12px] text-ink-faint"
           >
             {w}
           </div>
@@ -82,26 +82,26 @@ export function Calendar({
           const key = keyOf(date);
           const isToday = key === today;
           const isSelected = key === selected;
-          const marked = marks.has(key);
+          const marked = marks?.has(key) ?? false;
           return (
             <button
               key={key}
               onClick={() => onSelect?.(key, date)}
-              className="press relative flex h-9 items-center justify-center"
+              className="press relative flex h-10 items-center justify-center"
             >
               <span
-                className={`num flex h-8 w-8 items-center justify-center rounded-full text-[14px] transition-colors ${
+                className={`num text-[14.5px] transition-colors ${
                   isSelected
-                    ? "bg-[var(--accent)] text-[var(--accent-ink)]"
+                    ? "flex h-8 w-8 items-center justify-center rounded-xl border-[1.5px] border-[var(--accent-deep)] text-[var(--accent-deep)]"
                     : isToday
-                      ? "text-ink ring-1 ring-[var(--accent)] ring-opacity-60"
+                      ? "text-ink"
                       : "text-ink-soft"
                 }`}
               >
                 {date.getDate()}
               </span>
               {marked && !isSelected && (
-                <span className="absolute bottom-0.5 h-[3px] w-[3px] rounded-full bg-[var(--accent)] opacity-80" />
+                <span className="absolute bottom-[3px] h-[3px] w-[3px] rounded-full bg-[var(--accent-deep)] opacity-80" />
               )}
             </button>
           );

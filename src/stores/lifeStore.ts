@@ -155,8 +155,15 @@ const seed = () => {
     words: [{ date: t, learned: 12, goal: 20 }],
     wrongWords,
     todos: [
-      { id: uid("t"), text: "把简历最后一版发出去", done: false, at: now },
-      { id: uid("t"), text: "给妈妈回电话", done: false, at: now - 3600_000 },
+      {
+        id: uid("t"),
+        text: "一百天",
+        done: false,
+        at: now,
+        due: "09.13",
+        moon: true,
+      },
+      { id: uid("t"), text: "打印计算机准考证", done: false, at: now - 3600_000, due: "09.14" },
     ],
     bobaBudget: 25,
     listeningTime: 12.7,
