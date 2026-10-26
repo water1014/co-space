@@ -37,6 +37,29 @@ export const todaySleep = (sleep: SleepLog[]) =>
 export const todayWords = (words: WordProgress[]) =>
   words.find((w) => w.date === todayKey());
 
+/** 最近七天：每天的花费与睡眠，用来画柱子。 */
+export function last7(
+  ledger: LedgerEntry[],
+  sleep: SleepLog[],
+): { label: string; amount: number; hours: number }[] {
+  const out: { label: string; amount: number; hours: number }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = dayKeyOf(d);
+    const amount = ledger
+      .filter((e) => dayKeyOf(e.at) === key)
+      .reduce((sum, e) => sum + e.amount, 0);
+    const hours = sleep.find((s) => s.date === key)?.hours ?? 0;
+    out.push({
+      label: `${d.getMonth() + 1}/${d.getDate()}`,
+      amount: Math.round(amount * 100) / 100,
+      hours,
+    });
+  }
+  return out;
+}
+
 /** 连续有记录的天数：三餐、睡眠、记账任意一项有动静就算一天。 */
 export function streakDays(
   meals: Record<string, MealKey[]>,

@@ -6,7 +6,10 @@ import {
   IconTrash,
 } from "../components/ui/icons";
 import { useLifeStore, todayKey } from "../stores/lifeStore";
+import { VinylRecord } from "../components/together/VinylRecord";
+import { TrendChart } from "../components/together/TrendChart";
 import {
+  last7,
   streakDays,
   todayBoba,
   todayLedger,
@@ -29,6 +32,7 @@ export function Together() {
   const boba = todayBoba(life.ledger);
   const total = todayTotal(life.ledger);
   const streak = streakDays(life.meals, life.sleep, life.ledger);
+  const week = last7(life.ledger, life.sleep);
 
   const [ledgerOpen, setLedgerOpen] = useState(false);
   const [sleepOpen, setSleepOpen] = useState(false);
@@ -48,6 +52,43 @@ export function Together() {
           <p className="mt-1 text-[11.5px] text-ink-faint">连续记录</p>
         </div>
       </header>
+
+      {/* 在听 */}
+      <div className="mt-6">
+        <SectionTitle
+          action={
+            <span className="text-[11px] text-ink-faint">
+              本周 {life.listeningTime} 小时
+            </span>
+          }
+        >
+          在听
+        </SectionTitle>
+        <Card className="flex items-center gap-4 py-4">
+          <VinylRecord
+            playing={life.currentSong.isPlaying}
+            onToggle={life.togglePlay}
+          />
+          <div className="min-w-0 flex-1">
+            <p className="serif truncate text-[15.5px] text-ink">
+              {life.currentSong.title}
+            </p>
+            <p className="mt-0.5 text-[11.5px] text-ink-faint">
+              {life.currentSong.artist}
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-[11px] text-ink-faint">
+              <span
+                className={`h-[5px] w-[5px] rounded-full ${
+                  life.currentSong.isPlaying
+                    ? "bg-[var(--accent)]"
+                    : "bg-ink-faint/60"
+                }`}
+              />
+              {life.currentSong.isPlaying ? "正在放" : "暂停着"}
+            </p>
+          </div>
+        </Card>
+      </div>
 
       {/* 三餐 */}
       <div className="mt-6">
@@ -102,20 +143,31 @@ export function Together() {
         >
           睡眠
         </SectionTitle>
-        <Card className="flex items-center justify-between py-4">
-          <div className="flex items-baseline gap-1.5">
-            <span className="num text-[31px] leading-none text-ink">
-              {sleep ? sleep.hours.toFixed(1) : "—"}
-            </span>
-            <span className="text-[13px] text-ink-faint">小时</span>
+        <Card className="py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-baseline gap-1.5">
+              <span className="num text-[31px] leading-none text-ink">
+                {sleep ? sleep.hours.toFixed(1) : "—"}
+              </span>
+              <span className="text-[13px] text-ink-faint">小时</span>
+            </div>
+            <div className="text-right">
+              <p className="text-[13.5px] text-ink-soft">
+                {sleep ? `${sleep.bedAt} — ${sleep.wakeAt}` : "昨晚没记"}
+              </p>
+              <p className="mt-0.5 text-[12px] text-ink-faint">
+                {sleep && sleep.hours < 6.5
+                  ? "少于 6.5 小时，它会在对话里提"
+                  : "正常"}
+              </p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-[13.5px] text-ink-soft">
-              {sleep ? `${sleep.bedAt} — ${sleep.wakeAt}` : "昨晚没记"}
-            </p>
-            <p className="mt-0.5 text-[12px] text-ink-faint">
-              {sleep && sleep.hours < 6.5 ? "少于 6.5 小时，它会在对话里提" : "正常"}
-            </p>
+          <div className="mt-3">
+            <TrendChart
+              data={week.map((d) => ({ label: d.label, value: d.hours }))}
+              color="rgb(168 196 220)"
+              unit="h"
+            />
           </div>
         </Card>
       </div>
@@ -168,7 +220,15 @@ export function Together() {
             />
           </div>
 
-          <div className="mt-4 space-y-0">
+          <div className="mt-3">
+            <TrendChart
+              data={week.map((d) => ({ label: d.label, value: d.amount }))}
+              color="var(--accent)"
+              unit=" 元"
+            />
+          </div>
+
+          <div className="mt-2 space-y-0">
             {todayLedger(life.ledger)
               .slice(0, 4)
               .map((e) => (

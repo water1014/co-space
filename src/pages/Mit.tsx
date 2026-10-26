@@ -21,6 +21,8 @@ import {
 } from "../types";
 
 const LEVELS: InitiativeLevel[] = [0, 1, 2, 3];
+/** 记忆容量的参考上限：不是硬限制，只是让人心里有个水位。 */
+const CAPACITY = 500;
 
 export function Mit() {
   const theme = useThemeStore((s) => s.theme);
@@ -250,6 +252,24 @@ export function Mit() {
         </Card>
       </div>
 
+      {/* 人设 */}
+      <div className="mt-5">
+        <SectionTitle>专属设定</SectionTitle>
+        <Card>
+          <textarea
+            value={connector.persona}
+            onChange={(e) => connector.setPersona(e.target.value)}
+            rows={4}
+            placeholder="它会照这个说话。写具体一点，比写温柔更有用。"
+            className="serif w-full resize-none bg-transparent text-[13.5px] leading-[1.95] text-ink"
+          />
+          <p className="mt-2 flex items-center justify-between text-[10.5px] text-ink-faint">
+            <span>这段会放在每次请求的最前面。</span>
+            <span className="num">{connector.persona.length}/1200</span>
+          </p>
+        </Card>
+      </div>
+
       {/* 连接器 */}
       <div className="mt-5">
         <SectionTitle>连接器</SectionTitle>
@@ -290,6 +310,33 @@ export function Mit() {
               </div>
             ))}
           </div>
+          {/* 河床：记忆容量 */}
+          <div className="mt-4 border-t border-[var(--line)] pt-3.5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-[11px] text-ink-faint">河床</span>
+              <span className="num text-[10.5px] text-ink-faint">
+                {memories.length} / {CAPACITY}
+              </span>
+            </div>
+            <div className="mt-2 h-[5px] w-full overflow-hidden rounded-full bg-[var(--glass-hi)]">
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${Math.min(100, (memories.length / CAPACITY) * 100)}%`,
+                  background:
+                    memories.length / CAPACITY > 0.8
+                      ? "var(--danger)"
+                      : "var(--accent)",
+                }}
+              />
+            </div>
+            <p className="mt-1.5 text-[10px] text-ink-faint">
+              {memories.length / CAPACITY > 0.8
+                ? "快满了。导出或清理一些再继续。"
+                : "水位很浅。它可以再记很多。"}
+            </p>
+          </div>
+
           <div className="mt-4 space-y-1.5 border-t border-[var(--line)] pt-3">
             <p className="flex items-center justify-between text-[13px]">
               <span className="text-ink-faint">落库队列</span>

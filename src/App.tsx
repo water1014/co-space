@@ -1,10 +1,13 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { AppFrame } from "./components/layout/AppFrame";
+import { AppShell } from "./layouts/AppShell";
 import { Home } from "./pages/Home";
 import { Chat } from "./pages/Chat";
 import { Memory } from "./pages/Memory";
-import { Together } from "./pages/Together";
+// 图表只在共处页用，懒加载，首屏不背这个包。
+const Together = lazy(() =>
+  import("./pages/Together").then((m) => ({ default: m.Together })),
+);
 import { Mit } from "./pages/Mit";
 import { useRelationEngine } from "./lib/relation/engine";
 import { useThemeStore } from "./stores/themeStore";
@@ -30,15 +33,22 @@ export default function App() {
   }, [load]);
 
   return (
-    <AppFrame>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/memory" element={<Memory />} />
-        <Route path="/together" element={<Together />} />
-        <Route path="/mit" element={<Mit />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AppFrame>
+    <AppShell>
+      <Suspense
+        fallback={<div className="flex h-full items-center justify-center" />}
+      >
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/memory" element={<Memory />} />
+          <Route
+            path="/together"
+            element={<Together />}
+          />
+          <Route path="/mit" element={<Mit />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </AppShell>
   );
 }

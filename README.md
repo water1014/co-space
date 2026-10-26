@@ -61,6 +61,16 @@
 渐变给出"厚度"，`blur` 吃掉背后的噪点，1px 内高光给出边缘。
 日间模式整套换成白玻璃 + 暖灰细边 + 柔和投影。
 
+### GlassCard 的配方
+
+```tsx
+<div className="glass rounded-[24px] p-5">{children}</div>
+```
+
+内发光用 `.glass::before` 伪元素，**不是**额外一层 `div`。
+多包一层 `<div class="relative z-10">` 会把 `className="flex"` 的作用吃掉——
+唱片和文字会从横排变成上下堆。这个坑踩过一次。
+
 ### 颗粒
 
 内联 SVG `feTurbulence`，`mix-blend-mode: soft-light`，`background-size: 140px`。
@@ -77,7 +87,47 @@
 
 ---
 
+## 目录
+
+```
+src/
+  layouts/
+    AppShell.tsx        // 背景 + 滚动出口 + 底部五格
+    BackgroundLayer.tsx // 底色 / 三团微光 / 颗粒 / 暗角
+  pages/
+    Home  Chat  Memory  Together  Mit
+  components/
+    ui/       GlassCard, kit(Switch/Segmented/Sheet), icons
+    chat/     ThoughtCard, ToolCallBadge, VoiceBubble, FileCard, OutputInterceptor
+    together/ VinylRecord, TrendChart
+    home/     Calendar, Weather
+  stores/     chat / memory / life / boundary / presence / connector / theme
+  lib/        boundary / db / chat / life / relation / mock / utils
+```
+
+---
+
 ## 五个关键实现
+
+### 0. 消息的每一段都是独立的 data part
+
+`convertMessage` 把一段消息拆成若干 part：
+
+```ts
+{ type: "data-thought", data: { seconds, tools, steps } }
+{ type: "text", text, status? }
+{ type: "data-voice", data: { duration, peaks, transcript } }
+{ type: "data-boundary", data: { hits } }
+```
+
+**注意**：assistant-ui 不会把它们原样交还。渲染时拿到的是
+
+```js
+{ type: "data", name: "thought", data: {...}, dataRendererUI: null }
+```
+
+所以判断要写 `part.type === "data" && part.name === "thought"`。
+第一版我按 `data-thought` 判断，结果思考卡、工具徽标、图片全都没渲染出来。
 
 ### 1. 思考过程是真的在"想"，不是装饰
 
@@ -112,6 +162,15 @@ const hit = ranked[0]?.score >= 0.35;   // 低于阈值就当没想起来
 
 （当前图片是程序生成的低饱和渐变 + 噪点，不是真实图像模型输出；接口形状已经留好。）
 
+### 3.5 记忆库用虚拟列表
+
+`@tanstack/react-virtual` + `measureElement` 实测行高（长文本展开会变高）。
+滚动容器是记忆页自己的 `overflow-auto`，不是外层 `main`——
+虚拟化必须拿到 scroll element。
+
+另外两条：超过 200 字折叠成"原文"按钮；二级 Tab 用绝对定位浮在内容上方，
+不占布局，也就不跟内容一起滚走。
+
 ### 4. 生活数据 → 对话上下文
 
 `lib/life/derive.ts` 的 `lifeContext()` 把当天状态压成一行：
@@ -129,6 +188,14 @@ const hit = ranked[0]?.score >= 0.35;   // 低于阈值就当没想起来
 `lib/boundary/rules.ts` 三条规则（关系融合 / 身份融合 / 安慰循环），
 `convertMessage` 与消息渲染都过同一套 `calibrate()`，命中痕迹显示在消息下方，
 展开能看到原句和改写句。规则与 20 条断言放在一起，改一个字都要过测试。
+
+### 6. 共处的两件小东西
+
+**黑胶**是纯 CSS：`repeating-radial-gradient` 做纹槽，`conic-gradient` 做一道扫光
+（没有扫光就看不出在转），`animation-play-state` 由 `isPlaying` 控制。
+
+**趋势图**用 recharts 画七天的柱子，没有坐标轴——它说明趋势，精确值在旁边数字里。
+recharts 单独打成一个 chunk，只共处页懒加载：首屏 gzip 82KB，图表包 99KB 按需到。
 
 ---
 

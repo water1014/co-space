@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           assistant: ["@assistant-ui/react"],
+          charts: ["recharts"],
         },
       },
     },

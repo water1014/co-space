@@ -3,28 +3,8 @@ import { IconClose } from "./icons";
 
 /* ---------------- 卡片 ---------------- */
 
-export function Card({
-  children,
-  className = "",
-  pad = true,
-  onClick,
-}: {
-  children: ReactNode;
-  className?: string;
-  pad?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <div
-      onClick={onClick}
-      className={`glass edge ${pad ? "p-5" : ""} ${
-        onClick ? "press cursor-pointer" : ""
-      } ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
+export { GlassCard, InsetCard } from "./GlassCard";
+export { GlassCard as Card } from "./GlassCard";
 
 export function SectionTitle({
   children,

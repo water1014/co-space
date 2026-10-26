@@ -184,6 +184,7 @@ body {
 
 .glass {
   position: relative;
+  overflow: hidden;
   background: linear-gradient(
     168deg,
     rgba(255, 248, 240, 0.16) 0%,
@@ -217,6 +218,30 @@ body {
     0 1px 2px rgba(120, 96, 70, 0.06),
     0 10px 26px -16px rgba(120, 96, 70, 0.4),
     0 2px 6px -3px rgba(120, 96, 70, 0.1);
+}
+
+/* 内发光：左上最亮，向右下消失。用伪元素，避免多包一层 div 破坏 flex 布局。 */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.03) 34%,
+    transparent 64%
+  );
+}
+
+[data-theme="day"] .glass::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.12) 34%,
+    transparent 64%
+  );
 }
 
 .glass-hi {
@@ -390,8 +415,9 @@ textarea:focus {
   width: 42px;
   height: 25px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--ink) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
   transition: background-color 0.35s ease;
   flex: none;
 }
@@ -413,4 +439,66 @@ textarea:focus {
 .switch[data-on="true"] > span {
   transform: translateX(17px);
   background: var(--accent-ink);
+}
+
+/* ---------------- 黑胶 ---------------- */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vinyl-disc {
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(circle at 50% 50%, #241f19 0%, #14110d 62%, #0d0b09 100%);
+  animation: spin 9s linear infinite;
+  animation-play-state: paused;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 24px rgba(0, 0, 0, 0.8);
+}
+
+.vinyl-disc[data-playing="true"] {
+  animation-play-state: running;
+}
+
+/* 一道扫光，让旋转看得见 */
+.vinyl-disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.09) 24deg,
+    transparent 60deg
+  );
+}
+
+.vinyl-label {
+  background: radial-gradient(
+    circle at 38% 32%,
+    color-mix(in srgb, var(--accent) 78%, white),
+    var(--accent) 58%,
+    color-mix(in srgb, var(--accent) 62%, black)
+  );
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="day"] .vinyl-disc {
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(0, 0, 0, 0.06) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(circle at 50% 50%, #3a332a 0%, #241f19 62%, #1a1611 100%);
 }

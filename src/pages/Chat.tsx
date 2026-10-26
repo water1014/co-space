@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   AssistantRuntimeProvider,
+  MessagePrimitive,
   ThreadPrimitive,
   useExternalStoreRuntime,
   type AppendMessage,
@@ -11,7 +12,8 @@ import { usePresenceStore } from "../stores/presenceStore";
 import { useBoundaryStore } from "../stores/boundaryStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { cancelTurn, regenerateLast, sendTurn } from "../lib/chat/turn";
-import { BoundaryTrace, useCalibration } from "../components/chat/OutputInterceptor";
+import { calibrate } from "../lib/boundary/interceptor";
+import { BoundaryTraceCard } from "../components/chat/OutputInterceptor";
 import {
   FileCard,
   ImageBubble,
@@ -28,11 +30,15 @@ import {
   IconSpark,
 } from "../components/ui/icons";
 import { formatClock } from "../lib/utils/id";
-import {
-  messageText,
-  type ChatMessage,
-  type MessagePart,
-} from "../types";
+import type { BoundaryHit, ChatMessage, MessagePart } from "../types";
+
+/**
+ * 对话。
+ *
+ * 每一段（思考、工具、语音、文件、印记、边界痕迹）在 convertMessage 里被转成
+ * 独立的 data part，再由 MessagePrimitive.Parts 逐个分发到组件。
+ * runtime 持有渲染所需的一切，UI 只是分发器——消息因此可以原样导出、回放。
+ */
 
 export function Chat() {
   const messages = useChatStore((s) => s.messages);
@@ -41,18 +47,7 @@ export function Chat() {
   const runtime = useExternalStoreRuntime<ChatMessage>({
     messages,
     isRunning,
-    convertMessage: (m): ThreadMessageLike => ({
-      id: m.id,
-      role: m.role,
-      content: [{ type: "text", text: messageText(m) }],
-      createdAt: new Date(m.createdAt),
-      status:
-        m.role === "assistant"
-          ? m.status === "streaming"
-            ? { type: "running" }
-            : { type: "complete", reason: "stop" }
-          : undefined,
-    }),
+    convertMessage: (m): ThreadMessageLike => toThreadMessage(m, messages),
     onNew: async (append: AppendMessage) => {
       const text = append.content
         .filter((p): p is { type: "text"; text: string } => p.type === "text")
@@ -87,6 +82,73 @@ export function Chat() {
   );
 }
 
+/* ---------------- 消息 → data parts ---------------- */
+
+const toDataPart = (part: MessagePart) => {
+  switch (part.type) {
+    case "thought":
+      return { type: "data-thought" as const, data: part };
+    case "voice":
+      return { type: "data-voice" as const, data: part };
+    case "file":
+      return { type: "data-file" as const, data: part };
+    case "image":
+      return { type: "data-imprint" as const, data: part };
+    default:
+      return { type: "data-unknown" as const, data: part };
+  }
+};
+
+function toThreadMessage(
+  m: ChatMessage,
+  all: readonly ChatMessage[],
+): ThreadMessageLike {
+  if (m.role === "user") {
+    return {
+      id: m.id,
+      role: "user",
+      createdAt: new Date(m.createdAt),
+      content: m.parts.map((p) =>
+        p.type === "text"
+          ? { type: "text" as const, text: p.text }
+          : toDataPart(p),
+      ),
+    };
+  }
+
+  const { text, hits } = calibrate(m, all);
+  const thoughts = m.parts.filter((p) => p.type === "thought").map(toDataPart);
+  const extras = m.parts
+    .filter((p) => p.type !== "thought" && p.type !== "text")
+    .map(toDataPart);
+
+  return {
+    id: m.id,
+    role: "assistant",
+    createdAt: new Date(m.createdAt),
+    content: [
+      ...thoughts,
+      {
+        type: "text" as const,
+        text,
+        ...(m.status === "streaming"
+          ? { status: { type: "running" as const } }
+          : {}),
+      },
+      ...extras,
+      ...(hits.length
+        ? [{ type: "data-boundary" as const, data: { hits } }]
+        : []),
+    ],
+    status:
+      m.status === "streaming"
+        ? { type: "running" }
+        : { type: "complete", reason: "stop" },
+  };
+}
+
+/* ---------------- 头部 ---------------- */
+
 function ChatHeader() {
   const status = usePresenceStore((s) => s.statusLine);
   const quiet = useBoundaryStore((s) => s.quietMode);
@@ -96,8 +158,8 @@ function ChatHeader() {
   return (
     <header className="flex items-center justify-between px-5 pt-5 pb-3">
       <div>
-        <h1 className="serif text-[18px] text-ink">对话</h1>
-        <p className="mt-0.5 flex items-center gap-1.5 text-[12.5px] text-ink-faint">
+        <h1 className="serif text-[19px] text-ink">对话</h1>
+        <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-faint">
           <span
             className={`h-[5px] w-[5px] rounded-full ${
               quiet ? "bg-ink-faint" : "bg-[var(--accent)]"
@@ -107,7 +169,7 @@ function ChatHeader() {
         </p>
       </div>
       {confirming ? (
-        <span className="flex items-center gap-3 text-[13px]">
+        <span className="flex items-center gap-3 text-[11.5px]">
           <button
             onClick={() => {
               reset();
@@ -117,17 +179,14 @@ function ChatHeader() {
           >
             确认清空
           </button>
-          <button
-            onClick={() => setConfirming(false)}
-            className="text-ink-faint"
-          >
+          <button onClick={() => setConfirming(false)} className="text-ink-faint">
             算了
           </button>
         </span>
       ) : (
         <button
           onClick={() => setConfirming(true)}
-          className="tap text-[13px] text-ink-faint hover:text-ink-soft"
+          className="tap text-[11.5px] text-ink-faint hover:text-ink-soft"
         >
           清空
         </button>
@@ -144,7 +203,7 @@ function EmptyChat() {
       <p className="serif text-[17px] leading-[2] text-ink-soft">
         还没有说过话。
       </p>
-      <p className="mt-2 text-[13.5px] leading-[1.9] text-ink-faint">
+      <p className="mt-2 text-[12.5px] leading-[1.9] text-ink-faint">
         它在等第一句。也可以先告诉它今天吃了什么——
         它会去翻你的记录，而不是假装知道。
       </p>
@@ -153,7 +212,7 @@ function EmptyChat() {
           <button
             key={c}
             onClick={() => setDraft(c)}
-            className="press glass-flat px-3 py-1.5 text-[13.5px] text-ink-soft"
+            className="press glass-flat px-3 py-1.5 text-[12px] text-ink-soft"
           >
             {c}
           </button>
@@ -163,60 +222,104 @@ function EmptyChat() {
   );
 }
 
+/* ---------------- 消息 ---------------- */
+
 function MessageRow({ id }: { id: string }) {
-  const message = useChatStore((s) => s.messages.find((m) => m.id === id));
-  if (!message) return null;
-  return message.role === "user" ? (
-    <UserRow message={message} />
+  const meta = useChatStore((s) => s.messages.find((m) => m.id === id));
+  if (!meta) return null;
+  return meta.role === "user" ? (
+    <UserRow meta={meta} />
   ) : (
-    <AssistantRow message={message} />
+    <AssistantRow meta={meta} />
   );
 }
 
-function UserRow({ message }: { message: ChatMessage }) {
+function UserRow({ meta }: { meta: ChatMessage }) {
   return (
     <div className="rise mt-5 flex justify-end first:mt-0">
       <div className="max-w-[86%]">
-        <div className="glass rounded-[20px] rounded-br-[7px] px-4 py-2.5">
-          <div className="space-y-2">
-            {message.parts.map((p, i) => (
-              <PartView key={i} part={p} align="right" />
-            ))}
-          </div>
-        </div>
-        <p className="mt-1 pr-1 text-right text-[11.5px] text-ink-faint">
-          {formatClock(message.createdAt)}
+        <MessagePrimitive.Root className="glass rounded-[20px] rounded-br-[7px] px-4 py-2.5">
+          <MessagePrimitive.Parts>
+            {({ part }) => <PartView part={part} side="user" />}
+          </MessagePrimitive.Parts>
+        </MessagePrimitive.Root>
+        <p className="mt-1 pr-1 text-right text-[10px] text-ink-faint">
+          {formatClock(meta.createdAt)}
         </p>
       </div>
     </div>
   );
 }
 
-function AssistantRow({ message }: { message: ChatMessage }) {
-  const { text } = useCalibration(message);
-  const streaming = message.status === "streaming";
-  const thoughts = message.parts.filter((p) => p.type === "thought");
-  const extras = message.parts.filter(
-    (p) => p.type !== "text" && p.type !== "thought",
-  );
-  const initiative = message.origin === "initiative";
+function AssistantRow({ meta }: { meta: ChatMessage }) {
+  const streaming = meta.status === "streaming";
+  const initiative = meta.origin === "initiative";
 
   return (
     <div className="rise mt-7 first:mt-0">
-      {thoughts.map((p, i) => (
-        <ThoughtCard
-          key={i}
-          part={p as Extract<MessagePart, { type: "thought" }>}
-        />
-      ))}
+      <MessagePrimitive.Root>
+        <MessagePrimitive.Parts>
+          {({ part }) => (
+            <PartView part={part} side="assistant" initiative={initiative} />
+          )}
+        </MessagePrimitive.Parts>
+      </MessagePrimitive.Root>
 
+      {!streaming && (
+        <div className="mt-1 flex items-center gap-4 pl-4 text-[10px] text-ink-faint">
+          <span>{formatClock(meta.createdAt)}</span>
+          <button
+            onClick={() => void regenerateLast()}
+            className="transition-colors hover:text-ink-soft"
+          >
+            重新回应
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** assistant-ui 会把 `data-thought` 解析成 `{ type: "data", name: "thought" }`。 */
+type AnyPart = {
+  type: string;
+  name?: string;
+  text?: string;
+  status?: { type: string };
+  data?: unknown;
+};
+
+function PartView({
+  part,
+  side,
+  initiative,
+}: {
+  part: AnyPart;
+  side: "user" | "assistant";
+  initiative?: boolean;
+}) {
+  const createImprint = useMemoryStore((s) => s.createImprint);
+
+  if (part.type === "text") {
+    const text = part.text ?? "";
+    const running = part.status?.type === "running";
+
+    if (side === "user") {
+      return (
+        <p className="whitespace-pre-wrap break-words text-[14.5px] leading-[1.85] text-ink">
+          {text}
+        </p>
+      );
+    }
+
+    return (
       <div className="border-l border-[var(--line-strong)] pl-4">
         {initiative && (
-          <p className="mb-1.5 text-[11.5px] tracking-[0.2em] text-[var(--accent)] uppercase">
+          <p className="mb-1.5 text-[10px] tracking-[0.2em] text-[var(--accent)] uppercase">
             它先开口的
           </p>
         )}
-        <div className="serif whitespace-pre-wrap break-words text-[16.5px] leading-[1.98] text-ink">
+        <div className="serif whitespace-pre-wrap break-words text-[15.5px] leading-[1.98] text-ink">
           {text.split(/\n{2,}/).map((para, i) => {
             const aside = para.trimStart().startsWith("（");
             return (
@@ -224,7 +327,7 @@ function AssistantRow({ message }: { message: ChatMessage }) {
                 key={i}
                 className={
                   aside
-                    ? "mt-3 text-[15px] leading-[1.9] text-ink-faint"
+                    ? "mt-3 text-[13.5px] leading-[1.9] text-ink-faint"
                     : i > 0
                       ? "mt-3"
                       : undefined
@@ -234,74 +337,67 @@ function AssistantRow({ message }: { message: ChatMessage }) {
               </p>
             );
           })}
-          {streaming && (
+          {running && (
             <span className="blink ml-0.5 inline-block h-[1em] w-[2px] translate-y-[0.15em] bg-ink align-middle" />
           )}
         </div>
       </div>
-
-      {extras.length > 0 && (
-        <div className="mt-3 space-y-2 pl-4">
-          {extras.map((p, i) => (
-            <PartView key={i} part={p} align="left" />
-          ))}
-        </div>
-      )}
-
-      <div className="pl-4">
-        <BoundaryTrace message={message} />
-        {!streaming && (
-          <div className="mt-2 flex items-center gap-4 text-[11.5px] text-ink-faint">
-            <span>{formatClock(message.createdAt)}</span>
-            <button
-              onClick={() => void regenerateLast()}
-              className="transition-colors hover:text-ink-soft"
-            >
-              重新回应
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function PartView({
-  part,
-  align,
-}: {
-  part: MessagePart;
-  align: "left" | "right";
-}) {
-  const createImprint = useMemoryStore((s) => s.createImprint);
-
-  if (part.type === "text") {
-    return (
-      <p
-        className={`whitespace-pre-wrap break-words text-[15.5px] leading-[1.85] ${
-          align === "right" ? "text-ink" : "text-ink-soft"
-        }`}
-      >
-        {part.text}
-      </p>
     );
   }
-  if (part.type === "thought") return <ThoughtCard part={part} />;
-  if (part.type === "voice") return <VoiceBubble part={part} />;
-  if (part.type === "file") return <FileCard part={part} />;
-  if (part.type === "image") {
+
+  if (part.type === "data" && part.name === "thought") {
     return (
-      <ImageBubble
-        part={part}
-        onClick={() =>
-          void createImprint({
-            title: `${new Date().getMonth() + 1}.${new Date().getDate()} 的印记`,
-            prompt: part.caption ?? "未命名",
-          })
-        }
+      <ThoughtCard
+        part={part.data as Extract<MessagePart, { type: "thought" }>}
       />
     );
   }
+
+  if (part.type === "data" && part.name === "voice") {
+    return (
+      <div className={side === "assistant" ? "mt-3 pl-4" : "mt-2"}>
+        <VoiceBubble
+          part={part.data as Extract<MessagePart, { type: "voice" }>}
+        />
+      </div>
+    );
+  }
+
+  if (part.type === "data" && part.name === "file") {
+    return (
+      <div className={side === "assistant" ? "mt-3 pl-4" : "mt-2"}>
+        <FileCard part={part.data as Extract<MessagePart, { type: "file" }>} />
+      </div>
+    );
+  }
+
+  if (part.type === "data" && part.name === "imprint") {
+    const data = part.data as Extract<MessagePart, { type: "image" }>;
+    return (
+      <div className={side === "assistant" ? "mt-3 pl-4" : "mt-2"}>
+        <ImageBubble
+          part={data}
+          compact={side === "user"}
+          onClick={() =>
+            void createImprint({
+              title: `${new Date().getMonth() + 1}.${new Date().getDate()} 的印记`,
+              prompt: data.caption ?? "未命名",
+            })
+          }
+        />
+      </div>
+    );
+  }
+
+  if (part.type === "data" && part.name === "boundary") {
+    const data = part.data as { hits: BoundaryHit[] };
+    return (
+      <div className="pl-4">
+        <BoundaryTraceCard hits={data.hits} />
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -339,8 +435,9 @@ function Composer() {
       lang: string;
       interimResults: boolean;
       start: () => void;
-      stop: () => void;
-      onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+      onresult:
+        | ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void)
+        | null;
       onerror: (() => void) | null;
       onend: (() => void) | null;
     };
@@ -408,7 +505,7 @@ function Composer() {
             }
           />
         </div>
-        <p className="mt-4 text-[13px] leading-[1.9] text-ink-faint">
+        <p className="mt-4 text-[11.5px] leading-[1.9] text-ink-faint">
           这些附件目前是本地占位：图片会存成印记，文件没有真正的字节，
           语音用系统 TTS 读转写文本。接上后端之后形状不变。
         </p>
@@ -419,13 +516,9 @@ function Composer() {
           {pending.map((p, i) => (
             <span
               key={i}
-              className="glass-flat flex items-center gap-2 px-2.5 py-1 text-[13px] text-ink-soft"
+              className="glass-flat flex items-center gap-2 px-2.5 py-1 text-[11.5px] text-ink-soft"
             >
-              {p.type === "image"
-                ? "图片"
-                : p.type === "file"
-                  ? p.name
-                  : "语音"}
+              {p.type === "image" ? "图片" : p.type === "file" ? p.name : "语音"}
               <button
                 onClick={() => setPending((x) => x.filter((_, j) => j !== i))}
                 aria-label="移除"
@@ -438,9 +531,7 @@ function Composer() {
         </div>
       )}
 
-      {notice && (
-        <p className="mb-2 px-1 text-[12.5px] text-ink-faint">{notice}</p>
-      )}
+      {notice && <p className="mb-2 px-1 text-[11px] text-ink-faint">{notice}</p>}
 
       <div className="glass edge flex items-end gap-2 p-2">
         <button
@@ -462,7 +553,7 @@ function Composer() {
             }
           }}
           placeholder={quiet ? "它今天不太说话。你仍然可以写。" : "说点什么"}
-          className="ghost-input max-h-28 flex-1 resize-none bg-transparent py-2 text-[15.5px] leading-[1.6] text-ink"
+          className="ghost-input max-h-28 flex-1 resize-none bg-transparent py-2 text-[14.5px] leading-[1.6] text-ink"
         />
 
         <button
@@ -476,7 +567,7 @@ function Composer() {
         {isRunning ? (
           <button
             onClick={() => cancelTurn()}
-            className="press flex h-9 flex-none items-center justify-center rounded-full bg-[var(--glass-hi)] px-3 text-[13.5px] text-ink"
+            className="press flex h-9 flex-none items-center justify-center rounded-full bg-[var(--glass-hi)] px-3 text-[12px] text-ink"
           >
             停下
           </button>
@@ -510,7 +601,7 @@ function AttachTile({
       className="press glass-flat flex flex-col items-center gap-2 py-4 text-ink-soft"
     >
       {icon}
-      <span className="text-[13px]">{label}</span>
+      <span className="text-[11.5px]">{label}</span>
     </button>
   );
 }
