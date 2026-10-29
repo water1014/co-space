@@ -95,20 +95,26 @@ export function Home() {
         <p className="num text-[13px] text-ink-soft">{time}</p>
       </header>
 
-      {/* 双头像 + 红线 */}
-      <section className="mt-5 flex items-center justify-center gap-5">
+      {/* 草图②：左右圆形头像，中间圆角矩形（红线 + 在一起 N 天） */}
+      <section className="mt-5 flex items-center justify-center gap-4">
         <AvatarBlock initial={t.people.wan[0]} name={t.people.wan} />
-        <RedThread />
+        <div className="glass flex h-[64px] min-w-[116px] flex-col items-center justify-center gap-0.5 rounded-2xl px-3">
+          <RedThread />
+          <p className="num text-[11.5px] text-ink-soft">
+            在一起{" "}
+            <span className="font-semibold text-[var(--accent)]">{days}</span> 天
+          </p>
+        </div>
         <AvatarBlock initial={t.people.yan[0]} name={t.people.yan} accent />
       </section>
 
-      {/* 介绍 / 日期 小字（主卡上方） */}
+      {/* 修改意见：介绍/日期挪到主卡上方小字 */}
       <p className="mt-3 text-center text-[12px] text-ink-faint">
-        {todayLabel()} · 我们在一起 {days} 天
+        {todayLabel()}
       </p>
 
-      {/* 主卡：他今天想对我说的话 */}
-      <section className="glass mt-3 rounded-3xl px-5 py-5">
+      {/* 草图③：主卡（最大）——他今天想对我说的话；撑到 58vh，首屏下只露音乐卡边缘 */}
+      <section className="glass mt-3 flex min-h-[58vh] flex-col rounded-3xl px-5 py-5">
         <div className="flex items-center justify-between">
           <h2 className="card-title text-ink">他今天想对我说的话</h2>
           <button
@@ -121,7 +127,7 @@ export function Home() {
             换一句
           </button>
         </div>
-        <p className="kai mt-3 min-h-[128px] text-[16px] leading-[2] text-ink">
+        <p className="kai mt-3 flex-1 text-[16px] leading-[2] text-ink">
           {loading ? "正在想今天要对你说的话…" : msg?.text}
         </p>
         <div className="mt-3 flex items-center justify-between border-t border-[var(--line)] pt-3">
