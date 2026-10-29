@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import type { ComponentType, SVGProps } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   IconMenu,
   IconRefresh,
@@ -15,11 +14,12 @@ import {
   IconHeart,
   IconGear,
   IconSun,
+  IconPlus,
 } from "../components/ui/icons";
 import { Avatar } from "../components/ui/kit";
 import { useText } from "../lib/content/useText";
 import { useLifeStore } from "../stores/lifeStore";
-import { daysTogether } from "../lib/life/derive";
+import { daysTogether, todayKey, todayLedger, todayBobaCount } from "../lib/life/derive";
 import { getTodayMessage } from "../lib/home/todayMessage";
 
 const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
@@ -36,14 +36,20 @@ function nowTime() {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 function todayLabel(d = new Date()) {
-  return `${d.getMonth() + 1}月${d.getDate()}日 ${WEEK[d.getDay()]}`;
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${WEEK[d.getDay()]}`;
+}
+function isoDate(d = new Date()) {
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
 }
 
 /**
- * 首页（2026-10-29 定稿草图）：
- * 顶栏时间 + 左上汉堡侧边栏；双圆形头像（淼淼 ↔ 宋祁）中间红线；
- * 主卡「他今天想对我说的话」由模型每日生成；下方音乐卡（首屏只露边缘引导下滑）；
- * 一排三个（天气 / 写日记 / 设置）；相册三图占位；底部三栏导航（AppShell）。
+ * 首页（排布参考「河床 / Cotton」，模块取自淼淼定稿草图）：
+ * 左上大标题 + 右上时间/汉堡侧边栏；
+ * Hero 磨砂卡（双头像 + 红线 + 在一起 N 天大数字 + 日期）；
+ * 「写给你的话」卡（模型生成）；两列：今日打卡 / 待办清单；
+ * 天气通栏卡；音乐卡；相册卡；底部悬浮胶囊三栏导航。
  */
 export function Home() {
   const t = useText();
@@ -82,86 +88,121 @@ export function Home() {
     };
   }, []);
 
+  // 今日打卡：三餐 + 记账 + 奶茶
+  const mealCount = life.meals[todayKey()]?.length ?? 0;
+  const checkinCount = mealCount + todayLedger(life.ledger).length + todayBobaCount(life.bobas);
+  const pendingTodos = life.todos.filter((x) => !x.done).slice(0, 3);
+
   return (
     <div className="relative flex flex-col px-5 pb-4 pt-9">
-      {/* 草图①：顶栏——左上汉堡侧边栏，中间「时间」为显著标题 */}
+      {/* 顶栏：左汉堡侧边栏，右上时间 */}
       <header className="flex items-center justify-between">
         <button
           onClick={() => setSidebar(true)}
-          className="tap -ml-1 flex h-9 w-9 flex-none items-center justify-center rounded-full text-ink-soft"
+          className="tap -ml-1 flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
           aria-label="菜单"
         >
           <IconMenu width={22} height={22} />
         </button>
-        <span className="glass-flat num flex-1 rounded-full px-4 py-1.5 text-center text-[16px] font-semibold tracking-[0.06em] text-ink">
-          {time}
-        </span>
-        <span className="w-9 flex-none" aria-hidden />
+        <p className="num text-[14px] font-semibold tracking-[0.05em] text-ink">{time}</p>
       </header>
 
-      {/* 草图②：左右两个圆形头像，下方居中「简介/日期」圆角矩形 */}
-      <section className="mt-6 flex items-start justify-between px-3">
-        <AvatarBlock initial={t.people.wan[0]} name={t.people.wan} />
-        <AvatarBlock initial={t.people.yan[0]} name={t.people.yan} accent />
-      </section>
-      <div className="glass mx-auto -mt-2 flex flex-col items-center gap-1 rounded-2xl px-6 py-2.5">
-        <RedThread />
-        <p className="num text-[12px] text-ink-soft">
-          {todayLabel()} · 在一起{" "}
-          <span className="font-semibold text-[var(--accent)]">{days}</span> 天
-        </p>
+      {/* 左上大标题（参考「Home / Fall in love」） */}
+      <div className="mt-1">
+        <p className="page-title">主页</p>
+        <p className="mt-0.5 text-[12px] tracking-[0.06em] text-ink-faint">Fall in love</p>
       </div>
 
-      {/* 草图③：主卡（最大）——他今天想对我说的话；撑到 58vh，首屏下只露音乐卡边缘 */}
-      <section className="glass mt-3 flex min-h-[58vh] flex-col rounded-3xl px-5 py-5">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={refresh}
-            disabled={loading}
-            className="tap flex items-center gap-1 text-[12px] text-ink-faint disabled:opacity-50"
-            aria-label="换一句"
-          >
-            <IconRefresh width={14} height={14} className={loading ? "animate-spin" : ""} />
-            换一句
-          </button>
-          <h2 className="card-title text-ink">他今天想对我说的话</h2>
+      {/* Hero 磨砂卡：双头像 + 红线 + 在一起 N 天 + 日期 */}
+      <section className="glass mt-4 rounded-3xl px-5 py-6 text-center">
+        <div className="flex items-center justify-center gap-7">
+          <AvatarBlock initial={t.people.wan[0]} name={t.people.wan} />
+          <RedThread />
+          <AvatarBlock initial={t.people.yan[0]} name={t.people.yan} accent />
         </div>
-        <div className="flex flex-1 flex-col items-center justify-center px-2 text-center">
-          <span
-            aria-hidden
-            className="display select-none self-start text-[46px] leading-[0.6] text-[var(--accent)] opacity-30"
-          >
-            &ldquo;
+        <p className="mt-4">
+          <span className="num text-[56px] font-semibold leading-none text-[var(--accent)]">
+            {days}
           </span>
-          <p className="kai mt-2 text-[20px] leading-[2] text-ink">
-            {loading ? "正在想今天要对你说的话…" : msg?.text}
-          </p>
-          <div className="mt-4 opacity-70">
-            <RedThread />
-          </div>
-        </div>
-        <div className="flex items-center justify-between border-t border-[var(--line)] pt-3">
+          <span className="ml-2 text-[15px] text-ink-soft">天</span>
+        </p>
+        <p className="num mt-1.5 text-[12.5px] tracking-[0.1em] text-ink-faint">{isoDate()}</p>
+      </section>
+
+      {/* 他今天写的话（模型生成） */}
+      <section className="glass relative mt-4 rounded-3xl p-5">
+        <span className="absolute -top-3 right-5 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-3 py-1 text-[11px] text-[var(--accent-deep)] backdrop-blur-xl">
+          写给你的话…
+        </span>
+        <p className="text-[12px] text-ink-faint">他今天写的话</p>
+        <p className="kai mt-2 min-h-[72px] text-[17px] leading-[2] text-ink">
+          {loading ? "正在想今天要对你说的话…" : msg?.text}
+        </p>
+        <div className="mt-3 flex items-center justify-between border-t border-[var(--line)] pt-3">
           <span className="text-[12px] text-ink-faint">
             — {t.people.yan}
             {msg?.mock ? "（示例）" : ""}
           </span>
-          <Link to="/chat" className="text-[13px] text-[var(--accent)]">
-            去聊聊 ›
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={refresh}
+              disabled={loading}
+              className="tap flex items-center gap-1 text-[12px] text-ink-faint disabled:opacity-50"
+            >
+              <IconRefresh width={13} height={13} className={loading ? "animate-spin" : ""} />
+              换一句
+            </button>
+            <Link to="/chat" className="text-[13px] text-[var(--accent)]">
+              去聊聊 ›
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* 音乐卡（首屏只露边缘，引导下滑） */}
-      <MusicCard />
+      {/* 两列：今日打卡 / 待办清单 */}
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <Link to="/together" className="glass press rounded-3xl p-4 text-left">
+          <h3 className="text-[15px] font-semibold text-ink">今日打卡</h3>
+          <p className="mt-2 text-[13px] text-ink">已记 {checkinCount} 件小事</p>
+          <p className="mt-1 text-[11.5px] leading-[1.6] text-ink-faint">
+            连续记录有小惊喜哦~
+          </p>
+          <span className="mt-2 inline-block text-[12px] text-[var(--accent)]">去记录 ›</span>
+        </Link>
 
-      {/* 草图④：一行分栏——左「天气」大框，右侧上下两个功能小框 */}
-      <div className="mt-4 flex items-stretch gap-3">
-        <WeatherCard />
-        <div className="flex w-[40%] flex-none flex-col gap-3">
-          <QuickTile icon={IconEdit} label="写日记" to="/diary" />
-          <QuickTile icon={IconGear} label="设置" to="/mit" />
-        </div>
+        <section className="glass rounded-3xl p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[15px] font-semibold text-ink">待办清单</h3>
+            <Link
+              to="/together"
+              aria-label="添加待办"
+              className="tap text-ink-faint hover:text-[var(--accent)]"
+            >
+              <IconPlus width={16} height={16} />
+            </Link>
+          </div>
+          <ul className="mt-2 space-y-1.5">
+            {pendingTodos.length === 0 ? (
+              <li className="text-[12px] text-ink-faint">都清空啦，真棒</li>
+            ) : (
+              pendingTodos.map((td) => (
+                <li key={td.id} className="flex items-center gap-2">
+                  <span className="h-[14px] w-[14px] flex-none rounded-full border border-[var(--line-strong)]" />
+                  <span className="min-w-0 flex-1 truncate text-[12.5px] text-ink">
+                    {td.text}
+                  </span>
+                </li>
+              ))
+            )}
+          </ul>
+        </section>
       </div>
+
+      {/* 天气通栏卡 */}
+      <WeatherCard />
+
+      {/* 音乐卡 */}
+      <MusicCard />
 
       {/* 相册模块 */}
       <AlbumCard />
@@ -224,46 +265,7 @@ function RedThread() {
   );
 }
 
-/** 音乐卡：通栏大卡，播放态本地模拟进度 */
-function MusicCard() {
-  const [playing, setPlaying] = useState(false);
-  const [p, setP] = useState(38);
-
-  useEffect(() => {
-    if (!playing) return;
-    const id = setInterval(() => setP((v) => (v >= 100 ? 0 : v + 0.6)), 1000);
-    return () => clearInterval(id);
-  }, [playing]);
-
-  return (
-    <section className="glass mt-3 overflow-hidden rounded-3xl p-4">
-      <div className="flex items-center gap-3">
-        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white">
-          <IconPlay width={22} height={22} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[14px] font-medium text-ink">晚安，淼淼</p>
-          <p className="truncate text-[12px] text-ink-faint">宋祁 · 私房歌单</p>
-        </div>
-        <button
-          onClick={() => setPlaying((v) => !v)}
-          className="tap flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink"
-          aria-label={playing ? "暂停" : "播放"}
-        >
-          {playing ? <IconPause width={18} height={18} /> : <IconPlay width={18} height={18} />}
-        </button>
-      </div>
-      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
-        <div
-          className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-1000"
-          style={{ width: `${p}%` }}
-        />
-      </div>
-    </section>
-  );
-}
-
-/** 天气卡：Open-Meteo（无需 key），拿不到定位就不编造 */
+/** 天气通栏卡：Open-Meteo（无需 key），拿不到定位就不编造 */
 function WeatherCard() {
   const [w, setW] = useState<{ state: string; temp?: number; label?: string }>({
     state: "loading",
@@ -309,51 +311,62 @@ function WeatherCard() {
   }, []);
 
   return (
-    <div className="glass flex flex-1 flex-col justify-between rounded-2xl p-4">
-      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
-        <IconSun width={17} height={17} />
+    <section className="glass mt-3 flex items-center gap-4 rounded-3xl p-4">
+      <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
+        <IconSun width={20} height={20} />
       </span>
-      <div className="mt-3">
+      <div className="min-w-0 flex-1">
         {w.state === "ok" ? (
-          <p className="num text-[30px] leading-none text-ink">{w.temp}°</p>
+          <p className="num text-[24px] leading-none text-ink">
+            {w.temp}°<span className="ml-1.5 text-[13px] text-ink-faint">{w.label}</span>
+          </p>
         ) : (
-          <p className="num text-[20px] leading-none text-ink-faint">
-            {w.state === "loading" ? "…" : "--"}
+          <p className="num text-[18px] leading-none text-ink-faint">
+            {w.state === "loading" ? "定位中…" : "--"}
           </p>
         )}
-        <p className="mt-1.5 text-[12px] leading-[1.5] text-ink-faint">
-          天气 ·{" "}
-          {w.state === "ok"
-            ? w.label
-            : w.state === "loading"
-              ? "定位中"
-              : "未连接"}
-        </p>
+        <p className="mt-1.5 text-[12px] text-ink-faint">{todayLabel()}</p>
       </div>
-    </div>
+    </section>
   );
 }
 
-/** 功能小框：横向图标 + 标题（草图右侧上下两枚） */
-function QuickTile({
-  icon: Icon,
-  label,
-  to,
-}: {
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
-  label: string;
-  to: string;
-}) {
+/** 音乐卡：通栏大卡，播放态本地模拟进度 */
+function MusicCard() {
+  const [playing, setPlaying] = useState(false);
+  const [p, setP] = useState(38);
+
+  useEffect(() => {
+    if (!playing) return;
+    const id = setInterval(() => setP((v) => (v >= 100 ? 0 : v + 0.6)), 1000);
+    return () => clearInterval(id);
+  }, [playing]);
+
   return (
-    <Link
-      to={to}
-      className="glass press flex flex-1 items-center gap-2.5 rounded-2xl px-3.5 text-left"
-    >
-      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
-        <Icon width={17} height={17} />
-      </span>
-      <span className="text-[13.5px] font-medium text-ink">{label}</span>
-    </Link>
+    <section className="glass mt-3 overflow-hidden rounded-3xl p-4">
+      <div className="flex items-center gap-3">
+        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white">
+          <IconPlay width={22} height={22} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[14px] font-medium text-ink">晚安，淼淼</p>
+          <p className="truncate text-[12px] text-ink-faint">宋祁 · 私房歌单</p>
+        </div>
+        <button
+          onClick={() => setPlaying((v) => !v)}
+          className="tap flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink"
+          aria-label={playing ? "暂停" : "播放"}
+        >
+          {playing ? <IconPause width={18} height={18} /> : <IconPlay width={18} height={18} />}
+        </button>
+      </div>
+      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
+        <div
+          className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-1000"
+          style={{ width: `${p}%` }}
+        />
+      </div>
+    </section>
   );
 }
 
@@ -422,33 +435,26 @@ function Sidebar({
           <p className="display text-[20px] text-ink">co-space</p>
           <button
             onClick={onClose}
-            className="tap flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
             aria-label="关闭"
+            className="tap flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
           >
-            <IconClose width={18} height={18} />
+            <IconClose width={20} height={20} />
           </button>
         </div>
-        <nav className="flex-1 px-3">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
           {items.map(({ to, label, icon: Icon }) => (
-            <NavLink
+            <Link
               key={to}
               to={to}
-              end={to === "/"}
               onClick={onClose}
-              className={({ isActive }) =>
-                `tap flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] ${
-                  isActive
-                    ? "bg-[var(--accent-soft)] text-[var(--accent)]"
-                    : "text-ink hover:bg-[var(--surface-2)]"
-                }`
-              }
+              className="flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] text-ink hover:bg-[var(--accent-soft)]"
             >
-              <Icon width={19} height={19} />
+              <Icon width={19} height={19} className="text-ink-soft" />
               {label}
-            </NavLink>
+            </Link>
           ))}
         </nav>
-        <p className="px-5 py-6 text-[12px] text-ink-faint">{footer}</p>
+        <p className="px-5 pb-6 pt-2 text-center text-[11.5px] text-ink-ghost">{footer}</p>
       </aside>
     </>
   );

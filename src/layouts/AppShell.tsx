@@ -42,31 +42,31 @@ type TabItem = {
   icon: React.ComponentType<SVGProps<SVGSVGElement> & { strokeWidth?: number }>;
 };
 
-/** 底部三栏导航条 */
+/** 底部悬浮胶囊导航（参考「河床」的浮动底栏） */
 function TabBar({ tabs }: { tabs: TabItem[] }) {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--glass-border)] bg-[var(--glass-bg-strong)] backdrop-blur-2xl"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="fixed inset-x-0 bottom-0 z-40"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
     >
-      <div className="mx-auto flex max-w-[600px]">
+      <div className="mx-auto flex w-[min(88%,380px)] items-center rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-2 py-1.5 shadow-[var(--shadow-float)] backdrop-blur-2xl">
         {tabs.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `tap flex flex-1 flex-col items-center gap-[3px] py-2.5 ${
+              `tap flex flex-1 flex-col items-center gap-[2px] rounded-full py-1.5 transition-colors ${
                 isActive
-                  ? "text-[var(--accent)]"
+                  ? "bg-[var(--accent-soft)] text-[var(--accent-deep)]"
                   : "text-ink-faint hover:text-ink-soft"
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <Icon width={22} height={22} strokeWidth={isActive ? 1.8 : 1.3} />
-                <span className="tab-label">{label}</span>
+                <Icon width={20} height={20} strokeWidth={isActive ? 1.8 : 1.3} />
+                <span className="text-[10px] font-medium">{label}</span>
               </>
             )}
           </NavLink>
