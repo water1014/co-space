@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, dayKey } from "../components/home/Calendar";
-import { IconCheck, IconGear, IconMoon, IconPlus } from "../components/ui/icons";
+import { IconCheck, IconGear, IconMoon, IconPlus, ROOM_ICONS } from "../components/ui/icons";
 import { IconButton, GroupTitle, Avatar } from "../components/ui/kit";
 import { useLifeStore, todayKey } from "../stores/lifeStore";
 import { useMemoryStore } from "../stores/memoryStore";
@@ -53,12 +53,12 @@ export function Home() {
   // 今日条目：三餐 / 睡眠 / 记账 / 奶茶 / 单词
   const todayItems = useMemo(() => {
     const t = todayKey();
-    const items: { key: string; emoji: string; label: string; value: string; by?: "wan" | "yan" }[] = [];
+    const items: { key: string; iconKey: string; label: string; value: string; by?: "wan" | "yan" }[] = [];
     MEALS.forEach((m) => {
       if (life.meals[t]?.includes(m)) {
         items.push({
           key: `meal-${m}`,
-          emoji: "🥚",
+          iconKey: "meal",
           label: MEAL_LABEL[m],
           value: life.mealNotes[t]?.[m] || "吃了",
           by: life.mealBy[t]?.[m],
@@ -68,7 +68,7 @@ export function Home() {
     if (night) {
       items.push({
         key: "sleep",
-        emoji: "😴",
+        iconKey: "sleep",
         label: "夜睡",
         value: `${Math.floor(night.hours)}h${Math.round((night.hours % 1) * 60)}m`,
         by: night.by,
@@ -79,7 +79,7 @@ export function Home() {
       .forEach((e) => {
         items.push({
           key: `l-${e.id}`,
-          emoji: "¥",
+          iconKey: "ledger",
           label: e.note || e.category,
           value: `¥${e.amount.toFixed(2)}`,
           by: e.by,
@@ -90,7 +90,7 @@ export function Home() {
       .forEach((b) => {
         items.push({
           key: `b-${b.id}`,
-          emoji: "🧋",
+          iconKey: "boba",
           label: b.note || "奶茶",
           value: `¥${b.price}`,
           by: b.by,
@@ -99,7 +99,7 @@ export function Home() {
     if (words) {
       items.push({
         key: "words",
-        emoji: "📚",
+        iconKey: "words",
         label: "单词",
         value: `${words.learned}/${words.goal}`,
       });
@@ -171,21 +171,26 @@ export function Home() {
       {/* 七间房：首页主导入口 */}
       <p className="eyebrow mb-3 mt-8 px-1">房间 · ROOMS</p>
       <div className="grid grid-cols-2 gap-3">
-        {t.rooms.map((r) => (
-          <Link
-            key={r.key}
-            to="/together"
-            className="glass press rounded-2xl px-4 py-3.5"
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="text-[20px]">{r.emoji}</span>
-              <span className="text-[15px] font-medium text-ink">{r.label}</span>
-            </div>
-            <p className="mt-2 line-clamp-2 text-[12px] leading-[1.6] text-ink-faint">
-              {r.slogan}
-            </p>
-          </Link>
-        ))}
+        {t.rooms.map((r) => {
+          const RoomIcon = ROOM_ICONS[r.key];
+          return (
+            <Link
+              key={r.key}
+              to="/together"
+              className="glass press rounded-2xl px-4 py-3.5"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-[var(--surface-2)] text-[var(--ink)]">
+                  <RoomIcon width={18} height={18} />
+                </span>
+                <span className="text-[15px] font-medium text-ink">{r.label}</span>
+              </div>
+              <p className="mt-2.5 line-clamp-2 text-[12px] leading-[1.6] text-ink-faint">
+                {r.slogan}
+              </p>
+            </Link>
+          );
+        })}
       </div>
 
       {/* 01 · 今日 */}
@@ -231,14 +236,18 @@ export function Home() {
           </p>
         ) : (
           <div className="mt-3">
-            {todayItems.map((it, i) => (
+          {todayItems.map((it, i) => {
+            const Icon = ROOM_ICONS[it.iconKey];
+            return (
               <div
                 key={it.key}
                 className={`flex items-center gap-3 py-2.5 ${
                   i > 0 ? "border-t border-[var(--line)]" : ""
                 }`}
               >
-                <span className="text-[15px]">{it.emoji}</span>
+                <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[var(--surface-2)] text-ink-soft">
+                  <Icon width={14} height={14} />
+                </span>
                 <span className="min-w-0 flex-1 truncate text-[14px] text-ink">
                   {it.label}
                 </span>
@@ -255,7 +264,8 @@ export function Home() {
                   />
                 )}
               </div>
-            ))}
+            );
+          })}
           </div>
         )}
 

@@ -5,6 +5,7 @@ import {
   IconChevron,
   IconClose,
   IconMoon,
+  ROOM_ICONS,
 } from "../components/ui/icons";
 import { Calendar } from "../components/home/Calendar";
 import { useLifeStore, todayKey } from "../stores/lifeStore";
@@ -79,16 +80,25 @@ export function Together() {
       <div className="grid grid-cols-2 gap-2.5 px-1">
         {t.rooms.map((r) => {
           const on = r.key === room;
+          const RoomIcon = ROOM_ICONS[r.key];
           return (
             <button
               key={r.key}
               onClick={() => setRoom(r.key)}
-              className={`glass press rounded-2xl px-4 py-3 text-left transition ${
+              className={`glass press rounded-2xl px-3.5 py-3 text-left transition ${
                 on ? "ring-1 ring-[var(--accent-deep)]" : ""
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <span className="text-[20px] leading-none">{r.emoji}</span>
+                <span
+                  className={`flex h-8 w-8 flex-none items-center justify-center rounded-xl border ${
+                    on
+                      ? "border-[var(--accent-deep)] bg-[var(--accent-soft)] text-[var(--accent-deep)]"
+                      : "border-[var(--line)] text-ink"
+                  }`}
+                >
+                  <RoomIcon width={16} height={16} />
+                </span>
                 <span
                   className={`text-[14.5px] font-medium ${
                     on ? "text-[var(--accent-deep)]" : "text-ink"

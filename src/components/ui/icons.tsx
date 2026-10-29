@@ -152,3 +152,46 @@ export const IconFolder = (p: SVGProps<SVGSVGElement>) => (
     <path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h4l2 2.5h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" />
   </svg>
 );
+
+/** 三餐：碗口 + 碗身 + 两缕热气（线条勾勒） */
+export const IconBowl = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M3.5 11.5h17" />
+    <path d="M4.6 11.5a7.4 7.4 0 0 0 14.8 0" />
+    <path d="M9.7 8c-.4-.9.4-1.6.4-2.6M14.2 8c-.4-.9.4-1.6.4-2.6" />
+  </svg>
+);
+
+/** 奶茶：杯身 + 杯盖 + 吸管（线条勾勒） */
+export const IconCup = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M6.5 9h11l-1.2 9.6a1.4 1.4 0 0 1-1.4 1.2H9.1a1.4 1.4 0 0 1-1.4-1.2z" />
+    <path d="M9 9V7.3A3 3 0 0 1 15 7.3V9" />
+    <path d="M12 6.4v7.6" />
+  </svg>
+);
+
+/** 记账：圆 + ¥ 符号（线条勾勒） */
+export const IconCoin = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="8" />
+    <path d="M12 8.2v7.6M9.9 9.8c0-1 .9-1.5 2.1-1.5s2.1.6 2.1 1.5-1 1.4-2.1 1.4-2.1.5-2.1 1.4 1 1.5 2.1 1.5 2.1-.6 2.1-1.5" />
+  </svg>
+);
+
+/**
+ * 七房间 → 线条图标映射。
+ * 用途：Home 与 Together 的房间网格统一用线条勾勒，不再依赖 emoji 字体。
+ */
+export const ROOM_ICONS: Record<
+  string,
+  (p: SVGProps<SVGSVGElement>) => JSX.Element
+> = {
+  meal: IconBowl,
+  sleep: IconMoon,
+  ledger: IconCoin,
+  boba: IconCup,
+  words: IconBook,
+  wrong: IconClose,
+  reward: IconSpark,
+};
