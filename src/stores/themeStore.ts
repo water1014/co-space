@@ -39,7 +39,7 @@ export function applyAppearanceVars(s: {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      theme: "night",
+      theme: "day",
       bgStrength: 100,
       glassAlpha: 100,
       setTheme: (theme) => {

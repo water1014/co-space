@@ -2,16 +2,15 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, dayKey } from "../components/home/Calendar";
 import { IconCheck, IconGear, IconMoon, IconPlus } from "../components/ui/icons";
-import { IconButton, GroupTitle } from "../components/ui/kit";
+import { IconButton, GroupTitle, Avatar } from "../components/ui/kit";
 import { useLifeStore, todayKey } from "../stores/lifeStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useDiaryStore } from "../stores/diaryStore";
+import { useProjectsStore } from "../stores/projectsStore";
 import {
   daysTogether,
   nightSleeps,
-  todayBobaCount,
   todayMeals,
-  todayTotal,
   todayWords,
   wakeDateOf,
 } from "../lib/life/derive";
@@ -22,13 +21,17 @@ import { useText } from "../lib/content/useText";
 const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
 
 /**
- * 首页：Canoe 式浅色系统。
- * DAYS TOGETHER 眉题 + 大数字 + 引言 + 编号分组（今日 / 待办 / 共处 / 月历）。
+ * 首页：角色 + 房间主导。
+ * 顶部是「你 ↔ 角色」的头像与一根红线，下面「在一起 N 天」；
+ * 七间房作为入口网格；再往下是今日概览 / 待办 / 记忆 / 月历。
  */
 export function Home() {
   const life = useLifeStore();
   const memories = useMemoryStore((s) => s.memories);
   const diaryEntries = useDiaryStore((s) => s.entries);
+  const projects = useProjectsStore((s) => s.projects);
+  const activeId = useProjectsStore((s) => s.activeId);
+  const activeProject = projects.find((p) => p.id === activeId);
 
   const t = useText();
   const [selected, setSelected] = useState<string>(todayKey());
@@ -37,8 +40,6 @@ export function Home() {
 
   const days = daysTogether(life.anniversary);
   const meals = todayMeals(life.meals);
-  const total = todayTotal(life.ledger);
-  const bobaCount = todayBobaCount(life.bobas);
   const words = todayWords(life.words);
   const openTodos = life.todos.filter((t) => !t.done);
   const night = useMemo(
@@ -49,7 +50,7 @@ export function Home() {
     [life.sleep],
   );
 
-  // 今日条目：三餐 / 睡眠 / 记账 / 奶茶 / 单词，全部来自同一套 store。
+  // 今日条目：三餐 / 睡眠 / 记账 / 奶茶 / 单词
   const todayItems = useMemo(() => {
     const t = todayKey();
     const items: { key: string; emoji: string; label: string; value: string; by?: "wan" | "yan" }[] = [];
@@ -106,13 +107,11 @@ export function Home() {
     return items;
   }, [life.meals, life.mealNotes, life.mealBy, life.sleep, life.ledger, life.bobas, life.words]);
 
-  // 选中日的日记摘句
   const dayDiary = diaryEntries.filter((e) => e.date === selected);
   const dayMemories = memories.filter(
     (m) => dayKey(new Date(m.createdAt)) === selected,
   );
 
-  // 月历小标记：有任何记录的日子
   const calMarks = useMemo(() => {
     const s = new Set<string>();
     Object.keys(life.meals).forEach((k) => life.meals[k]?.length && s.add(k));
@@ -124,10 +123,10 @@ export function Home() {
   }, [life.meals, life.ledger, life.bobas, life.sleep, memories]);
 
   return (
-    <div className="flex flex-col px-5 pb-12 pt-9">
-      {/* 顶栏：眉题 + 菜单 */}
+    <div className="flex flex-col px-5 pb-14 pt-9">
+      {/* 顶栏 */}
       <div className="flex items-center justify-between">
-        <p className="eyebrow">{t.home.eyebrow}</p>
+        <p className="eyebrow">CO-SPACE</p>
         <Link to="/mit" aria-label="设置">
           <IconButton label="设置">
             <IconGear width={18} height={18} />
@@ -135,16 +134,59 @@ export function Home() {
         </Link>
       </div>
 
-      {/* 大数字 + 引言 */}
-      <div className="mt-4">
-        <h1 className="display num text-[78px] leading-[0.92] tracking-tight text-ink">
-          {days}
-        </h1>
-        <p className="kai mt-2 text-[18px] leading-[1.85] text-ink">{t.home.quote}</p>
-        <p className="quote-by mt-1.5">— {t.home.quoteAuthor}</p>
-      </div>
+      {/* Hero：你 ↔ 角色 + 红线 + 在一起 N 天 */}
+      <section className="mt-5">
+        <div className="flex items-center justify-center gap-5">
+          <Avatar size={56} className="ring-2 ring-[var(--surface)]">
+            <span className="text-[15px] font-medium text-ink-soft">我</span>
+          </Avatar>
 
-      <div className="mt-6 h-px w-full bg-[var(--line)]" />
+          <RedThread />
+
+          <Avatar
+            size={56}
+            className="bg-[var(--accent-soft)]"
+          >
+            <span className="text-[15px] font-semibold text-[var(--accent)]">
+              {activeProject?.name?.[0] ?? "伴"}
+            </span>
+          </Avatar>
+        </div>
+
+        <div className="mt-5 text-center">
+          <p className="eyebrow">我们在一起</p>
+          <h1 className="display num mt-1 text-[62px] leading-none text-[var(--accent)]">
+            {days}
+          </h1>
+          <p className="mt-2 text-[14px] text-ink-soft">
+            {activeProject?.name ?? "我们的空间"}
+          </p>
+          <p className="kai mt-3 text-[15px] leading-[1.8] text-ink">
+            {t.home.quote}
+          </p>
+          <p className="quote-by mt-1.5">— {t.home.quoteAuthor}</p>
+        </div>
+      </section>
+
+      {/* 七间房：首页主导入口 */}
+      <p className="eyebrow mb-3 mt-8 px-1">房间 · ROOMS</p>
+      <div className="grid grid-cols-2 gap-3">
+        {t.rooms.map((r) => (
+          <Link
+            key={r.key}
+            to="/together"
+            className="glass press rounded-2xl px-4 py-3.5"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-[20px]">{r.emoji}</span>
+              <span className="text-[15px] font-medium text-ink">{r.label}</span>
+            </div>
+            <p className="mt-2 line-clamp-2 text-[12px] leading-[1.6] text-ink-faint">
+              {r.slogan}
+            </p>
+          </Link>
+        ))}
+      </div>
 
       {/* 01 · 今日 */}
       <GroupTitle index="01" title="今日" en="TODAY" />
@@ -227,7 +269,7 @@ export function Home() {
                 onClick={() => life.toggleMeal(m, "wan", todayKey())}
                 className={`press flex flex-1 items-center justify-center gap-1.5 rounded-full border py-1.5 text-[12.5px] ${
                   on
-                    ? "border-ink text-ink"
+                    ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
                     : "border-[var(--line)] text-ink-faint"
                 }`}
               >
@@ -281,39 +323,35 @@ export function Home() {
         </div>
       </section>
 
-      {/* 03 · 共处 */}
-      <GroupTitle index="03" title="共处" en="TOGETHER" />
-      <Link to="/together" className="block">
-        <section className="glass rounded-2xl px-5 py-4 press">
-          <div className="flex items-center justify-between">
-            <h2 className="card-title text-ink">共处</h2>
-            <span className="page-head-sub text-[12.5px]">life, kept ›</span>
+      {/* 03 · 记忆 */}
+      <GroupTitle index="03" title="记忆" en="MEMORY" />
+      <section className="glass rounded-2xl px-5 py-4">
+        {memories.length === 0 ? (
+          <p className="card-title py-4 text-center text-[15px] text-ink-faint">
+            还没有记下什么值得收藏的。
+          </p>
+        ) : (
+          <div className="mt-1 space-y-3">
+            {memories.slice(0, 3).map((m) => (
+              <div key={m.id} className="flex gap-3">
+                <span className="mt-1.5 h-[6px] w-[6px] flex-none rounded-full bg-[var(--accent)]" />
+                <div className="min-w-0">
+                  <p className="text-[14px] leading-[1.7] text-ink">{m.text}</p>
+                  <p className="num mt-0.5 text-[11px] text-ink-faint">
+                    {dayKey(new Date(m.createdAt)).slice(5).replace("-", ".")}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="mt-3 flex items-center gap-5 overflow-hidden text-[14px] text-ink">
-            <span className="flex items-center gap-1.5">
-              <span className="text-[15px]">🥚</span>
-              <MealDots n={meals.length} />
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-[15px]">😴</span>
-              <span className="text-ink-soft">
-                {night ? `${Math.floor(night.hours)}h${Math.round((night.hours % 1) * 60)}m` : "未记"}
-              </span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-[15px]">🧋</span>
-              <span className="num">
-                {bobaCount}/{life.bobaQuota}
-              </span>
-            </span>
-            <span className="num flex items-center">¥{total.toFixed(0)}</span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-[15px]">📚</span>
-              <span className="num">{words?.learned ?? 0}</span>
-            </span>
-          </div>
-        </section>
-      </Link>
+        )}
+        <Link
+          to="/memory"
+          className="mt-3 block border-t border-[var(--line)] pt-3 text-center text-[13px] text-[var(--accent)]"
+        >
+          查看全部记忆 ›
+        </Link>
+      </section>
 
       {/* 04 · 月历 */}
       <GroupTitle index="04" title="月历" en="CALENDAR" />
@@ -341,11 +379,26 @@ export function Home() {
         )}
       </section>
 
-      {/* 页脚 */}
       <footer className="mt-9">
         <p className="page-head-sub text-center text-[13px]">{t.home.footer}</p>
       </footer>
     </div>
+  );
+}
+
+/** 你 ↔ 角色 之间的一根红线（命运感） */
+function RedThread() {
+  return (
+    <svg width="44" height="22" viewBox="0 0 44 22" fill="none" aria-hidden>
+      <path
+        d="M3 11 C 13 3, 17 19, 22 11 S 35 3, 41 11"
+        stroke="var(--accent)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeDasharray="1 4"
+      />
+      <circle cx="22" cy="11" r="2.4" fill="var(--accent)" />
+    </svg>
   );
 }
 
@@ -359,18 +412,5 @@ function RoundPlus({ onClick }: { onClick?: () => void }) {
     >
       <IconPlus width={13} height={13} />
     </button>
-  );
-}
-
-/** 三餐 ●●○ 小圆点 */
-function MealDots({ n }: { n: number }) {
-  return (
-    <span className="num flex items-center gap-[3px] text-[13px] tracking-[0.12em]">
-      {[0, 1, 2].map((i) => (
-        <span key={i} className={i < n ? "text-ink" : "text-ink-faint/60"}>
-          {i < n ? "●" : "○"}
-        </span>
-      ))}
-    </span>
   );
 }

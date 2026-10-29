@@ -75,22 +75,31 @@ export function Together() {
         </div>
       </div>
 
-      {/* 房间 pills */}
-      <div className="scroll-area -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      {/* 房间网格：七间房的入口，选中态用品牌色 */}
+      <div className="grid grid-cols-2 gap-2.5 px-1">
         {t.rooms.map((r) => {
           const on = r.key === room;
           return (
             <button
               key={r.key}
               onClick={() => setRoom(r.key)}
-              className={`press flex flex-none items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] ${
-                on
-                  ? "border-[var(--accent-deep)] bg-[var(--glass-solid)] text-[var(--accent-deep)]"
-                  : "border-[var(--line)] text-ink-soft"
+              className={`glass press rounded-2xl px-4 py-3 text-left transition ${
+                on ? "ring-1 ring-[var(--accent-deep)]" : ""
               }`}
             >
-              <span className="text-[13px]">{r.emoji}</span>
-              {r.label}
+              <div className="flex items-center gap-2.5">
+                <span className="text-[20px] leading-none">{r.emoji}</span>
+                <span
+                  className={`text-[14.5px] font-medium ${
+                    on ? "text-[var(--accent-deep)]" : "text-ink"
+                  }`}
+                >
+                  {r.label}
+                </span>
+              </div>
+              <p className="mt-1.5 line-clamp-1 text-[11.5px] leading-[1.5] text-ink-faint">
+                {r.slogan}
+              </p>
             </button>
           );
         })}

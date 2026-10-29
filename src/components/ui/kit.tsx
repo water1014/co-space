@@ -63,7 +63,7 @@ export function GroupTitle({
   return (
     <div className="mb-3 mt-7 flex items-baseline justify-between gap-3 px-5 first:mt-0">
       <div className="flex items-baseline gap-2.5">
-        {index && <span className="num text-[13px] text-ink-ghost">{index}</span>}
+        {index && <span className="num text-[13px] text-[var(--accent)]">{index}</span>}
         <h2 className="group-title">{title}</h2>
       </div>
       {action ?? (en ? <span className="eyebrow">{en}</span> : null)}
@@ -140,7 +140,9 @@ export function Segmented<T extends string>({
             aria-selected={active}
             onClick={() => onChange(o.key)}
             className={`tap relative flex-1 rounded-[10px] py-1.5 text-[13.5px] ${
-              active ? "bg-[var(--surface)] text-ink" : "text-ink-faint"
+              active
+                ? "bg-[var(--accent-soft)] text-[var(--accent)] font-medium"
+                : "text-ink-faint"
             }`}
           >
             {o.label}

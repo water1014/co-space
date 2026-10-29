@@ -112,7 +112,9 @@ function TabBar({
 }) {
   const item = (active: boolean) =>
     `tap flex flex-col items-center gap-[3px] px-3.5 py-1.5 ${
-      active ? "text-ink" : "text-ink-faint hover:text-ink-soft"
+      active
+        ? "text-[var(--accent)]"
+        : "text-ink-faint hover:text-ink-soft"
     }`;
 
   return (

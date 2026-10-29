@@ -575,7 +575,7 @@ export function Mit() {
           <div className="flex items-center justify-between">
             <span className="text-[14.5px] text-ink">面板连接</span>
             <span className="flex items-center gap-1.5 text-[12.5px] text-ink-soft">
-              <span className="text-emerald-500">
+              <span className="text-[var(--accent)]">
                 <IconCheck width={13} height={13} strokeWidth={2.4} />
               </span>
               {memories.length} memories
@@ -967,7 +967,7 @@ function HealthRow({
       <span className="flex items-center gap-2.5 text-[14.5px] text-ink">
         <span
           className={`h-[9px] w-[9px] rounded-full ${
-            on ? "bg-emerald-400" : "bg-ink-faint/50"
+            on ? "bg-[var(--accent)]" : "bg-ink-faint/50"
           }`}
         />
         {label}

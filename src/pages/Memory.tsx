@@ -38,7 +38,7 @@ export function Memory() {
             <h1 className="page-head-title text-[30px] leading-none text-ink">{t.pages.memory.title}</h1>
             <p className="page-head-sub mt-1 text-[12.5px]">{t.pages.memory.sub}</p>
           </div>
-          <span className="mt-2 h-[7px] w-[7px] rounded-full bg-emerald-500" />
+          <span className="mt-2 h-[7px] w-[7px] rounded-full bg-[var(--accent)]" />
         </div>
 
         {/* 三 Tab */}
@@ -501,7 +501,7 @@ function EditSheet({
           </div>
 
           <div className="mt-4 flex items-center gap-2 border-t border-[var(--line)] pt-3 text-[10.5px] text-ink-faint">
-            <IconCheck width={11} height={11} className="text-emerald-500" />
+            <IconCheck width={11} height={11} className="text-[var(--accent)]" />
             {formatClock(current.updatedAt)} 改过
             <button onClick={onClose} className="press ml-auto flex items-center gap-1">
               <IconClose width={11} height={11} /> 收起
