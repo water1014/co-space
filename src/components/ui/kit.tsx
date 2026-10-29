@@ -390,7 +390,7 @@ export function Sheet({
         }`}
       />
       <div
-        className={`absolute inset-x-0 bottom-0 mx-auto w-full max-w-[560px] overflow-hidden rounded-t-[24px] border-t border-[var(--line)] bg-[var(--surface)] transition-transform duration-300 ${
+        className={`absolute inset-x-0 bottom-0 mx-auto w-full max-w-[560px] overflow-hidden rounded-t-[24px] border-t border-[var(--glass-border)] bg-[var(--glass-bg-strong)] backdrop-blur-2xl transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-full"
         }`}
         style={{

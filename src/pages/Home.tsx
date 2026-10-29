@@ -376,7 +376,7 @@ function Sidebar({
         />
       )}
       <aside
-        className={`fixed left-0 top-0 z-[60] flex h-full w-[80%] max-w-[320px] flex-col bg-[var(--surface)] shadow-2xl transition-transform duration-300 ${
+        className={`fixed left-0 top-0 z-[60] flex h-full w-[80%] max-w-[320px] flex-col border-r border-[var(--glass-border)] bg-[var(--glass-bg-strong)] shadow-2xl backdrop-blur-2xl transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{ paddingTop: "env(safe-area-inset-top)" }}

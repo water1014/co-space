@@ -46,7 +46,7 @@ type TabItem = {
 function TabBar({ tabs }: { tabs: TabItem[] }) {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--line)] bg-[var(--surface)]/95 backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--glass-border)] bg-[var(--glass-bg-strong)] backdrop-blur-2xl"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="mx-auto flex max-w-[600px]">

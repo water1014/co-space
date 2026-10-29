@@ -48,6 +48,14 @@
   --shadow-card: 0 1px 2px rgba(40, 30, 28, 0.05);
   --shadow-float: 0 8px 28px -10px rgba(40, 30, 28, 0.18);
   --shadow-bar: 0 -1px 0 rgba(40, 30, 28, 0.06);
+  --shadow-glass: 0 12px 32px -16px rgba(40, 30, 28, 0.28);
+
+  /* 磨砂玻璃容器：半透明 + 背景模糊 + 顶部内高光 */
+  --glass-bg: rgba(255, 255, 255, 0.52);
+  --glass-bg-strong: rgba(255, 255, 255, 0.68);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-sheen: rgba(255, 255, 255, 0.75);
+  --glass-blur: 18px;
 
   --f-display: "Noto Sans SC", -apple-system, BlinkMacSystemFont,
     "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
@@ -91,6 +99,14 @@
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-float: 0 10px 30px -12px rgba(0, 0, 0, 0.7);
   --shadow-bar: 0 -1px 0 rgba(255, 240, 232, 0.07);
+  --shadow-glass: 0 16px 36px -16px rgba(0, 0, 0, 0.6);
+
+  /* 磨砂玻璃容器（夜间：深色半透明，彩斑透出更明显） */
+  --glass-bg: rgba(38, 32, 28, 0.5);
+  --glass-bg-strong: rgba(40, 34, 30, 0.66);
+  --glass-border: rgba(255, 240, 232, 0.12);
+  --glass-sheen: rgba(255, 240, 232, 0.09);
+  --glass-blur: 18px;
 
   color-scheme: dark;
 }
@@ -100,9 +116,9 @@
    等原始变量，这里把它们映射回新体系，值随主题自动切换。
    ---------------------------------------------------------------- */
 :root {
-  --glass-hi: var(--surface-2);
-  --glass-solid: var(--surface);
-  --glass-soft: var(--surface-2);
+  --glass-hi: var(--glass-bg-strong);
+  --glass-solid: var(--glass-bg-strong);
+  --glass-soft: var(--glass-bg);
   --sheen: rgba(255, 255, 255, 0.55);
   --crimson: var(--accent);
   --crimson-deep: var(--accent-deep);
@@ -161,12 +177,17 @@ body {
   color: var(--ink);
 }
 
-/* ---------------- 背景：极简的柔光，不抢戏 ---------------- */
+/* ---------------- 背景：暖白底 + 柔彩光斑，供磨砂玻璃透出 ---------------- */
 
 .app-bg {
   position: fixed;
   inset: 0;
-  background: var(--bg);
+  background:
+    radial-gradient(42% 36% at 14% 12%, rgba(226, 96, 95, 0.2) 0%, transparent 70%),
+    radial-gradient(44% 38% at 86% 8%, rgba(122, 180, 208, 0.17) 0%, transparent 72%),
+    radial-gradient(46% 40% at 80% 84%, rgba(230, 186, 118, 0.18) 0%, transparent 72%),
+    radial-gradient(48% 42% at 16% 90%, rgba(158, 200, 168, 0.15) 0%, transparent 74%),
+    var(--bg);
   overflow: hidden;
   transition: background 0.45s ease;
 }
@@ -178,20 +199,30 @@ body {
   height: 70%;
   background: radial-gradient(
     60% 60% at 50% 0%,
-    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.75) 0%,
     transparent 70%
   );
   filter: blur(30px);
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 [data-theme="night"] .app-bg .glow {
   background: radial-gradient(
     60% 60% at 50% 0%,
-    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.05) 0%,
     transparent 70%
   );
   opacity: 1;
+}
+
+/* 夜间：光斑更饱和、底色更沉，磨砂玻璃的透彩感更强 */
+[data-theme="night"] .app-bg {
+  background:
+    radial-gradient(44% 38% at 14% 12%, rgba(226, 96, 95, 0.24) 0%, transparent 70%),
+    radial-gradient(46% 40% at 86% 8%, rgba(96, 150, 196, 0.2) 0%, transparent 72%),
+    radial-gradient(48% 42% at 80% 84%, rgba(212, 168, 104, 0.18) 0%, transparent 72%),
+    radial-gradient(50% 44% at 16% 90%, rgba(122, 172, 142, 0.16) 0%, transparent 74%),
+    var(--bg);
 }
 
 /* 取消噪点与暗角：Canoe 的底是干净的，靠留白和发丝线分层 */
@@ -206,35 +237,49 @@ body {
 
 /* ---------------- 卡片 ---------------- */
 
-/* 白底 + 发丝线 + 极浅阴影。这是 Canoe 的基础容器语言。 */
+/* 磨砂玻璃：半透明底 + 背景模糊 + 白发丝描边 + 顶部内高光。
+   背景层的柔彩光斑透过卡片被模糊化，形成「磨砂」质感；
+   左上斜向柔光直接叠在自身背景里，内容永远在其上。 */
 .glass {
   position: relative;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background:
+    linear-gradient(150deg, var(--glass-sheen) 0%, transparent 42%) no-repeat,
+    var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
   border-radius: 20px;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-glass), inset 0 1px 0 var(--glass-sheen);
   transition:
     background-color 0.35s ease,
     border-color 0.35s ease;
 }
 
-.glass::before {
-  content: none;
-}
-
 .glass-hi {
-  background: var(--surface-2);
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 var(--glass-sheen);
 }
 
-/* 填充面：搜索框、灰气泡底、未选中的分段控件 */
+/* 填充面：搜索框、灰气泡底、未选中的分段控件——同样磨砂，只是更实 */
 .glass-flat {
-  background: var(--surface-2);
-  border: 1px solid transparent;
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid var(--glass-border);
   border-radius: 14px;
+  box-shadow: inset 0 1px 0 var(--glass-sheen);
 }
 
 .glass-solid {
-  background: var(--surface);
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass), inset 0 1px 0 var(--glass-sheen);
 }
 
 /* 顶部一道高光（夜间才需要） */
