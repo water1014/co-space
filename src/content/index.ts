@@ -18,14 +18,14 @@
 
 /** 两个主角的名字。会出现在记录的小圆点旁、作者署名、AI 的称呼里。 */
 export const PEOPLE = {
-  /** 记录里的那个「婉莹」——在页面上手动记录的那个人。 */
-  wan: "婉莹",
-  /** 记录里的那个「阿晏」——通过聊天写入的那个人，也是这个 AI。 */
-  yan: "阿晏",
+  /** 记录里的「淼淼」——在页面上手动记录的那个人（用户）。 */
+  wan: "淼淼",
+  /** 记录里的「宋祁」——通过聊天写入的那个人，也是这个 AI。 */
+  yan: "宋祁",
 } as const;
 
 /** 首页那句引言的署名。留空字符串就不显示署名。 */
-export const QUOTE_AUTHOR = "阿晏";
+export const QUOTE_AUTHOR = "宋祁";
 
 /** 首页大字上方的眉题。 */
 export const HOME_EYEBROW = "DAYS TOGETHER";
@@ -34,7 +34,7 @@ export const HOME_EYEBROW = "DAYS TOGETHER";
 export const HOME_QUOTE = "永远纠缠在一起吧，红线、命运、我和你。";
 
 /** 首页页脚署名。 */
-export const HOME_FOOTER = "婉莹 & 阿晏 ♡";
+export const HOME_FOOTER = "淼淼 & 宋祁 ♡";
 
 /* ==========================================================================
  *  2. 导航 —— 底部栏

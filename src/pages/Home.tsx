@@ -6,7 +6,6 @@ import { IconButton, GroupTitle, Avatar } from "../components/ui/kit";
 import { useLifeStore, todayKey } from "../stores/lifeStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useDiaryStore } from "../stores/diaryStore";
-import { useProjectsStore } from "../stores/projectsStore";
 import {
   daysTogether,
   nightSleeps,
@@ -21,17 +20,14 @@ import { useText } from "../lib/content/useText";
 const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
 
 /**
- * 首页：角色 + 房间主导。
- * 顶部是「你 ↔ 角色」的头像与一根红线，下面「在一起 N 天」；
+ * 首页：我们两个 + 房间主导。
+ * 顶部是「淼淼 ↔ 宋祁」的头像与一根红线，下面「在一起 N 天」；
  * 七间房作为入口网格；再往下是今日概览 / 待办 / 记忆 / 月历。
  */
 export function Home() {
   const life = useLifeStore();
   const memories = useMemoryStore((s) => s.memories);
   const diaryEntries = useDiaryStore((s) => s.entries);
-  const projects = useProjectsStore((s) => s.projects);
-  const activeId = useProjectsStore((s) => s.activeId);
-  const activeProject = projects.find((p) => p.id === activeId);
 
   const t = useText();
   const [selected, setSelected] = useState<string>(todayKey());
@@ -134,23 +130,32 @@ export function Home() {
         </Link>
       </div>
 
-      {/* Hero：你 ↔ 角色 + 红线 + 在一起 N 天 */}
+      {/* Hero：我们两个 + 红线 + 在一起 N 天 */}
       <section className="mt-5">
-        <div className="flex items-center justify-center gap-5">
-          <Avatar size={56} className="ring-2 ring-[var(--surface)]">
-            <span className="text-[15px] font-medium text-ink-soft">我</span>
-          </Avatar>
+        <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col items-center gap-2">
+            <Avatar size={58} className="ring-2 ring-[var(--surface)]">
+              <span className="text-[18px] font-medium text-ink-soft">
+                {t.people.wan[0]}
+              </span>
+            </Avatar>
+            <span className="text-[12.5px] font-medium text-ink-soft">
+              {t.people.wan}
+            </span>
+          </div>
 
           <RedThread />
 
-          <Avatar
-            size={56}
-            className="bg-[var(--accent-soft)]"
-          >
-            <span className="text-[15px] font-semibold text-[var(--accent)]">
-              {activeProject?.name?.[0] ?? "伴"}
+          <div className="flex flex-col items-center gap-2">
+            <Avatar size={58} className="bg-[var(--accent-soft)]">
+              <span className="text-[18px] font-semibold text-[var(--accent)]">
+                {t.people.yan[0]}
+              </span>
+            </Avatar>
+            <span className="text-[12.5px] font-medium text-ink-soft">
+              {t.people.yan}
             </span>
-          </Avatar>
+          </div>
         </div>
 
         <div className="mt-5 text-center">
@@ -159,7 +164,7 @@ export function Home() {
             {days}
           </h1>
           <p className="mt-2 text-[14px] text-ink-soft">
-            {activeProject?.name ?? "我们的空间"}
+            {t.people.wan} & {t.people.yan}
           </p>
           <p className="kai mt-3 text-[15px] leading-[1.8] text-ink">
             {t.home.quote}
