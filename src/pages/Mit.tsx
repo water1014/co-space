@@ -215,14 +215,14 @@ export function Mit() {
                     className="h-[6px] w-[6px] rounded-full"
                     style={{ background: "var(--accent-deep)" }}
                   />
-                  婉莹
+                  {t.people.wan}
                 </span>
                 <span className="flex items-center gap-1">
                   <span
                     className="h-[6px] w-[6px] rounded-full"
                     style={{ background: "var(--ink-faint)" }}
                   />
-                  阿晏
+                  {t.people.yan}
                 </span>
               </span>
             }
@@ -401,9 +401,21 @@ export function Mit() {
               </button>
             </div>
           </label>
+          <label className="mt-4 block">
+            <span className="eyebrow">自定义请求头</span>
+            <textarea
+              value={connector.model.headers || ""}
+              onChange={(e) => connector.setModel({ headers: e.target.value })}
+              rows={3}
+              placeholder={'需要额外请求头就填这里，JSON：\n{\n  "X-App-Key": "…",\n  "X-Channel": "openai"\n}'}
+              className="ghost-input mt-1.5 w-full resize-none rounded-xl border border-[var(--line)] bg-transparent px-3 py-2 font-mono text-[12px] leading-[1.7] text-ink placeholder:text-ink-faint"
+            />
+            <span className="mt-1.5 block text-[11.5px] text-ink-faint">
+              留空则只发 Authorization。某些中转 / 订阅服务（如 opencode go）需要在这里补自定义头。
+            </span>
+          </label>
           <p className="mt-3 text-[12.5px] leading-[1.9] text-ink-faint">
-            Key 只放在内存里，不写 localStorage，刷新就没了。
-            这一版还没接真实模型，配置先存着。
+            Key 只放在内存里，不写 localStorage，刷新就没了。自定义请求头会随配置持久化。
           </p>
         </Card>
       </div>

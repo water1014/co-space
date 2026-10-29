@@ -195,3 +195,38 @@ export const ROOM_ICONS: Record<
   wrong: IconClose,
   reward: IconSpark,
 };
+
+/** 汉堡菜单（侧边栏开关） */
+export const IconMenu = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M4 7h16" />
+    <path d="M4 12h16" />
+    <path d="M4 17h16" />
+  </svg>
+);
+
+/** 相册：两张叠放的照片（线条勾勒） */
+export const IconImages = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="4" y="6" width="13" height="13" rx="2.2" />
+    <path d="M8.5 4.5h11A1.5 1.5 0 0 1 21 6v11" />
+    <circle cx="9.5" cy="11" r="1.6" />
+    <path d="M6.5 18l4-4 3 3 3-3 3.5 3.5" />
+  </svg>
+);
+
+/** 用户（「我」） */
+export const IconUser = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="8.5" r="3.6" />
+    <path d="M5 20a7 7 0 0 1 14 0" />
+  </svg>
+);
+
+/** 刷新（换一句） */
+export const IconRefresh = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M20 12a8 8 0 1 1-2.3-5.6" />
+    <path d="M20 4v3.4h-3.4" />
+  </svg>
+);

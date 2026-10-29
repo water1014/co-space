@@ -1,402 +1,185 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { Calendar, dayKey } from "../components/home/Calendar";
-import { IconCheck, IconGear, IconMoon, IconPlus, ROOM_ICONS } from "../components/ui/icons";
-import { IconButton, GroupTitle, Avatar } from "../components/ui/kit";
-import { useLifeStore, todayKey } from "../stores/lifeStore";
-import { useMemoryStore } from "../stores/memoryStore";
-import { useDiaryStore } from "../stores/diaryStore";
+import { useEffect, useState } from "react";
+import type { ComponentType, SVGProps } from "react";
+import { Link, NavLink } from "react-router-dom";
 import {
-  daysTogether,
-  nightSleeps,
-  todayMeals,
-  todayWords,
-  wakeDateOf,
-} from "../lib/life/derive";
-import { MEAL_LABEL, type MealKey } from "../types";
-import { EMPTY_STATES } from "../content";
+  IconMenu,
+  IconRefresh,
+  IconPlay,
+  IconPause,
+  IconImages,
+  IconClose,
+  IconHome,
+  IconChat,
+  IconEdit,
+  IconSpark,
+  IconHeart,
+  IconGear,
+} from "../components/ui/icons";
+import { Avatar } from "../components/ui/kit";
 import { useText } from "../lib/content/useText";
+import { useLifeStore } from "../stores/lifeStore";
+import { daysTogether } from "../lib/life/derive";
+import { getTodayMessage } from "../lib/home/todayMessage";
 
-const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
+const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+
+const CODE_MAP: Record<number, string> = {
+  0: "晴", 1: "大致晴", 2: "多云", 3: "阴", 45: "雾", 48: "雾凇",
+  51: "小毛雨", 53: "毛毛雨", 55: "密毛雨", 61: "小雨", 63: "中雨",
+  65: "大雨", 71: "小雪", 73: "中雪", 75: "大雪", 80: "阵雨",
+  82: "暴雨", 95: "雷阵雨",
+};
+
+function nowTime() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+function todayLabel(d = new Date()) {
+  return `${d.getMonth() + 1}月${d.getDate()}日 ${WEEK[d.getDay()]}`;
+}
 
 /**
- * 首页：我们两个 + 房间主导。
- * 顶部是「淼淼 ↔ 宋祁」的头像与一根红线，下面「在一起 N 天」；
- * 七间房作为入口网格；再往下是今日概览 / 待办 / 记忆 / 月历。
+ * 首页（2026-10-29 定稿草图）：
+ * 顶栏时间 + 左上汉堡侧边栏；双圆形头像（淼淼 ↔ 宋祁）中间红线；
+ * 主卡「他今天想对我说的话」由模型每日生成；下方音乐卡（首屏只露边缘引导下滑）；
+ * 一排三个（天气 / 写日记 / 设置）；相册三图占位；底部三栏导航（AppShell）。
  */
 export function Home() {
-  const life = useLifeStore();
-  const memories = useMemoryStore((s) => s.memories);
-  const diaryEntries = useDiaryStore((s) => s.entries);
-
   const t = useText();
-  const [selected, setSelected] = useState<string>(todayKey());
-  const [adding, setAdding] = useState(false);
-  const [draft, setDraft] = useState("");
+  const life = useLifeStore();
 
   const days = daysTogether(life.anniversary);
-  const meals = todayMeals(life.meals);
-  const words = todayWords(life.words);
-  const openTodos = life.todos.filter((t) => !t.done);
-  const night = useMemo(
-    () =>
-      nightSleeps(life.sleep).find(
-        (s) => wakeDateOf(s.date, s.bedAt) === todayKey(),
-      ),
-    [life.sleep],
-  );
+  const [time, setTime] = useState(nowTime());
+  const [msg, setMsg] = useState<{ text: string; mock: boolean } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [sidebar, setSidebar] = useState(false);
 
-  // 今日条目：三餐 / 睡眠 / 记账 / 奶茶 / 单词
-  const todayItems = useMemo(() => {
-    const t = todayKey();
-    const items: { key: string; iconKey: string; label: string; value: string; by?: "wan" | "yan" }[] = [];
-    MEALS.forEach((m) => {
-      if (life.meals[t]?.includes(m)) {
-        items.push({
-          key: `meal-${m}`,
-          iconKey: "meal",
-          label: MEAL_LABEL[m],
-          value: life.mealNotes[t]?.[m] || "吃了",
-          by: life.mealBy[t]?.[m],
-        });
+  useEffect(() => {
+    const id = setInterval(() => setTime(nowTime()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const refresh = () => {
+    setLoading(true);
+    getTodayMessage().then((m) => {
+      setMsg(m);
+      setLoading(false);
+    });
+  };
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    getTodayMessage().then((m) => {
+      if (alive) {
+        setMsg(m);
+        setLoading(false);
       }
     });
-    if (night) {
-      items.push({
-        key: "sleep",
-        iconKey: "sleep",
-        label: "夜睡",
-        value: `${Math.floor(night.hours)}h${Math.round((night.hours % 1) * 60)}m`,
-        by: night.by,
-      });
-    }
-    life.ledger
-      .filter((e) => dayKey(new Date(e.at)) === t)
-      .forEach((e) => {
-        items.push({
-          key: `l-${e.id}`,
-          iconKey: "ledger",
-          label: e.note || e.category,
-          value: `¥${e.amount.toFixed(2)}`,
-          by: e.by,
-        });
-      });
-    life.bobas
-      .filter((b) => dayKey(new Date(b.at)) === t)
-      .forEach((b) => {
-        items.push({
-          key: `b-${b.id}`,
-          iconKey: "boba",
-          label: b.note || "奶茶",
-          value: `¥${b.price}`,
-          by: b.by,
-        });
-      });
-    if (words) {
-      items.push({
-        key: "words",
-        iconKey: "words",
-        label: "单词",
-        value: `${words.learned}/${words.goal}`,
-      });
-    }
-    return items;
-  }, [life.meals, life.mealNotes, life.mealBy, life.sleep, life.ledger, life.bobas, life.words]);
-
-  const dayDiary = diaryEntries.filter((e) => e.date === selected);
-  const dayMemories = memories.filter(
-    (m) => dayKey(new Date(m.createdAt)) === selected,
-  );
-
-  const calMarks = useMemo(() => {
-    const s = new Set<string>();
-    Object.keys(life.meals).forEach((k) => life.meals[k]?.length && s.add(k));
-    life.ledger.forEach((e) => s.add(dayKey(new Date(e.at))));
-    life.bobas.forEach((b) => s.add(dayKey(new Date(b.at))));
-    life.sleep.forEach((sl) => s.add(sl.date));
-    memories.forEach((m) => s.add(dayKey(new Date(m.createdAt))));
-    return s;
-  }, [life.meals, life.ledger, life.bobas, life.sleep, memories]);
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
-    <div className="flex flex-col px-5 pb-14 pt-9">
-      {/* 顶栏 */}
-      <div className="flex items-center justify-between">
-        <p className="eyebrow">CO-SPACE</p>
-        <Link to="/mit" aria-label="设置">
-          <IconButton label="设置">
-            <IconGear width={18} height={18} />
-          </IconButton>
-        </Link>
-      </div>
-
-      {/* Hero：我们两个 + 红线 + 在一起 N 天 */}
-      <section className="mt-5">
-        <div className="flex items-center justify-center gap-4">
-          <div className="flex flex-col items-center gap-2">
-            <Avatar size={58} className="ring-2 ring-[var(--surface)]">
-              <span className="text-[18px] font-medium text-ink-soft">
-                {t.people.wan[0]}
-              </span>
-            </Avatar>
-            <span className="text-[12.5px] font-medium text-ink-soft">
-              {t.people.wan}
-            </span>
-          </div>
-
-          <RedThread />
-
-          <div className="flex flex-col items-center gap-2">
-            <Avatar size={58} className="bg-[var(--accent-soft)]">
-              <span className="text-[18px] font-semibold text-[var(--accent)]">
-                {t.people.yan[0]}
-              </span>
-            </Avatar>
-            <span className="text-[12.5px] font-medium text-ink-soft">
-              {t.people.yan}
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-5 text-center">
-          <p className="eyebrow">我们在一起</p>
-          <h1 className="display num mt-1 text-[62px] leading-none text-[var(--accent)]">
-            {days}
-          </h1>
-          <p className="mt-2 text-[14px] text-ink-soft">
-            {t.people.wan} & {t.people.yan}
-          </p>
-          <p className="kai mt-3 text-[15px] leading-[1.8] text-ink">
-            {t.home.quote}
-          </p>
-          <p className="quote-by mt-1.5">— {t.home.quoteAuthor}</p>
-        </div>
-      </section>
-
-      {/* 七间房：首页主导入口 */}
-      <p className="eyebrow mb-3 mt-8 px-1">房间 · ROOMS</p>
-      <div className="grid grid-cols-2 gap-3">
-        {t.rooms.map((r) => {
-          const RoomIcon = ROOM_ICONS[r.key];
-          return (
-            <Link
-              key={r.key}
-              to="/together"
-              className="glass press rounded-2xl px-4 py-3.5"
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-[var(--surface-2)] text-[var(--ink)]">
-                  <RoomIcon width={18} height={18} />
-                </span>
-                <span className="text-[15px] font-medium text-ink">{r.label}</span>
-              </div>
-              <p className="mt-2.5 line-clamp-2 text-[12px] leading-[1.6] text-ink-faint">
-                {r.slogan}
-              </p>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* 01 · 今日 */}
-      <GroupTitle index="01" title="今日" en="TODAY" />
-      <section className="glass rounded-2xl px-5 py-4">
-        <div className="flex items-center justify-between">
-          <h2 className="card-title text-ink">今日</h2>
-          <RoundPlus onClick={() => setAdding((v) => !v)} />
-        </div>
-
-        {adding && (
-          <div className="mt-3 flex gap-2">
-            <input
-              autoFocus
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  life.addTodo(draft);
-                  setDraft("");
-                  setAdding(false);
-                }
-              }}
-              placeholder="要记住的一件事..."
-              className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--surface-2)] px-3 py-2 text-[13px] text-ink placeholder:text-ink-faint"
-            />
-            <button
-              onClick={() => {
-                life.addTodo(draft);
-                setDraft("");
-                setAdding(false);
-              }}
-              className="btn-solid flex-none px-4 py-2 text-[13px]"
-            >
-              记
-            </button>
-          </div>
-        )}
-
-        {todayItems.length === 0 ? (
-          <p className="card-title mt-5 mb-3 text-center text-[15px] text-ink-faint">
-            {EMPTY_STATES.emptyToday}
-          </p>
-        ) : (
-          <div className="mt-3">
-          {todayItems.map((it, i) => {
-            const Icon = ROOM_ICONS[it.iconKey];
-            return (
-              <div
-                key={it.key}
-                className={`flex items-center gap-3 py-2.5 ${
-                  i > 0 ? "border-t border-[var(--line)]" : ""
-                }`}
-              >
-                <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[var(--surface-2)] text-ink-soft">
-                  <Icon width={14} height={14} />
-                </span>
-                <span className="min-w-0 flex-1 truncate text-[14px] text-ink">
-                  {it.label}
-                </span>
-                <span className="num flex-none text-[12.5px] text-ink-soft">
-                  {it.value}
-                </span>
-                {it.by && (
-                  <span
-                    className="h-[6px] w-[6px] flex-none rounded-full"
-                    style={{
-                      background:
-                        it.by === "wan" ? "var(--accent-deep)" : "var(--ink-faint)",
-                    }}
-                  />
-                )}
-              </div>
-            );
-          })}
-          </div>
-        )}
-
-        {/* 快速打卡：三餐一按就记上 */}
-        <div className="mt-3 flex items-center gap-2 border-t border-[var(--line)] pt-3">
-          {MEALS.map((m) => {
-            const on = meals.includes(m);
-            return (
-              <button
-                key={m}
-                onClick={() => life.toggleMeal(m, "wan", todayKey())}
-                className={`press flex flex-1 items-center justify-center gap-1.5 rounded-full border py-1.5 text-[12.5px] ${
-                  on
-                    ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
-                    : "border-[var(--line)] text-ink-faint"
-                }`}
-              >
-                <IconCheck width={11} height={11} strokeWidth={2.4} />
-                {MEAL_LABEL[m]}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 02 · 待办 */}
-      <GroupTitle index="02" title="待办" en="UPCOMING" />
-      <section className="glass rounded-2xl px-5 py-4">
-        <div className="mt-2">
-          {openTodos.length === 0 && (
-            <p className="card-title py-4 text-center text-[15px] text-ink-faint">
-              {EMPTY_STATES.emptyTodos}
-            </p>
-          )}
-          {openTodos.map((t, i) => (
-            <div
-              key={t.id}
-              className={`flex items-center gap-3 py-3.5 ${
-                i > 0 ? "border-t border-[var(--line)]" : ""
-              }`}
-            >
-              <button
-                onClick={() => life.toggleTodo(t.id)}
-                aria-label="完成"
-                className="press h-[19px] w-[19px] flex-none rounded-full border-[1.5px] border-[var(--line-strong)]"
-              />
-              {t.moon && (
-                <IconMoon width={13} height={13} className="flex-none text-ink-faint" />
-              )}
-              <span className="min-w-0 flex-1 truncate text-[15px] text-ink">
-                {t.text}
-              </span>
-              {t.due && (
-                <span className="num flex-none text-[12.5px] text-ink-faint">{t.due}</span>
-              )}
-              <button
-                onClick={() => life.removeTodo(t.id)}
-                aria-label="删除"
-                className="press flex-none text-[13px] text-ink-faint/70 hover:text-ink-soft"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 03 · 记忆 */}
-      <GroupTitle index="03" title="记忆" en="MEMORY" />
-      <section className="glass rounded-2xl px-5 py-4">
-        {memories.length === 0 ? (
-          <p className="card-title py-4 text-center text-[15px] text-ink-faint">
-            还没有记下什么值得收藏的。
-          </p>
-        ) : (
-          <div className="mt-1 space-y-3">
-            {memories.slice(0, 3).map((m) => (
-              <div key={m.id} className="flex gap-3">
-                <span className="mt-1.5 h-[6px] w-[6px] flex-none rounded-full bg-[var(--accent)]" />
-                <div className="min-w-0">
-                  <p className="text-[14px] leading-[1.7] text-ink">{m.text}</p>
-                  <p className="num mt-0.5 text-[11px] text-ink-faint">
-                    {dayKey(new Date(m.createdAt)).slice(5).replace("-", ".")}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        <Link
-          to="/memory"
-          className="mt-3 block border-t border-[var(--line)] pt-3 text-center text-[13px] text-[var(--accent)]"
+    <div className="relative flex flex-col px-5 pb-4 pt-9">
+      {/* 顶栏：汉堡 + 时间 */}
+      <header className="flex items-center justify-between">
+        <button
+          onClick={() => setSidebar(true)}
+          className="tap -ml-1 flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
+          aria-label="菜单"
         >
-          查看全部记忆 ›
-        </Link>
+          <IconMenu width={22} height={22} />
+        </button>
+        <p className="num text-[13px] text-ink-soft">{time}</p>
+      </header>
+
+      {/* 双头像 + 红线 */}
+      <section className="mt-5 flex items-center justify-center gap-5">
+        <AvatarBlock initial={t.people.wan[0]} name={t.people.wan} />
+        <RedThread />
+        <AvatarBlock initial={t.people.yan[0]} name={t.people.yan} accent />
       </section>
 
-      {/* 04 · 月历 */}
-      <GroupTitle index="04" title="月历" en="CALENDAR" />
-      <section className="glass rounded-2xl px-4 py-4">
-        <Calendar marks={calMarks} selected={selected} onSelect={(k) => setSelected(k)} />
-        {dayDiary.length > 0 && (
-          <div className="mt-3 border-t border-[var(--line)] pt-3">
-            <p className="num text-[12px] text-ink-faint">
-              {selected.slice(5).replace("-", ".")}
-            </p>
-            {dayDiary.slice(0, 2).map((e) => (
-              <p
-                key={e.id}
-                className="mt-1.5 line-clamp-2 text-[13.5px] leading-[1.85] text-ink-soft"
-              >
-                {e.text}
-              </p>
-            ))}
-          </div>
-        )}
-        {dayMemories.length > 0 && dayDiary.length === 0 && (
-          <p className="mt-3 border-t border-[var(--line)] pt-3 text-[12.5px] text-ink-faint">
-            {dayMemories.length} 条记忆落在了这一天。
-          </p>
-        )}
+      {/* 介绍 / 日期 小字（主卡上方） */}
+      <p className="mt-3 text-center text-[12px] text-ink-faint">
+        {todayLabel()} · 我们在一起 {days} 天
+      </p>
+
+      {/* 主卡：他今天想对我说的话 */}
+      <section className="glass mt-3 rounded-3xl px-5 py-5">
+        <div className="flex items-center justify-between">
+          <h2 className="card-title text-ink">他今天想对我说的话</h2>
+          <button
+            onClick={refresh}
+            disabled={loading}
+            className="tap flex items-center gap-1 text-[12px] text-ink-faint disabled:opacity-50"
+            aria-label="换一句"
+          >
+            <IconRefresh width={14} height={14} className={loading ? "animate-spin" : ""} />
+            换一句
+          </button>
+        </div>
+        <p className="kai mt-3 min-h-[128px] text-[16px] leading-[2] text-ink">
+          {loading ? "正在想今天要对你说的话…" : msg?.text}
+        </p>
+        <div className="mt-3 flex items-center justify-between border-t border-[var(--line)] pt-3">
+          <span className="text-[12px] text-ink-faint">
+            — {t.people.yan}
+            {msg?.mock ? "（示例）" : ""}
+          </span>
+          <Link to="/chat" className="text-[13px] text-[var(--accent)]">
+            去聊聊 ›
+          </Link>
+        </div>
       </section>
 
-      <footer className="mt-9">
-        <p className="page-head-sub text-center text-[13px]">{t.home.footer}</p>
+      {/* 音乐卡（首屏只露边缘，引导下滑） */}
+      <MusicCard />
+
+      {/* 一排三个：天气 / 写日记 / 设置 */}
+      <div className="mt-3 grid grid-cols-3 gap-3">
+        <WeatherCard />
+        <QuickTile icon={IconEdit} label="写日记" to="/diary" />
+        <QuickTile icon={IconGear} label="设置" to="/mit" />
+      </div>
+
+      {/* 相册模块 */}
+      <AlbumCard />
+
+      <footer className="mt-8">
+        <p className="text-center text-[12px] text-ink-faint">{t.home.footer}</p>
       </footer>
+
+      <Sidebar open={sidebar} onClose={() => setSidebar(false)} footer={t.home.footer} />
+    </div>
+  );
+}
+
+/** 头像 + 名字（左侧常态 / 右侧品牌色） */
+function AvatarBlock({
+  initial,
+  name,
+  accent,
+}: {
+  initial: string;
+  name: string;
+  accent?: boolean;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <Avatar
+        size={60}
+        className={accent ? "bg-[var(--accent-soft)]" : "ring-2 ring-[var(--surface)]"}
+      >
+        <span
+          className={`text-[18px] font-semibold ${accent ? "text-[var(--accent)]" : "text-ink-soft"}`}
+        >
+          {initial}
+        </span>
+      </Avatar>
+      <span className="text-[12.5px] font-medium text-ink-soft">{name}</span>
     </div>
   );
 }
@@ -417,15 +200,219 @@ function RedThread() {
   );
 }
 
-/** ⊕ 圆形加号按钮 */
-function RoundPlus({ onClick }: { onClick?: () => void }) {
+/** 音乐卡：通栏大卡，播放态本地模拟进度 */
+function MusicCard() {
+  const [playing, setPlaying] = useState(false);
+  const [p, setP] = useState(38);
+
+  useEffect(() => {
+    if (!playing) return;
+    const id = setInterval(() => setP((v) => (v >= 100 ? 0 : v + 0.6)), 1000);
+    return () => clearInterval(id);
+  }, [playing]);
+
   return (
-    <button
-      onClick={onClick}
-      aria-label="添加"
-      className="press flex h-7 w-7 items-center justify-center rounded-full border border-[var(--line-strong)] text-ink-faint hover:text-ink-soft"
+    <section className="glass mt-3 overflow-hidden rounded-3xl p-4">
+      <div className="flex items-center gap-3">
+        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white">
+          <IconPlay width={22} height={22} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[14px] font-medium text-ink">晚安，淼淼</p>
+          <p className="truncate text-[12px] text-ink-faint">宋祁 · 私房歌单</p>
+        </div>
+        <button
+          onClick={() => setPlaying((v) => !v)}
+          className="tap flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink"
+          aria-label={playing ? "暂停" : "播放"}
+        >
+          {playing ? <IconPause width={18} height={18} /> : <IconPlay width={18} height={18} />}
+        </button>
+      </div>
+      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
+        <div
+          className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-1000"
+          style={{ width: `${p}%` }}
+        />
+      </div>
+    </section>
+  );
+}
+
+/** 天气卡：Open-Meteo（无需 key），拿不到定位就不编造 */
+function WeatherCard() {
+  const [w, setW] = useState<{ state: string; temp?: number; label?: string }>({
+    state: "loading",
+  });
+
+  useEffect(() => {
+    let alive = true;
+    if (!("geolocation" in navigator)) {
+      setW({ state: "err" });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const url =
+            `https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(2)}` +
+            `&longitude=${longitude.toFixed(2)}&current=temperature_2m,weather_code`;
+          const res = await fetch(url);
+          const json = (await res.json()) as {
+            current?: { temperature_2m: number; weather_code: number };
+          };
+          if (!alive) return;
+          if (json.current) {
+            setW({
+              state: "ok",
+              temp: Math.round(json.current.temperature_2m),
+              label: CODE_MAP[json.current.weather_code] ?? "未知",
+            });
+          } else setW({ state: "err" });
+        } catch {
+          if (alive) setW({ state: "err" });
+        }
+      },
+      () => {
+        if (alive) setW({ state: "err" });
+      },
+      { timeout: 8000, maximumAge: 600_000 },
+    );
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  return (
+    <div className="glass flex flex-col rounded-2xl p-3">
+      <span className="text-[11px] text-ink-faint">天气</span>
+      {w.state === "ok" ? (
+        <div className="mt-1 flex items-baseline gap-1">
+          <span className="num text-[20px] text-ink">{w.temp}°</span>
+          <span className="text-[12px] text-ink-faint">{w.label}</span>
+        </div>
+      ) : (
+        <span className="mt-1 text-[13px] text-ink-faint">
+          {w.state === "loading" ? "定位中…" : "未连接"}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** 快捷入口小卡 */
+function QuickTile({
+  icon: Icon,
+  label,
+  to,
+}: {
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  label: string;
+  to: string;
+}) {
+  return (
+    <Link
+      to={to}
+      className="glass press flex flex-col items-start rounded-2xl p-3 text-left"
     >
-      <IconPlus width={13} height={13} />
-    </button>
+      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink-soft">
+        <Icon width={15} height={15} />
+      </span>
+      <span className="mt-2 text-[13px] font-medium text-ink">{label}</span>
+    </Link>
+  );
+}
+
+/** 相册模块：横向 3 个图片占位框 */
+function AlbumCard() {
+  return (
+    <section className="glass mt-3 rounded-3xl p-4">
+      <div className="flex items-center justify-between">
+        <h2 className="card-title text-ink">相册</h2>
+        <Link to="/memory" className="text-[12px] text-ink-faint">
+          全部 ›
+        </Link>
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="flex aspect-square items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--surface-2)] to-[var(--bg-deep)] text-ink-ghost"
+          >
+            <IconImages width={26} height={26} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/** 左侧抽屉式侧边栏（汉堡拉出） */
+function Sidebar({
+  open,
+  onClose,
+  footer,
+}: {
+  open: boolean;
+  onClose: () => void;
+  footer: string;
+}) {
+  const items = [
+    { to: "/", label: "主页", icon: IconHome },
+    { to: "/chat", label: "聊天", icon: IconChat },
+    { to: "/diary", label: "日记", icon: IconEdit },
+    { to: "/memory", label: "记忆", icon: IconSpark },
+    { to: "/together", label: "共处", icon: IconHeart },
+    { to: "/mit", label: "设置", icon: IconGear },
+  ];
+  return (
+    <>
+      {open && (
+        <div
+          className="fixed inset-0 z-[55] bg-black/30 backdrop-blur-[1px]"
+          onClick={onClose}
+          aria-hidden
+        />
+      )}
+      <aside
+        className={`fixed left-0 top-0 z-[60] flex h-full w-[80%] max-w-[320px] flex-col bg-[var(--surface)] shadow-2xl transition-transform duration-300 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        <div className="flex items-center justify-between px-5 pb-4 pt-6">
+          <p className="display text-[20px] text-ink">co-space</p>
+          <button
+            onClick={onClose}
+            className="tap flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
+            aria-label="关闭"
+          >
+            <IconClose width={18} height={18} />
+          </button>
+        </div>
+        <nav className="flex-1 px-3">
+          {items.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === "/"}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `tap flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] ${
+                  isActive
+                    ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+                    : "text-ink hover:bg-[var(--surface-2)]"
+                }`
+              }
+            >
+              <Icon width={19} height={19} />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+        <p className="px-5 py-6 text-[12px] text-ink-faint">{footer}</p>
+      </aside>
+    </>
   );
 }

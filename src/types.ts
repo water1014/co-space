@@ -295,6 +295,8 @@ export type ModelConfig = {
   baseUrl: string;
   model: string;
   hasKey: boolean;
+  /** 自定义请求头（JSON 字符串），例如某些中转 / 订阅服务需要的 X-App-Key 等。 */
+  headers?: string;
 };
 
 /* ---------------- 日记与阅读 ---------------- */

@@ -24,7 +24,7 @@ export const useConnectorStore = create<ConnectorState>()(
   persist(
     (set, get) => ({
       enabled: { map: false, mail: false, files: false, mcp: false },
-      model: { baseUrl: "", model: "gpt-4o-mini", hasKey: false },
+      model: { baseUrl: "", model: "gpt-4o-mini", hasKey: false, headers: "" },
       persona: PERSONA_DEFAULT,
       sessionKey: "",
 
