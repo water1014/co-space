@@ -84,40 +84,37 @@ export function Home() {
 
   return (
     <div className="relative flex flex-col px-5 pb-4 pt-9">
-      {/* 顶栏：汉堡 + 时间 */}
+      {/* 草图①：顶栏——左上汉堡侧边栏，中间「时间」为显著标题 */}
       <header className="flex items-center justify-between">
         <button
           onClick={() => setSidebar(true)}
-          className="tap -ml-1 flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
+          className="tap -ml-1 flex h-9 w-9 flex-none items-center justify-center rounded-full text-ink-soft"
           aria-label="菜单"
         >
           <IconMenu width={22} height={22} />
         </button>
-        <p className="num text-[13px] text-ink-soft">{time}</p>
+        <span className="glass-flat num flex-1 rounded-full px-4 py-1.5 text-center text-[16px] font-semibold tracking-[0.06em] text-ink">
+          {time}
+        </span>
+        <span className="w-9 flex-none" aria-hidden />
       </header>
 
-      {/* 草图②：左右圆形头像，中间圆角矩形（红线 + 在一起 N 天） */}
-      <section className="mt-5 flex items-center justify-center gap-4">
+      {/* 草图②：左右两个圆形头像，下方居中「简介/日期」圆角矩形 */}
+      <section className="mt-6 flex items-start justify-between px-3">
         <AvatarBlock initial={t.people.wan[0]} name={t.people.wan} />
-        <div className="glass flex h-[64px] min-w-[116px] flex-col items-center justify-center gap-0.5 rounded-2xl px-3">
-          <RedThread />
-          <p className="num text-[11.5px] text-ink-soft">
-            在一起{" "}
-            <span className="font-semibold text-[var(--accent)]">{days}</span> 天
-          </p>
-        </div>
         <AvatarBlock initial={t.people.yan[0]} name={t.people.yan} accent />
       </section>
-
-      {/* 修改意见：介绍/日期挪到主卡上方小字 */}
-      <p className="mt-3 text-center text-[12px] text-ink-faint">
-        {todayLabel()}
-      </p>
+      <div className="glass mx-auto -mt-2 flex flex-col items-center gap-1 rounded-2xl px-6 py-2.5">
+        <RedThread />
+        <p className="num text-[12px] text-ink-soft">
+          {todayLabel()} · 在一起{" "}
+          <span className="font-semibold text-[var(--accent)]">{days}</span> 天
+        </p>
+      </div>
 
       {/* 草图③：主卡（最大）——他今天想对我说的话；撑到 58vh，首屏下只露音乐卡边缘 */}
       <section className="glass mt-3 flex min-h-[58vh] flex-col rounded-3xl px-5 py-5">
         <div className="flex items-center justify-between">
-          <h2 className="card-title text-ink">他今天想对我说的话</h2>
           <button
             onClick={refresh}
             disabled={loading}
@@ -127,6 +124,7 @@ export function Home() {
             <IconRefresh width={14} height={14} className={loading ? "animate-spin" : ""} />
             换一句
           </button>
+          <h2 className="card-title text-ink">他今天想对我说的话</h2>
         </div>
         <div className="flex flex-1 flex-col items-center justify-center px-2 text-center">
           <span
@@ -156,11 +154,13 @@ export function Home() {
       {/* 音乐卡（首屏只露边缘，引导下滑） */}
       <MusicCard />
 
-      {/* 一排三个：天气 / 写日记 / 设置 */}
-      <div className="mt-3 grid grid-cols-3 gap-3">
+      {/* 草图④：一行分栏——左「天气」大框，右侧上下两个功能小框 */}
+      <div className="mt-4 flex items-stretch gap-3">
         <WeatherCard />
-        <QuickTile icon={IconEdit} label="写日记" sub="记下今天" to="/diary" />
-        <QuickTile icon={IconGear} label="设置" sub="偏好与模型" to="/mit" />
+        <div className="flex w-[40%] flex-none flex-col gap-3">
+          <QuickTile icon={IconEdit} label="写日记" to="/diary" />
+          <QuickTile icon={IconGear} label="设置" to="/mit" />
+        </div>
       </div>
 
       {/* 相册模块 */}
@@ -309,44 +309,50 @@ function WeatherCard() {
   }, []);
 
   return (
-    <div className="glass flex flex-col items-center rounded-2xl px-2 py-3.5 text-center">
+    <div className="glass flex flex-1 flex-col justify-between rounded-2xl p-4">
       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
         <IconSun width={17} height={17} />
       </span>
-      <span className="mt-2 text-[13px] font-medium text-ink">天气</span>
-      <span className="mt-0.5 text-[11px] leading-[1.5] text-ink-faint">
-        {w.state === "ok"
-          ? `${w.temp}° ${w.label}`
-          : w.state === "loading"
-            ? "定位中…"
-            : "未连接"}
-      </span>
+      <div className="mt-3">
+        {w.state === "ok" ? (
+          <p className="num text-[30px] leading-none text-ink">{w.temp}°</p>
+        ) : (
+          <p className="num text-[20px] leading-none text-ink-faint">
+            {w.state === "loading" ? "…" : "--"}
+          </p>
+        )}
+        <p className="mt-1.5 text-[12px] leading-[1.5] text-ink-faint">
+          天气 ·{" "}
+          {w.state === "ok"
+            ? w.label
+            : w.state === "loading"
+              ? "定位中"
+              : "未连接"}
+        </p>
+      </div>
     </div>
   );
 }
 
-/** 快捷入口小卡（与天气格同构：圆形图标 + 标题 + 副行） */
+/** 功能小框：横向图标 + 标题（草图右侧上下两枚） */
 function QuickTile({
   icon: Icon,
   label,
-  sub,
   to,
 }: {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
-  sub: string;
   to: string;
 }) {
   return (
     <Link
       to={to}
-      className="glass press flex flex-col items-center rounded-2xl px-2 py-3.5 text-center"
+      className="glass press flex flex-1 items-center gap-2.5 rounded-2xl px-3.5 text-left"
     >
-      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
+      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
         <Icon width={17} height={17} />
       </span>
-      <span className="mt-2 text-[13px] font-medium text-ink">{label}</span>
-      <span className="mt-0.5 text-[11px] leading-[1.5] text-ink-faint">{sub}</span>
+      <span className="text-[13.5px] font-medium text-ink">{label}</span>
     </Link>
   );
 }
