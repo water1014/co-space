@@ -12,6 +12,8 @@ type ChatState = {
   append: (msg: ChatMessage) => void;
   appendStreaming: (msg: ChatMessage) => void;
   appendPart: (id: string, part: MessagePart) => void;
+  updatePart: (id: string, part: MessagePart) => void;
+  remove: (id: string) => void;
   appendText: (id: string, chunk: string) => void;
   replaceLastText: (id: string, text: string) => void;
   finish: (id: string, status?: "complete" | "cancelled") => void;
@@ -82,6 +84,30 @@ export const useChatStore = create<ChatState>()(
           messages: s.messages.map((m) =>
             m.id === id ? { ...m, parts: [...m.parts, part] } : m,
           ),
+        })),
+
+      /**
+       * 替换某条消息里的一个 part（按 type 匹配）。
+       * 流式思考用：先把空的思考卡建好，模型给了依据再填进去。
+       * 只动这一条消息，不整表重写。
+       */
+      updatePart: (id, part) =>
+        set((s) => ({
+          messages: s.messages.map((m) => {
+            if (m.id !== id) return m;
+            const idx = m.parts.findIndex((p) => p.type === part.type);
+            if (idx === -1) return { ...m, parts: [...m.parts, part] };
+            const parts = [...m.parts];
+            parts[idx] = part;
+            return { ...m, parts };
+          }),
+        })),
+
+      /** 撤掉一条消息（没来得及说出一句话就取消时用）。 */
+      remove: (id) =>
+        set((s) => ({
+          messages: s.messages.filter((m) => m.id !== id),
+          isRunning: false,
         })),
 
       /** 流式增量：有 text 段就往最后一段追加，没有就新开一段。 */

@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
 
 /**
- * 统一的毛玻璃卡片。
+ * 卡片。
  *
- * 配方：半透明底 + backdrop-blur + 1px 边 + 一道从左上到右下的内发光。
- * 内发光层是独立的绝对定位 div，不用 box-shadow —— 这样它会被 overflow-hidden
- * 裁进圆角里，看起来像玻璃的厚度，而不是一圈描边。
+ * Canoe 的基础容器语言：白底 + 发丝线 + 极浅阴影 + 大圆角。
+ * 没有玻璃、没有渐变、没有内发光——层级靠留白和线来分。
  */
 export function GlassCard({
   children,
@@ -21,7 +20,7 @@ export function GlassCard({
   return (
     <div
       onClick={onClick}
-      className={`glass rounded-[24px] ${pad ? "p-5" : ""} ${
+      className={`glass rounded-[20px] ${pad ? "p-5" : ""} ${
         onClick ? "press cursor-pointer" : ""
       } ${className}`}
     >
@@ -30,7 +29,7 @@ export function GlassCard({
   );
 }
 
-/** 表单/列表里的嵌层容器，比 GlassCard 轻一档。 */
+/** 填充面容器：比卡片轻一档，用于表单区块、占位块。 */
 export function InsetCard({
   children,
   className = "",

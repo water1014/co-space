@@ -4,19 +4,19 @@ import type { ReactNode, SVGProps } from "react";
 import { BackgroundLayer } from "./BackgroundLayer";
 import {
   IconEdit,
-  IconMoon,
   IconGear,
   IconHeart,
   IconHome,
   IconMore,
+  IconMoon,
   IconSpark,
 } from "../components/ui/icons";
 import { useText } from "../lib/content/useText";
 
 /**
- * 导航：参考图式底部栏 —— 图标上、斜体衬线小标签下，
- * 选中项整体变绯红。Home / Moments / Chat / Diary / More。
- * 「More」点开底部抽屉（共处 Together 与 设置）。
+ * 导航：Canoe 式居中浮动胶囊底栏。
+ * 主区五项：Home / Moments / Chat / Diary / More；
+ * 「More」弹出底部浮层，含 Together 与 设置(Mit)。
  */
 const TAB_DEFS = [
   { to: "/", key: "home", icon: IconHome },
@@ -47,10 +47,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="relative flex h-full w-full max-w-[600px] flex-col">
           <main
             key={location.pathname}
-            className="scroll-area fadein min-h-0 flex-1 pb-28"
+            className="scroll-area fadein min-h-0 flex-1 pb-32"
           >
             {children}
           </main>
+
           <TabBar
             tabs={TABS}
             moreActive={moreActive}
@@ -59,37 +60,32 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </div>
 
-      {/* More：底部抽屉 */}
+      {/* More：底部浮层 */}
       {moreOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setMoreOpen(false)}
-          />
-          <div
-            className="fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-3xl border border-white/10 bg-white/10 p-2 shadow-2xl backdrop-blur-xl"
-            style={{
-              boxShadow:
-                "0 18px 50px -20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.18)",
-            }}
-          >
-            {MORE_ITEMS.map(({ to, label, icon: Icon }) => (
-              <button
-                key={to}
-                onClick={() => {
-                  navigate(to);
-                  setMoreOpen(false);
-                }}
-                className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-white/10"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-ink-soft">
-                  <Icon width={18} height={18} />
-                </span>
-                <span className="text-[15px] text-ink">{label}</span>
-              </button>
-            ))}
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setMoreOpen(false)}
+        >
+          <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[560px] px-4 pb-28">
+            <div className="glass w-full overflow-hidden rounded-3xl p-2">
+              {MORE_ITEMS.map(({ to, label, icon: Icon }) => (
+                <button
+                  key={to}
+                  onClick={() => {
+                    navigate(to);
+                    setMoreOpen(false);
+                  }}
+                  className="press flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left hover:bg-[var(--surface-2)]"
+                >
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink-soft">
+                    <Icon width={18} height={18} />
+                  </span>
+                  <span className="text-[15px] text-ink">{label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -104,7 +100,7 @@ type TabItem = {
   >;
 };
 
-/** 参考图式底部栏：全宽玻璃条 + 斜体标签，选中变绯红。 */
+/** 居中浮动胶囊底栏：白底 + 发丝线 + 极浅阴影，选中态变墨色。 */
 function TabBar({
   tabs,
   moreActive,
@@ -115,16 +111,16 @@ function TabBar({
   onMore: () => void;
 }) {
   const item = (active: boolean) =>
-    `tap flex flex-col items-center gap-[3px] px-2 py-1.5 ${
-      active ? "text-[var(--accent)]" : "text-ink-faint hover:text-ink-soft"
+    `tap flex flex-col items-center gap-[3px] px-3.5 py-1.5 ${
+      active ? "text-ink" : "text-ink-faint hover:text-ink-soft"
     }`;
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-50 w-full max-w-[600px] -translate-x-1/2 border-t border-[var(--line)] bg-[var(--glass-solid)]/80 backdrop-blur-2xl"
-      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 10px)" }}
+      className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="flex items-start justify-around px-3 pt-2">
+      <div className="glass flex items-start gap-1 rounded-full px-2 py-1.5 shadow-[var(--shadow-float)]">
         {tabs.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
@@ -134,14 +130,18 @@ function TabBar({
           >
             {({ isActive }) => (
               <>
-                <Icon width={20} height={20} strokeWidth={isActive ? 1.7 : 1.3} />
+                <Icon width={21} height={21} strokeWidth={isActive ? 1.8 : 1.3} />
                 <span className="tab-label">{label}</span>
               </>
             )}
           </NavLink>
         ))}
         <button onClick={onMore} className={item(moreActive)}>
-          <IconMore width={20} height={20} strokeWidth={moreActive ? 1.7 : 1.3} />
+          <IconMore
+            width={21}
+            height={21}
+            strokeWidth={moreActive ? 1.8 : 1.3}
+          />
           <span className="tab-label">More</span>
         </button>
       </div>

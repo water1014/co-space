@@ -217,7 +217,7 @@ function ChatHeader() {
 
       <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
         <IconMoon width={16} height={16} className="flex-none text-ink-soft" />
-        <h1 className="truncate text-[19px] italic text-ink">
+        <h1 className="truncate text-[19px] font-semibold text-ink">
           {activeProject?.name ?? t.pages.chat.title}
         </h1>
         <span
@@ -289,7 +289,7 @@ function ChatHeader() {
               >
                 <IconChevron width={16} height={16} className="rotate-180" />
               </button>
-              <h2 className="flex-1 text-[17px] italic text-ink">我们说过的话</h2>
+              <h2 className="flex-1 text-[17px] font-semibold text-ink">我们说过的话</h2>
               <button
                 onClick={() => setDrawer("projects")}
                 aria-label="项目"
@@ -398,7 +398,7 @@ function ChatHeader() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[var(--line-strong)]" />
-            <h2 className="flex items-center justify-center gap-2 text-[17px] italic text-ink">
+            <h2 className="flex items-center justify-center gap-2 text-[17px] font-semibold text-ink">
               <IconFolder width={16} height={16} /> Projects
             </h2>
 
@@ -488,7 +488,7 @@ function EmptyChat() {
   const records = [...EMPTY_STATES.chatRecordChips];
   return (
     <div className="fadein flex flex-1 flex-col justify-center py-16">
-      <p className="serif text-[17px] leading-[2] text-ink-soft">
+      <p className="text-[17px] leading-[2] text-ink-soft">
         {EMPTY_STATES.chatTitle}
       </p>
       <p className="mt-2 whitespace-pre-line text-[12.5px] leading-[1.9] text-ink-faint">
@@ -619,7 +619,8 @@ function PartView({
 
     if (side === "user") {
       return (
-        <p className="whitespace-pre-wrap break-words text-[14.5px] leading-[1.85] text-ink">
+        // 颜色交给 .user-bubble（黑底白字），这里不再另设 text-ink。
+        <p className="whitespace-pre-wrap break-words text-[14.5px] leading-[1.85]">
           {text}
         </p>
       );
@@ -919,7 +920,7 @@ function Composer() {
               onClick={submit}
               disabled={!canSend}
               aria-label="发送"
-              className="press flex h-9 w-9 flex-none items-center justify-center rounded-full border-[1.5px] border-[var(--accent-deep)] text-[var(--accent-deep)] disabled:opacity-30"
+              className="press flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--mine-bubble)] text-[var(--mine-bubble-ink)] disabled:opacity-30"
             >
               <IconSend width={16} height={16} />
             </button>

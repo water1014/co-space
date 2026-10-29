@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, dayKey } from "../components/home/Calendar";
-import { IconCheck, IconMoon, IconPlus } from "../components/ui/icons";
+import { IconCheck, IconGear, IconMoon, IconPlus } from "../components/ui/icons";
+import { IconButton, GroupTitle } from "../components/ui/kit";
 import { useLifeStore, todayKey } from "../stores/lifeStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useDiaryStore } from "../stores/diaryStore";
@@ -21,8 +22,8 @@ import { useText } from "../lib/content/useText";
 const MEALS: MealKey[] = ["breakfast", "lunch", "dinner"];
 
 /**
- * 首页：参考图逐像素对齐。
- * DAYS TOGETHER 眉题 + 绯红大数字 + 楷体引言 + Today/Upcoming/Together 卡 + 月历 + 页脚。
+ * 首页：Canoe 式浅色系统。
+ * DAYS TOGETHER 眉题 + 大数字 + 引言 + 编号分组（今日 / 待办 / 共处 / 月历）。
  */
 export function Home() {
   const life = useLifeStore();
@@ -66,7 +67,7 @@ export function Home() {
     if (night) {
       items.push({
         key: "sleep",
-        emoji: "😅",
+        emoji: "😴",
         label: "夜睡",
         value: `${Math.floor(night.hours)}h${Math.round((night.hours % 1) * 60)}m`,
         by: night.by,
@@ -123,38 +124,33 @@ export function Home() {
   }, [life.meals, life.ledger, life.bobas, life.sleep, memories]);
 
   return (
-    <div className="flex flex-col px-5 pb-12 pt-10">
-      {/* 眉题 + 菜单 */}
+    <div className="flex flex-col px-5 pb-12 pt-9">
+      {/* 顶栏：眉题 + 菜单 */}
       <div className="flex items-center justify-between">
-        <p className="eyebrow !tracking-[0.42em]">{t.home.eyebrow.replace(/ /g, "\u00a0\u00a0")}</p>
-        <Link
-          to="/mit"
-          aria-label="菜单"
-          className="press rounded-full p-1.5 text-ink-faint hover:text-ink-soft"
-        >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-            <path d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
+        <p className="eyebrow">{t.home.eyebrow}</p>
+        <Link to="/mit" aria-label="设置">
+          <IconButton label="设置">
+            <IconGear width={18} height={18} />
+          </IconButton>
         </Link>
       </div>
 
-      {/* 大数字 + 引言：参考图是左对齐 */}
+      {/* 大数字 + 引言 */}
       <div className="mt-4">
-        <h1 className="display text-[84px] italic leading-[0.9] tracking-tight text-[var(--accent)]">
+        <h1 className="display num text-[78px] leading-[0.92] tracking-tight text-ink">
           {days}
         </h1>
-        <p className="kai mt-2 text-[19px] leading-[1.85] text-ink">
-          {t.home.quote}
-        </p>
+        <p className="kai mt-2 text-[18px] leading-[1.85] text-ink">{t.home.quote}</p>
         <p className="quote-by mt-1.5">— {t.home.quoteAuthor}</p>
       </div>
 
       <div className="mt-6 h-px w-full bg-[var(--line)]" />
 
-      {/* Today */}
-      <section className="glass mt-5 rounded-3xl px-5 py-4">
+      {/* 01 · 今日 */}
+      <GroupTitle index="01" title="今日" en="TODAY" />
+      <section className="glass rounded-2xl px-5 py-4">
         <div className="flex items-center justify-between">
-          <h2 className="card-title text-ink">Today</h2>
+          <h2 className="card-title text-ink">今日</h2>
           <RoundPlus onClick={() => setAdding((v) => !v)} />
         </div>
 
@@ -172,7 +168,7 @@ export function Home() {
                 }
               }}
               placeholder="要记住的一件事..."
-              className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--glass-hi)] px-3 py-2 text-[13px] text-ink placeholder:text-ink-faint"
+              className="ghost-input min-w-0 flex-1 rounded-xl bg-[var(--surface-2)] px-3 py-2 text-[13px] text-ink placeholder:text-ink-faint"
             />
             <button
               onClick={() => {
@@ -180,7 +176,7 @@ export function Home() {
                 setDraft("");
                 setAdding(false);
               }}
-              className="press flex-none rounded-full bg-[var(--accent-deep)] px-4 text-[13px] text-white"
+              className="btn-solid flex-none px-4 py-2 text-[13px]"
             >
               记
             </button>
@@ -200,9 +196,13 @@ export function Home() {
                   i > 0 ? "border-t border-[var(--line)]" : ""
                 }`}
               >
-                <span className="text-[13px]">{it.emoji}</span>
-                <span className="min-w-0 flex-1 truncate text-[14px] text-ink">{it.label}</span>
-                <span className="num flex-none text-[12.5px] text-ink-soft">{it.value}</span>
+                <span className="text-[15px]">{it.emoji}</span>
+                <span className="min-w-0 flex-1 truncate text-[14px] text-ink">
+                  {it.label}
+                </span>
+                <span className="num flex-none text-[12.5px] text-ink-soft">
+                  {it.value}
+                </span>
                 {it.by && (
                   <span
                     className="h-[6px] w-[6px] flex-none rounded-full"
@@ -227,7 +227,7 @@ export function Home() {
                 onClick={() => life.toggleMeal(m, "wan", todayKey())}
                 className={`press flex flex-1 items-center justify-center gap-1.5 rounded-full border py-1.5 text-[12.5px] ${
                   on
-                    ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
+                    ? "border-ink text-ink"
                     : "border-[var(--line)] text-ink-faint"
                 }`}
               >
@@ -239,12 +239,9 @@ export function Home() {
         </div>
       </section>
 
-      {/* Upcoming */}
-      <section className="glass mt-4 rounded-3xl px-5 py-4">
-        <div className="flex items-center justify-between">
-          <h2 className="card-title text-ink">Upcoming</h2>
-          <RoundPlus onClick={() => setAdding((v) => !v)} />
-        </div>
+      {/* 02 · 待办 */}
+      <GroupTitle index="02" title="待办" en="UPCOMING" />
+      <section className="glass rounded-2xl px-5 py-4">
         <div className="mt-2">
           {openTodos.length === 0 && (
             <p className="card-title py-4 text-center text-[15px] text-ink-faint">
@@ -270,9 +267,7 @@ export function Home() {
                 {t.text}
               </span>
               {t.due && (
-                <span className="num flex-none text-[12.5px] text-ink-faint">
-                  {t.due}
-                </span>
+                <span className="num flex-none text-[12.5px] text-ink-faint">{t.due}</span>
               )}
               <button
                 onClick={() => life.removeTodo(t.id)}
@@ -286,41 +281,43 @@ export function Home() {
         </div>
       </section>
 
-      {/* Together 摘要：life, kept › */}
-      <Link to="/together" className="mt-4 block">
-        <section className="glass rounded-3xl px-5 py-4">
+      {/* 03 · 共处 */}
+      <GroupTitle index="03" title="共处" en="TOGETHER" />
+      <Link to="/together" className="block">
+        <section className="glass rounded-2xl px-5 py-4 press">
           <div className="flex items-center justify-between">
-            <h2 className="card-title text-ink">Together</h2>
+            <h2 className="card-title text-ink">共处</h2>
             <span className="page-head-sub text-[12.5px]">life, kept ›</span>
           </div>
           <div className="mt-3 flex items-center gap-5 overflow-hidden text-[14px] text-ink">
             <span className="flex items-center gap-1.5">
-              <span className="text-[13px]">🥚</span>
+              <span className="text-[15px]">🥚</span>
               <MealDots n={meals.length} />
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="text-[13px]">😅</span>
+              <span className="text-[15px]">😴</span>
               <span className="text-ink-soft">
                 {night ? `${Math.floor(night.hours)}h${Math.round((night.hours % 1) * 60)}m` : "未记"}
               </span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="text-[13px]">🧋</span>
+              <span className="text-[15px]">🧋</span>
               <span className="num">
                 {bobaCount}/{life.bobaQuota}
               </span>
             </span>
             <span className="num flex items-center">¥{total.toFixed(0)}</span>
             <span className="flex items-center gap-1.5">
-              <span className="text-[13px]">📚</span>
+              <span className="text-[15px]">📚</span>
               <span className="num">{words?.learned ?? 0}</span>
             </span>
           </div>
         </section>
       </Link>
 
-      {/* 月历 + 选中日的摘句 */}
-      <section className="glass mt-4 rounded-3xl px-4 py-4">
+      {/* 04 · 月历 */}
+      <GroupTitle index="04" title="月历" en="CALENDAR" />
+      <section className="glass rounded-2xl px-4 py-4">
         <Calendar marks={calMarks} selected={selected} onSelect={(k) => setSelected(k)} />
         {dayDiary.length > 0 && (
           <div className="mt-3 border-t border-[var(--line)] pt-3">
@@ -346,15 +343,13 @@ export function Home() {
 
       {/* 页脚 */}
       <footer className="mt-9">
-        <p className="page-head-sub text-center text-[13px]">
-          {t.home.footer}
-        </p>
+        <p className="page-head-sub text-center text-[13px]">{t.home.footer}</p>
       </footer>
     </div>
   );
 }
 
-/** ⊕ 圆形加号按钮（Today/Upcoming 右上） */
+/** ⊕ 圆形加号按钮 */
 function RoundPlus({ onClick }: { onClick?: () => void }) {
   return (
     <button

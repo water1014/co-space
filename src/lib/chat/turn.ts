@@ -5,7 +5,7 @@ import { useMemoryStore } from "../../stores/memoryStore";
 import { useLifeStore } from "../../stores/lifeStore";
 import { useConnectorStore } from "../../stores/connectorStore";
 import { useProjectsStore } from "../../stores/projectsStore";
-import { composePlan, streamText } from "../mock/replies";
+import { openTurn, takeFallbackExtras } from "./live";
 import { parseLifeActions } from "./tools";
 import { dueWords, lifeContext } from "../life/derive";
 import { uid } from "../utils/id";
@@ -23,10 +23,7 @@ export function cancelTurn() {
   currentAbort = null;
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 async function respond(userText: string): Promise<void> {
-  const chat = useChatStore.getState();
   const boundary = useBoundaryStore.getState();
   const presence = usePresenceStore.getState();
   const memory = useMemoryStore.getState();
@@ -44,7 +41,25 @@ async function respond(userText: string): Promise<void> {
   const lifeNow = useLifeStore.getState();
   const due = dueWords(lifeNow.wordBook, 1)[0];
 
-  const plan = composePlan(userText, {
+  // 控制器提前建：模型请求期间也能被「停下」打断。
+  const controller = new AbortController();
+  currentAbort = controller;
+
+  const started = Date.now();
+
+  // 先把这条 assistant 消息建出来，思考卡是空的。
+  // 流式是往这条消息上「长」出来的，不是等全部到齐再贴上去。
+  const assistantId = uid("a");
+  useChatStore.getState().appendStreaming({
+    id: assistantId,
+    role: "assistant",
+    parts: [{ type: "thought", seconds: 0, tools: [], steps: [] }],
+    createdAt: Date.now(),
+    status: "streaming",
+    origin: "reply",
+  });
+
+  const ctx = {
     name: boundary.name,
     energy: presence.energy,
     mood: presence.mood,
@@ -81,44 +96,46 @@ async function respond(userText: string): Promise<void> {
     bobaCount: lifeNow.bobas.filter(
       (b) => new Date(b.at).toDateString() === new Date().toDateString(),
     ).length,
-  });
+  };
 
-  // 思考阶段：这段时间是可见的，不是假的延迟。
-  const started = Date.now();
-  await sleep(900 + Math.random() * 900);
-  const seconds = (Date.now() - started) / 1000;
-
-  const assistantId = uid("a");
-  chat.appendStreaming({
-    id: assistantId,
-    role: "assistant",
-    parts: [{ ...plan.thought, seconds: Number(seconds.toFixed(1)) }],
-    createdAt: Date.now(),
-    status: "streaming",
-    origin: "reply",
-  });
-
-  // 图片要落库，否则"印记"只是一次性的装饰。
-  const hasImage = plan.extras.some((p) => p.type === "image");
-  if (hasImage) {
-    await useMemoryStore.getState().createImprint({
-      title: `${new Date().getMonth() + 1}.${new Date().getDate()} 的印记`,
-      prompt: userText.slice(0, 60),
-      messageId: assistantId,
-    });
-  }
-
-  const controller = new AbortController();
-  currentAbort = controller;
+  let sawText = false;
 
   try {
-    for await (const chunk of streamText(plan.text, controller.signal)) {
-      useChatStore.getState().appendText(assistantId, chunk);
+    for await (const ev of openTurn(userText, ctx, controller.signal)) {
+      if (controller.signal.aborted) break;
+
+      if (ev.type === "thought") {
+        useChatStore.getState().updatePart(assistantId, {
+          type: "thought",
+          seconds: Number(((Date.now() - started) / 1000).toFixed(1)),
+          tools: ev.tools,
+          steps: ev.steps,
+        });
+      } else {
+        sawText = true;
+        useChatStore.getState().appendText(assistantId, ev.delta);
+      }
     }
+
     if (controller.signal.aborted) {
-      useChatStore.getState().finish(assistantId, "cancelled");
+      // 一个字都没说就取消：这条消息没有存在的意义，撤掉。
+      // 已经说了半句的：留着，标成 cancelled，让人知道是被打断的。
+      if (sawText) {
+        useChatStore.getState().finish(assistantId, "cancelled");
+      } else {
+        useChatStore.getState().remove(assistantId);
+      }
     } else {
-      for (const extra of plan.extras) {
+      // 降级路径可能带回来图片印记，要落库。
+      const extras = takeFallbackExtras();
+      if (extras.some((p) => p.type === "image")) {
+        await useMemoryStore.getState().createImprint({
+          title: `${new Date().getMonth() + 1}.${new Date().getDate()} 的印记`,
+          prompt: userText.slice(0, 60),
+          messageId: assistantId,
+        });
+      }
+      for (const extra of extras) {
         useChatStore.getState().appendPart(assistantId, extra);
       }
       useChatStore.getState().finish(assistantId, "complete");
