@@ -739,7 +739,7 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: var(--surface-2);
+  background-color: var(--surface-2);
   overflow: hidden;
   color: var(--ink-soft);
 }

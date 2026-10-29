@@ -14,6 +14,7 @@ import {
   IconSpark,
   IconHeart,
   IconGear,
+  IconSun,
 } from "../components/ui/icons";
 import { Avatar } from "../components/ui/kit";
 import { useText } from "../lib/content/useText";
@@ -127,10 +128,21 @@ export function Home() {
             换一句
           </button>
         </div>
-        <p className="kai mt-3 flex-1 text-[16px] leading-[2] text-ink">
-          {loading ? "正在想今天要对你说的话…" : msg?.text}
-        </p>
-        <div className="mt-3 flex items-center justify-between border-t border-[var(--line)] pt-3">
+        <div className="flex flex-1 flex-col items-center justify-center px-2 text-center">
+          <span
+            aria-hidden
+            className="display select-none self-start text-[46px] leading-[0.6] text-[var(--accent)] opacity-30"
+          >
+            &ldquo;
+          </span>
+          <p className="kai mt-2 text-[20px] leading-[2] text-ink">
+            {loading ? "正在想今天要对你说的话…" : msg?.text}
+          </p>
+          <div className="mt-4 opacity-70">
+            <RedThread />
+          </div>
+        </div>
+        <div className="flex items-center justify-between border-t border-[var(--line)] pt-3">
           <span className="text-[12px] text-ink-faint">
             — {t.people.yan}
             {msg?.mock ? "（示例）" : ""}
@@ -147,8 +159,8 @@ export function Home() {
       {/* 一排三个：天气 / 写日记 / 设置 */}
       <div className="mt-3 grid grid-cols-3 gap-3">
         <WeatherCard />
-        <QuickTile icon={IconEdit} label="写日记" to="/diary" />
-        <QuickTile icon={IconGear} label="设置" to="/mit" />
+        <QuickTile icon={IconEdit} label="写日记" sub="记下今天" to="/diary" />
+        <QuickTile icon={IconGear} label="设置" sub="偏好与模型" to="/mit" />
       </div>
 
       {/* 相册模块 */}
@@ -163,7 +175,7 @@ export function Home() {
   );
 }
 
-/** 头像 + 名字（左侧常态 / 右侧品牌色） */
+/** 头像 + 名字（左侧暖沙渐变 / 右侧品牌绯红渐变） */
 function AvatarBlock({
   initial,
   name,
@@ -176,11 +188,17 @@ function AvatarBlock({
   return (
     <div className="flex flex-col items-center gap-2">
       <Avatar
-        size={60}
-        className={accent ? "bg-[var(--accent-soft)]" : "ring-2 ring-[var(--surface)]"}
+        size={62}
+        className={
+          accent
+            ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] shadow-lg shadow-[var(--accent-soft)]"
+            : "bg-gradient-to-br from-[#f6e7dc] to-[#ecd0c0] shadow-md"
+        }
       >
         <span
-          className={`text-[18px] font-semibold ${accent ? "text-[var(--accent)]" : "text-ink-soft"}`}
+          className={`text-[19px] font-semibold ${
+            accent ? "text-white" : "text-[#9c6b52]"
+          }`}
         >
           {initial}
         </span>
@@ -291,41 +309,44 @@ function WeatherCard() {
   }, []);
 
   return (
-    <div className="glass flex flex-col rounded-2xl p-3">
-      <span className="text-[11px] text-ink-faint">天气</span>
-      {w.state === "ok" ? (
-        <div className="mt-1 flex items-baseline gap-1">
-          <span className="num text-[20px] text-ink">{w.temp}°</span>
-          <span className="text-[12px] text-ink-faint">{w.label}</span>
-        </div>
-      ) : (
-        <span className="mt-1 text-[13px] text-ink-faint">
-          {w.state === "loading" ? "定位中…" : "未连接"}
-        </span>
-      )}
+    <div className="glass flex flex-col items-center rounded-2xl px-2 py-3.5 text-center">
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
+        <IconSun width={17} height={17} />
+      </span>
+      <span className="mt-2 text-[13px] font-medium text-ink">天气</span>
+      <span className="mt-0.5 text-[11px] leading-[1.5] text-ink-faint">
+        {w.state === "ok"
+          ? `${w.temp}° ${w.label}`
+          : w.state === "loading"
+            ? "定位中…"
+            : "未连接"}
+      </span>
     </div>
   );
 }
 
-/** 快捷入口小卡 */
+/** 快捷入口小卡（与天气格同构：圆形图标 + 标题 + 副行） */
 function QuickTile({
   icon: Icon,
   label,
+  sub,
   to,
 }: {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
+  sub: string;
   to: string;
 }) {
   return (
     <Link
       to={to}
-      className="glass press flex flex-col items-start rounded-2xl p-3 text-left"
+      className="glass press flex flex-col items-center rounded-2xl px-2 py-3.5 text-center"
     >
-      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink-soft">
-        <Icon width={15} height={15} />
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
+        <Icon width={17} height={17} />
       </span>
       <span className="mt-2 text-[13px] font-medium text-ink">{label}</span>
+      <span className="mt-0.5 text-[11px] leading-[1.5] text-ink-faint">{sub}</span>
     </Link>
   );
 }
@@ -341,12 +362,16 @@ function AlbumCard() {
         </Link>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2">
-        {[0, 1, 2].map((i) => (
+        {[
+          "from-[#f6e3dc] to-[#f0d2c8]",
+          "from-[#e9eef2] to-[#dbe5ec]",
+          "from-[#f4ecdd] to-[#eadcc2]",
+        ].map((g, i) => (
           <div
             key={i}
-            className="flex aspect-square items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--surface-2)] to-[var(--bg-deep)] text-ink-ghost"
+            className={`flex aspect-square items-center justify-center rounded-2xl bg-gradient-to-br ${g} text-[#b3a08f]`}
           >
-            <IconImages width={26} height={26} />
+            <IconImages width={24} height={24} />
           </div>
         ))}
       </div>
