@@ -2194,3 +2194,149 @@ main.scroll-area > div > header:has(+ div) {
     50% { transform: scale(1.045); opacity: 1; }
   }
 }
+
+
+/* ================================================================
+   MIRROR FLOWER — page-specific atmosphere
+   Pressed petals in the diary, reflected keepsakes, moonlit letters,
+   and a shared water garden. Decorative layers never intercept input.
+   ================================================================ */
+.diary-page .diary-heading::after {
+  content: "✿";
+  right: 28px;
+  top: 27px;
+  color: rgba(112,132,166,.56);
+  font-size: 29px;
+  text-shadow: 13px 10px 0 rgba(177,164,195,.22);
+  transform: rotate(-18deg);
+}
+.diary-page .diary-card {
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(205,216,234,.25), transparent 42%),
+    linear-gradient(145deg, rgba(255,255,255,.97), rgba(239,243,248,.92));
+}
+.diary-page .diary-card::before {
+  content: "";
+  position: absolute;
+  right: -22px;
+  bottom: -38px;
+  width: 104px;
+  height: 104px;
+  border: 1px solid rgba(132,151,180,.14);
+  border-radius: 50%;
+  box-shadow: 0 0 0 12px rgba(255,255,255,.12), 0 0 0 26px rgba(132,151,180,.045);
+  pointer-events: none;
+}
+.diary-page .week-strip {
+  border: 1px solid rgba(255,255,255,.74);
+  border-radius: 20px;
+  background: linear-gradient(135deg,rgba(255,255,255,.56),rgba(225,233,243,.42));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.88), 0 10px 28px -24px rgba(74,94,132,.34);
+}
+.album-page .album-heading::after {
+  width: 38px;
+  height: 38px;
+  border-color: rgba(111,132,166,.42);
+  box-shadow: inset 0 0 0 5px var(--bg), inset 0 0 0 6px rgba(111,132,166,.22), 0 0 0 8px rgba(255,255,255,.18);
+}
+.album-page .album-photo-card {
+  padding: 5px;
+  background: linear-gradient(145deg,rgba(255,255,255,.96),rgba(222,231,242,.76));
+  box-shadow: 0 12px 30px -22px rgba(55,75,111,.48), inset 0 1px 0 #fff;
+}
+.album-page .album-thumb {
+  position: relative;
+  overflow: hidden;
+}
+.album-page .album-thumb::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 24%;
+  background: linear-gradient(180deg,transparent,rgba(35,48,70,.12));
+  pointer-events: none;
+}
+.album-page .keepsake {
+  border-color: rgba(255,255,255,.82);
+  background:
+    radial-gradient(ellipse at 92% 8%,rgba(179,194,217,.2),transparent 36%),
+    linear-gradient(155deg,rgba(255,255,255,.98),rgba(232,238,246,.96));
+}
+.chat-page {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 70% 24% at 50% 0%,rgba(255,255,255,.42),transparent 80%),
+    radial-gradient(ellipse 48% 32% at 100% 62%,rgba(158,177,207,.12),transparent 78%);
+}
+.chat-page::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(76vw,360px);
+  aspect-ratio: 1;
+  right: -48%;
+  top: 24%;
+  border: 1px solid rgba(133,153,184,.12);
+  border-radius: 50%;
+  box-shadow: 0 0 0 16px rgba(255,255,255,.035), 0 0 0 36px rgba(133,153,184,.035);
+  pointer-events: none;
+}
+.chat-page .chat-round {
+  border-color: rgba(255,255,255,.74);
+  background-color: rgba(255,255,255,.48);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.82);
+  backdrop-filter: blur(16px);
+}
+.chat-page [data-message-author="user"] {
+  filter: drop-shadow(0 7px 14px rgba(83,105,182,.08));
+}
+.together-page {
+  isolation: isolate;
+}
+.together-page::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 116px;
+  right: -76px;
+  width: 190px;
+  height: 190px;
+  border: 1px solid rgba(132,151,184,.16);
+  border-radius: 50%;
+  box-shadow: 0 0 0 14px rgba(255,255,255,.08), 0 0 0 32px rgba(132,151,184,.045);
+  pointer-events: none;
+}
+.together-page > div:nth-of-type(2) > button {
+  background: linear-gradient(145deg,rgba(255,255,255,.76),rgba(225,233,243,.54));
+  border-color: rgba(255,255,255,.76);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 12px 28px -24px rgba(67,86,123,.38);
+}
+.together-page .glass {
+  border-color: rgba(255,255,255,.72);
+  background: linear-gradient(145deg,rgba(255,255,255,.74),rgba(226,234,243,.58));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 14px 34px -28px rgba(67,86,123,.4);
+}
+[data-theme="night"] .diary-page .diary-card {
+  background: linear-gradient(145deg,rgba(39,51,69,.96),rgba(29,39,55,.94));
+}
+[data-theme="night"] .diary-page .week-strip,
+[data-theme="night"] .together-page .glass,
+[data-theme="night"] .together-page > div:nth-of-type(2) > button {
+  background: linear-gradient(145deg,rgba(43,57,77,.78),rgba(31,43,61,.72));
+  border-color: rgba(218,229,247,.1);
+}
+[data-theme="night"] .album-page .album-photo-card,
+[data-theme="night"] .album-page .keepsake {
+  background: linear-gradient(145deg,rgba(43,56,76,.96),rgba(30,42,60,.94));
+  border-color: rgba(218,229,247,.12);
+}
+[data-theme="night"] .chat-page {
+  background:
+    radial-gradient(ellipse 70% 24% at 50% 0%,rgba(150,169,207,.09),transparent 80%),
+    linear-gradient(180deg,rgba(30,43,63,.16),transparent 48%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .diary-page .diary-card::before,
+  .chat-page::before,
+  .together-page::before { animation: none !important; }
+}
