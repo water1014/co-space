@@ -330,52 +330,82 @@ body {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* 用户气泡：磨砂白 + 细描边，深色字（参考图气质） */
+/* 气泡：参考图的「纯白大圆角胶囊」——四角同弧度，无尖角，边缘发丝光 */
+.bubble {
+  position: relative;
+  color: var(--ink);
+  border-radius: 25px;
+  padding: 12px 17px;
+  transition: background-color 0.35s ease, border-color 0.35s ease;
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+}
+.bubble::before {
+  content: none;
+}
+
+/* 自己：更实一点的白，浮在背景之上 */
 .user-bubble {
-  position: relative;
-  background: rgba(255, 255, 255, 0.82);
-  color: var(--ink);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 20px 20px 6px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 1px 2px rgba(40, 30, 28, 0.05),
-    0 8px 18px -12px rgba(40, 30, 28, 0.22);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  backdrop-filter: blur(10px) saturate(140%);
-  transition: background-color 0.35s ease, border-color 0.35s ease;
+    0 1px 1px rgba(40, 30, 28, 0.04),
+    0 10px 22px -16px rgba(40, 30, 28, 0.35);
 }
 
-.user-bubble::before {
-  content: none;
-}
-
-/* AI 气泡：更透的磨砂白，同样细描边 */
+/* 对方：更透的磨砂白，像隔着玻璃 */
 .assistant-bubble {
-  position: relative;
-  background: rgba(255, 255, 255, 0.6);
-  color: var(--ink);
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  border-radius: 20px 20px 20px 6px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow:
-    0 1px 2px rgba(40, 30, 28, 0.04),
-    0 8px 18px -14px rgba(40, 30, 28, 0.2);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  backdrop-filter: blur(10px) saturate(140%);
-  transition: background-color 0.35s ease, border-color 0.35s ease;
+    0 1px 1px rgba(40, 30, 28, 0.03),
+    0 10px 22px -18px rgba(40, 30, 28, 0.3);
 }
 
-.assistant-bubble::before {
-  content: none;
-}
-
-/* 夜间：深色半透明磨砂气泡 */
+/* 夜间：深色磨砂，保持同样的层次差 */
 [data-theme="night"] .user-bubble {
-  background: rgba(64, 57, 51, 0.85);
-  border-color: rgba(255, 240, 232, 0.1);
+  background: rgba(84, 75, 68, 0.92);
+  border-color: rgba(255, 240, 232, 0.11);
 }
 [data-theme="night"] .assistant-bubble {
-  background: rgba(48, 42, 37, 0.7);
+  background: rgba(56, 49, 43, 0.78);
   border-color: rgba(255, 240, 232, 0.08);
+}
+
+/* 输入胶囊：参考图底部那条悬浮的白胶囊 */
+.composer-pill {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 1px 1px rgba(40, 30, 28, 0.04),
+    0 12px 26px -18px rgba(40, 30, 28, 0.32);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+[data-theme="night"] .composer-pill {
+  background: rgba(56, 49, 44, 0.9);
+  border-color: rgba(255, 240, 232, 0.1);
+}
+
+/* 顶栏圆钮：参考图左右那两颗白色小圆 */
+.chat-round {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 16px -12px rgba(40, 30, 28, 0.35);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+}
+[data-theme="night"] .chat-round {
+  background: rgba(56, 49, 44, 0.75);
+  border-color: rgba(255, 240, 232, 0.1);
 }
 
 /* ---------------- 排版 ---------------- */
@@ -1142,4 +1172,13 @@ textarea:focus {
 }
 .desk-page::-webkit-scrollbar {
   display: none;
+}
+
+/* 聊天右上「更多」面板：近乎实底，避免背后文字透出来 */
+.chat-menu {
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 48px -26px rgba(40, 30, 28, 0.5);
+  -webkit-backdrop-filter: blur(26px) saturate(160%);
+  backdrop-filter: blur(26px) saturate(160%);
 }

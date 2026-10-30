@@ -317,3 +317,20 @@ export const IconPhone = (p: SVGProps<SVGSVGElement>) => (
     <path d="M6.5 4h3l1.5 4-2 1.6a11 11 0 0 0 5 5l1.6-2 4 1.5v3a2 2 0 0 1-2.2 2A15 15 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4z" />
   </svg>
 );
+
+/** 更多（三点） */
+export const IconDots = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <circle cx="5.5" cy="12" r="1.15" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none" />
+    <circle cx="18.5" cy="12" r="1.15" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+/** 相机（输入栏左侧那颗圆钮） */
+export const IconCamera = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M4 8.5h3l1.4-2h7.2L17 8.5h3a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1z" />
+    <circle cx="12" cy="13.4" r="3.1" />
+  </svg>
+);

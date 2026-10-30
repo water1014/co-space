@@ -29,9 +29,8 @@ import {
   IconFile,
   IconFolder,
   IconMic,
-  IconMoon,
+  IconDots,
   IconPlus,
-  IconSearch,
   IconSend,
   IconSpark,
 } from "../components/ui/icons";
@@ -94,7 +93,7 @@ export function Chat() {
         <ChatHeader />
         <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
           <ThreadPrimitive.Viewport
-            className="scroll-area flex-1 px-4 pt-2"
+            className="scroll-area flex-1 px-4 pt-4"
             autoScroll
           >
             <div className="flex min-h-full flex-col justify-end pb-4">
@@ -198,7 +197,9 @@ function ChatHeader() {
   const activeId = useProjectsStore((s) => s.activeId);
   const setActive = useProjectsStore((s) => s.setActive);
   const [confirming, setConfirming] = useState(false);
-  const [drawer, setDrawer] = useState<null | "history" | "projects" | "model">(null);
+  const [drawer, setDrawer] = useState<null | "history" | "projects" | "model" | "menu">(
+    null,
+  );
   const phase = moonPhase();
   const activeProject = projects.find((p) => p.id === activeId);
   const t = useText();
@@ -229,42 +230,60 @@ function ChatHeader() {
   })();
 
   return (
-    <header className="flex items-center justify-between gap-2 px-4 pt-4 pb-2">
-      <button
-        onClick={back}
-        aria-label="返回"
-        className="press flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[var(--line)] bg-white/60 text-ink-soft backdrop-blur hover:text-ink"
-      >
-        <IconChevron width={17} height={17} className="rotate-180" />
+    <header className="relative flex items-center gap-2 px-4 pt-4 pb-2">
+      <button onClick={back} aria-label="返回" className="chat-round press">
+        <IconChevron width={18} height={18} className="rotate-180" />
       </button>
 
-      <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
-        <h1 className="truncate text-[17px] font-semibold text-ink">
-          {activeProject?.name ?? t.pages.chat.title}
+      <div className="flex min-w-0 flex-1 flex-col items-center">
+        <h1 className="max-w-full truncate text-[16.5px] font-semibold leading-tight text-ink">
+          {activeProject?.name ?? t.people.yan}
         </h1>
-        <span
-          className={`h-[7px] w-[7px] flex-none rounded-full ${
-            quiet ? "bg-ink-faint" : "bg-emerald-500"
-          }`}
-        />
+        <span className="mt-0.5 flex items-center gap-1 text-[10px] text-ink-ghost">
+          <span
+            className={`h-[5px] w-[5px] rounded-full ${
+              quiet ? "bg-[var(--line-strong)]" : "bg-emerald-500"
+            }`}
+          />
+          {quiet ? "安静着" : "在"}
+        </span>
       </div>
 
-      <div className="flex flex-none items-center gap-1.5">
-        <button
-          onClick={() => setDrawer("history")}
-          aria-label="搜索"
-          className="press flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-white/60 text-ink-soft backdrop-blur hover:text-ink"
-        >
-          <IconSearch width={17} height={17} />
-        </button>
-        <button
-          onClick={toggleTheme}
-          aria-label="切换主题"
-          className="press flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-white/60 text-ink-soft backdrop-blur hover:text-ink"
-        >
-          <IconMoon width={17} height={17} />
-        </button>
-      </div>
+      <button
+        onClick={() => setDrawer("menu")}
+        aria-label="更多"
+        className="chat-round press"
+      >
+        <IconDots width={18} height={18} />
+      </button>
+
+      {/* 更多菜单：历史 / 主题 / 模型 / 清空 */}
+      {drawer === "menu" && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setDrawer(null)} />
+          <div
+            className="chat-menu absolute right-4 top-[62px] z-50 w-[180px] overflow-hidden rounded-[20px] p-1.5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {[
+              { label: "我们说过的话", onClick: () => setDrawer("history") },
+              { label: "换个主题", onClick: () => { toggleTheme(); setDrawer(null); } },
+              { label: "模型 · Opus 4.6", onClick: () => setDrawer("model") },
+              { label: "清空这段对话", onClick: () => { setConfirming(true); setDrawer(null); }, danger: true },
+            ].map((it) => (
+              <button
+                key={it.label}
+                onClick={it.onClick}
+                className={`flex w-full items-center rounded-[14px] px-3 py-2.5 text-left text-[13.5px] transition-colors hover:bg-[var(--glass-hi)] ${
+                  it.danger ? "text-[var(--danger)]" : "text-ink"
+                }`}
+              >
+                {it.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {confirming && (
         <>
@@ -551,8 +570,8 @@ function MessageRow({ id, divider }: { id: string; divider?: string }) {
   return (
     <>
       {divider && (
-        <div className="my-4 flex justify-center">
-          <span className="rounded-full bg-white/60 px-3 py-1 text-[10.5px] text-ink-faint backdrop-blur">
+        <div className="my-5 flex justify-center">
+          <span className="rounded-full bg-white/55 px-3 py-[3px] text-[10px] tracking-[0.04em] text-ink-faint backdrop-blur">
             {divider}
           </span>
         </div>
@@ -563,20 +582,18 @@ function MessageRow({ id, divider }: { id: string; divider?: string }) {
 }
 
 function UserRow({ meta }: { meta: ChatMessage }) {
-  const t = useText();
   return (
-    <div className="rise mt-3 flex items-end justify-end gap-2 first:mt-0">
-      <div className="flex max-w-[78%] flex-col items-end gap-1">
-        <MessagePrimitive.Root className="user-bubble px-3.5 py-2.5">
+    <div className="rise mt-2 flex flex-col items-end first:mt-0">
+      <div className="max-w-[80%]">
+        <MessagePrimitive.Root className="bubble user-bubble">
           <MessagePrimitive.Parts>
             {({ part }) => <PartView part={part} side="user" />}
           </MessagePrimitive.Parts>
         </MessagePrimitive.Root>
-        <span className="pr-0.5 text-[9.5px] text-ink-ghost">
-          {formatClock(meta.createdAt)}
-        </span>
       </div>
-      <ChatAvatar initial={t.people.wan[0]} warm />
+      <span className="mt-[5px] pr-1.5 text-[10px] tracking-[0.02em] text-ink-faint">
+        {formatClock(meta.createdAt)}
+      </span>
     </div>
   );
 }
@@ -589,15 +606,18 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
   return (
     <div className="rise mt-3 flex items-start gap-2 first:mt-0">
       <ChatAvatar initial={t.people.yan[0]} />
-      <div className="flex max-w-[82%] flex-col items-start gap-1">
-        <MessagePrimitive.Root className="assistant-bubble px-3.5 py-2.5">
+      <div className="flex min-w-0 max-w-[80%] flex-col items-start">
+        <span className="mb-[5px] pl-2 text-[10px] tracking-[0.02em] text-ink-faint">
+          {t.people.yan}
+        </span>
+        <MessagePrimitive.Root className="bubble assistant-bubble">
           <MessagePrimitive.Parts>
             {({ part }) => (
               <PartView part={part} side="assistant" initiative={initiative} />
             )}
           </MessagePrimitive.Parts>
         </MessagePrimitive.Root>
-        <div className="flex items-center gap-3 pl-0.5 text-[9.5px] text-ink-ghost">
+        <div className="mt-[5px] flex items-center gap-3 pl-2 text-[10px] text-ink-faint">
           <span>{formatClock(meta.createdAt)}</span>
           {!streaming && (
             <button
@@ -613,16 +633,10 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
   );
 }
 
-/** 聊天头像（小圆，环白边） */
-function ChatAvatar({ initial, warm }: { initial: string; warm?: boolean }) {
+/** 聊天头像：参考图里那颗带白环的圆头像 */
+function ChatAvatar({ initial }: { initial: string; warm?: boolean }) {
   return (
-    <span
-      className={`flex h-8 w-8 flex-none items-center justify-center rounded-full text-[12px] font-semibold shadow-sm ring-2 ring-white/70 ${
-        warm
-          ? "bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[#9c6b52]"
-          : "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white"
-      }`}
-    >
+    <span className="mt-[13px] flex h-8 w-8 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[#f7e7e3] to-[#e9c9c0] text-[12px] font-semibold text-[#9c6b52] shadow-[0_4px_12px_-8px_rgba(40,30,28,0.5)] ring-[2px] ring-white/80">
       {initial}
     </span>
   );
@@ -655,7 +669,7 @@ function PartView({
     if (side === "user") {
       return (
         // 颜色交给 .user-bubble（黑底白字），这里不再另设 text-ink。
-        <p className="whitespace-pre-wrap break-words text-[14.5px] leading-[1.85]">
+        <p className="whitespace-pre-wrap break-words text-[15px] leading-[1.7]">
           {text}
         </p>
       );
@@ -668,7 +682,7 @@ function PartView({
             它先开口的
           </p>
         )}
-        <div className="whitespace-pre-wrap break-words text-[15px] leading-[1.95] text-ink">
+        <div className="whitespace-pre-wrap break-words text-[15px] leading-[1.75] text-ink">
           {text.split(/\n{2,}/).map((para, i) => {
             const aside = para.trimStart().startsWith("（");
             return (
@@ -759,7 +773,6 @@ function Composer() {
   const quiet = useBoundaryStore((s) => s.quietMode);
   const [pending, setPending] = useState<MessagePart[]>([]);
   const [sheet, setSheet] = useState(false);
-  const [model, setModel] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   const canSend = draft.trim().length > 0 || pending.length > 0;
@@ -886,84 +899,53 @@ function Composer() {
 
       {notice && <p className="mb-2 px-1 text-[11px] text-ink-faint">{notice}</p>}
 
-      <div className="glass edge rounded-[26px] px-3 py-2.5">
-        <textarea
-          rows={1}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
-              e.preventDefault();
-              submit();
-            }
-          }}
-          placeholder={quiet ? "它今天不太说话。你仍然可以写。" : "Message..."}
-          className="ghost-input max-h-28 w-full resize-none bg-transparent px-1 py-1 text-[14.5px] leading-[1.6] text-ink"
-        />
+      {/* 参考图底部：两颗圆钮夹一条输入胶囊 */}
+      <div className="flex items-end gap-2">
+        <button
+          onClick={() => setSheet(true)}
+          aria-label="添加附件"
+          className="chat-round press h-11 w-11"
+        >
+          <IconPlus width={20} height={20} />
+        </button>
 
-        <div className="mt-1 flex items-center gap-2">
-          <button
-            onClick={() => setSheet(true)}
-            aria-label="添加附件"
-            className="press flex h-8 w-8 flex-none items-center justify-center rounded-full text-ink-soft hover:text-ink"
-          >
-            <IconPlus width={18} height={18} />
-          </button>
-
-          <div className="relative">
-            <button
-              onClick={() => setModel((v) => !v)}
-              className="press rounded-full border border-[var(--line)] px-3 py-1 text-[12px] text-ink-soft"
-            >
-              Opus 4.6
-            </button>
-            {model && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setModel(false)} />
-                <div className="glass absolute bottom-10 left-0 z-50 w-52 rounded-2xl p-2">
-                  {["Opus 4.6", "Sonnet 4.6", "本地回应层"].map((m, i) => (
-                    <button
-                      key={m}
-                      onClick={() => setModel(false)}
-                      className="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left hover:bg-[var(--glass-hi)]"
-                    >
-                      <span className="flex-1 text-[13px] text-ink">{m}</span>
-                      {i === 0 && <IconCheck width={13} height={13} className="text-[var(--accent-deep)]" />}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          <span className="flex-1" />
-
-          <button
-            onClick={record}
-            aria-label="语音"
-            className="press flex h-8 w-8 flex-none items-center justify-center rounded-full text-ink-faint hover:text-ink-soft"
-          >
-            <IconMic width={16} height={16} />
-          </button>
-
-          {isRunning ? (
-            <button
-              onClick={() => cancelTurn()}
-              className="press flex h-9 flex-none items-center justify-center rounded-full border border-[var(--line-strong)] px-3 text-[12px] text-ink"
-            >
-              停下
-            </button>
-          ) : (
-            <button
-              onClick={submit}
-              disabled={!canSend}
-              aria-label="发送"
-              className="press flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-sm shadow-[var(--accent-soft)] disabled:opacity-30"
-            >
-              <IconSend width={16} height={16} />
-            </button>
-          )}
+        <div className="composer-pill flex min-h-[44px] flex-1 items-center rounded-[22px] px-4 py-1.5">
+          <textarea
+            rows={1}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                submit();
+              }
+            }}
+            placeholder={quiet ? "它今天不太说话。你仍然可以写。" : "Message..."}
+            className="ghost-input max-h-28 w-full resize-none bg-transparent py-[9px] text-[15px] leading-[1.5] text-ink"
+          />
         </div>
+
+        {isRunning ? (
+          <button
+            onClick={() => cancelTurn()}
+            aria-label="停下"
+            className="chat-round press h-11 w-11 text-[var(--accent-deep)]"
+          >
+            <span className="h-[10px] w-[10px] rounded-[2px] bg-current" />
+          </button>
+        ) : canSend ? (
+          <button
+            onClick={submit}
+            aria-label="发送"
+            className="press flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-[0_10px_22px_-12px_rgba(226,96,95,0.9)]"
+          >
+            <IconSend width={18} height={18} />
+          </button>
+        ) : (
+          <button onClick={record} aria-label="语音" className="chat-round press h-11 w-11">
+            <IconMic width={19} height={19} />
+          </button>
+        )}
       </div>
     </div>
   );

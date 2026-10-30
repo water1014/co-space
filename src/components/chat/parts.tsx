@@ -6,7 +6,6 @@ import {
   IconPause,
   IconPlay,
 } from "../ui/icons";
-import { ToolCallBadge } from "./ToolCallBadge";
 
 /* ---------------- 思考过程 ---------------- */
 
@@ -16,27 +15,29 @@ export function ThoughtCard({
   part: Extract<MessagePart, { type: "thought" }>;
 }) {
   return (
-    <div className="mb-2.5">
-      <ToolCallBadge tools={part.tools} />
-      <details className="group glass-flat px-3.5 py-2.5">
-        <summary className="flex cursor-pointer list-none items-center gap-2 text-[12.5px] text-ink-soft/85">
-          <span className="h-[5px] w-[5px] flex-none rounded-full bg-[var(--accent)] opacity-80" />
-          <span>思考 {part.seconds.toFixed(1)} 秒</span>
-          <IconChevron
-            width={13}
-            height={13}
-            className="ml-auto opacity-70 transition-transform duration-300 group-open:rotate-90"
-          />
-        </summary>
-        <div className="mt-2.5 space-y-1.5 border-l border-[var(--line)] pl-3">
-          {part.steps.map((step, i) => (
-            <p key={i} className="text-[12px] leading-[1.9] text-ink-faint">
-              {step}
-            </p>
-          ))}
-        </div>
-      </details>
-    </div>
+    <details className="group mb-2.5">
+      <summary className="flex cursor-pointer list-none items-center gap-1.5 text-[10.5px] text-ink-ghost">
+        <span className="h-[3px] w-[3px] flex-none rounded-full bg-[var(--accent)] opacity-60" />
+        <span className="truncate">
+          {part.tools.length > 0
+            ? `调用 ${part.tools.join(" · ")}`
+            : "想了一会儿"}
+        </span>
+        <span className="flex-none opacity-70">{part.seconds.toFixed(1)}s</span>
+        <IconChevron
+          width={11}
+          height={11}
+          className="ml-auto flex-none opacity-60 transition-transform duration-300 group-open:rotate-90"
+        />
+      </summary>
+      <div className="mt-2 space-y-1.5 border-l border-[var(--line)] pl-3">
+        {part.steps.map((step, i) => (
+          <p key={i} className="text-[11.5px] leading-[1.9] text-ink-faint">
+            {step}
+          </p>
+        ))}
+      </div>
+    </details>
   );
 }
 
