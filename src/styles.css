@@ -1918,3 +1918,132 @@ main.scroll-area > div > header:has(+ div) {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* ------------------------------------------------------------------
+   CO-SPACE / art direction pass
+   Editorial minimalism, with a little more color, tactility and motion.
+   ------------------------------------------------------------------ */
+:root, [data-theme="day"] {
+  --bg: #f3f5f8;
+  --bg-deep: #e9edf3;
+  --surface: rgba(255,255,255,.88);
+  --surface-2: #edf1f6;
+  --ink: #202735;
+  --ink-soft: #657184;
+  --ink-faint: #8995a6;
+  --ink-ghost: #b5bfcc;
+  --line: rgba(49,65,88,.09);
+  --line-strong: rgba(49,65,88,.16);
+  --accent: #6579c8;
+  --accent-deep: #465cae;
+  --accent-soft: rgba(101,121,200,.13);
+  --danger: #d66e7d;
+  --peer-bubble: #eef1f6;
+  --peer-bubble-ink: #202735;
+  --mine-bubble: #5369b6;
+  --mine-bubble-ink: #fff;
+  --glass-bg: rgba(250,252,255,.68);
+  --glass-bg-strong: rgba(255,255,255,.86);
+  --glass-border: rgba(255,255,255,.82);
+  --shadow-card: 0 8px 26px -18px rgba(44,58,88,.28);
+  --shadow-float: 0 18px 48px -22px rgba(44,58,88,.32);
+  --shadow-glass: 0 16px 44px -22px rgba(44,58,88,.3);
+}
+[data-theme="night"] {
+  --bg: #111722;
+  --bg-deep: #0b1019;
+  --surface: #192231;
+  --surface-2: #222e40;
+  --ink: #eef2fa;
+  --ink-soft: #b0bbcc;
+  --ink-faint: #8492a8;
+  --ink-ghost: #59677c;
+  --line: rgba(215,226,247,.09);
+  --line-strong: rgba(215,226,247,.16);
+  --accent: #9aa9f4;
+  --accent-deep: #788ce0;
+  --accent-soft: rgba(154,169,244,.16);
+  --peer-bubble: #222e40;
+  --peer-bubble-ink: #eef2fa;
+  --mine-bubble: #667bd0;
+  --mine-bubble-ink: #fff;
+}
+.app-bg {
+  background:
+    radial-gradient(42% 34% at 92% 8%, rgba(160,177,235,.28), transparent 72%),
+    radial-gradient(38% 32% at 2% 38%, rgba(191,170,220,.18), transparent 74%),
+    radial-gradient(42% 36% at 78% 100%, rgba(161,207,201,.16), transparent 74%),
+    var(--bg);
+}
+[data-theme="night"] .app-bg {
+  background:
+    radial-gradient(48% 34% at 92% 8%, rgba(82,101,174,.22), transparent 72%),
+    radial-gradient(38% 32% at 2% 42%, rgba(111,78,143,.14), transparent 74%),
+    var(--bg);
+}
+.home-love-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(255,255,255,.96), transparent 48%),
+    radial-gradient(ellipse at 88% 92%, rgba(157,177,236,.34), transparent 48%),
+    linear-gradient(135deg, #e9eef8 0%, #f6f4fb 48%, #e6f0f1 100%) !important;
+  border: 1px solid rgba(255,255,255,.9);
+  box-shadow: 0 22px 50px -30px rgba(67,83,138,.5), inset 0 1px 0 #fff;
+}
+.home-love-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 210px;
+  height: 210px;
+  right: -76px;
+  top: -100px;
+  border: 1px solid rgba(105,125,190,.22);
+  border-radius: 50%;
+  box-shadow: 0 0 0 18px rgba(255,255,255,.16), 0 0 0 38px rgba(255,255,255,.12);
+  animation: orbit-drift 18s linear infinite;
+}
+.home-love-card::after {
+  content: "✳";
+  position: absolute;
+  right: 22px;
+  bottom: 16px;
+  color: rgba(86,105,170,.38);
+  font-size: 23px;
+  animation: star-turn 22s linear infinite;
+}
+.home-love-card .serif-display { color: #5269b6 !important; }
+.home-love-card .text-\\[\\#b98a90\\] { color: #7887b4 !important; }
+@keyframes orbit-drift { to { transform: rotate(360deg); } }
+@keyframes star-turn { to { transform: rotate(180deg); } }
+.home-glass-card, .editorial-card, .album-photo-card {
+  border-color: rgba(255,255,255,.78);
+  box-shadow: 0 12px 34px -24px rgba(46,62,98,.38), inset 0 1px 0 rgba(255,255,255,.86);
+}
+.home-page .card, .home-page .home-glass-card {
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
+}
+.home-page .card:active, .home-page .home-glass-card:active {
+  transform: translateY(1px) scale(.985);
+}
+.home-date, .eyebrow { letter-spacing: .2em; }
+.home-wordmark { letter-spacing: -.055em; }
+[data-theme="night"] .home-love-card {
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(255,255,255,.08), transparent 48%),
+    radial-gradient(ellipse at 88% 92%, rgba(113,132,211,.22), transparent 48%),
+    linear-gradient(135deg, #202b40 0%, #25283d 52%, #1c343b 100%) !important;
+  border-color: rgba(220,230,255,.12);
+}
+[data-theme="night"] .home-love-card .serif-display { color: #aab8ff !important; }
+[data-theme="night"] .home-glass-card,
+[data-theme="night"] .editorial-card,
+[data-theme="night"] .album-photo-card {
+  border-color: rgba(220,230,255,.1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-love-card::before, .home-love-card::after { animation: none !important; }
+}
