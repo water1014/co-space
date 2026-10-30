@@ -104,9 +104,10 @@ export function Home() {
         ref={trackRef}
         onScroll={onTrackScroll}
         className="desk-track rise mt-1 min-h-0 flex-1"
+        aria-label="首页内容，可横向滑动"
       >
         {/* ───────── 第 1 屏：社交互动 ───────── */}
-        <section className="desk-page home-page px-5 pb-8 pt-9">
+        <section className="desk-page home-page home-page-cover px-5 pb-8 pt-9" aria-label="我们的日常">
           <header className="mb-7">
             <p className="home-date text-[11px] tracking-[0.16em] text-ink-faint">
               {`${new Date().getMonth() + 1}月${new Date().getDate()}日 ${WEEK[new Date().getDay()]}`}
@@ -156,7 +157,7 @@ export function Home() {
         </section>
 
         {/* ───────── 第 2 屏：记录 & 创作 ───────── */}
-        <section className="desk-page px-6 pb-8 pt-12">
+        <section className="desk-page home-page-create px-6 pb-8 pt-12" aria-label="记录与创作">
           <SectionHead zh="记录" en="CREATE" />
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 摘抄 / 短句卡片 */}
@@ -195,7 +196,7 @@ export function Home() {
         </section>
 
         {/* ───────── 第 3 屏：生活工具 ───────── */}
-        <section className="desk-page px-6 pb-8 pt-12">
+        <section className="desk-page home-page-tools px-6 pb-8 pt-12" aria-label="生活工具">
           <SectionHead zh="工具" en="TOOLS" />
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 日程概览卡片 */}
@@ -233,17 +234,24 @@ export function Home() {
         </section>
       </div>
 
-      {/* 翻页指示点 */}
-      <div className="flex items-center justify-center gap-1.5 pb-3 pt-1">
+      {/* 可触达的分屏导航 */}
+      <nav className="home-page-indicator flex items-center justify-center gap-2 pb-3 pt-1" aria-label="首页分屏导航">
         {[0, 1, 2].map((i) => (
-          <span
+          <button
             key={i}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              page === i ? "w-4 bg-[var(--accent)]" : "w-1.5 bg-[var(--line-strong)]"
-            }`}
+            type="button"
+            aria-label={`第 ${i + 1} 屏`}
+            aria-current={page === i ? "page" : undefined}
+            onClick={() => {
+              const el = trackRef.current;
+              if (!el) return;
+              el.scrollTo({ left: el.clientWidth * i, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+            }}
+            className={`home-page-dot ${page === i ? "is-active" : ""}`}
           />
         ))}
-      </div>
+        <span className="home-page-count" aria-live="polite">{page + 1} / 3</span>
+      </nav>
 
       {toast && (
         <div className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center">
