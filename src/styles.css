@@ -976,6 +976,8 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   width: 100%;
+  max-width: 56px;
+  margin: 0 auto;
   aspect-ratio: 1 / 1;
   border-radius: 23%;
   background:

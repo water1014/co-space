@@ -102,7 +102,7 @@ export function Home() {
             </h1>
           </header>
 
-          <div className="grid grid-cols-4 gap-x-4 gap-y-6">
+          <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 双人头像 + 在一起时间：长方形主卡 */}
             <div className="card col-span-4 rounded-[28px] px-6 py-7 text-center">
               <div className="flex items-center justify-center gap-6">
@@ -131,7 +131,7 @@ export function Home() {
                     key={i}
                     className={`flex aspect-[4/3] items-center justify-center rounded-2xl bg-gradient-to-br ${g} text-[#b3a08f]`}
                   >
-                    {i === 1 ? <IconHeart width={22} height={22} /> : <IconImages width={22} height={22} />}
+                    {i === 1 ? <IconHeart width={18} height={18} /> : <IconImages width={18} height={18} />}
                   </span>
                 ))}
               </div>
@@ -143,13 +143,13 @@ export function Home() {
             </Link>
 
             {/* 四个社交入口 */}
-            <AppIcon label="聊天" tile="cream" icon={<IconChat width={22} height={22} />} to="/chat" />
-            <AppIcon label="情侣空间" tile="blush" icon={<IconHeart width={22} height={22} />} to="/together" />
-            <AppIcon label="朋友圈" tile="blue" icon={<IconMoments width={22} height={22} />} to="/moments" />
+            <AppIcon label="聊天" tile="cream" icon={<IconChat width={18} height={18} />} to="/chat" />
+            <AppIcon label="情侣空间" tile="blush" icon={<IconHeart width={18} height={18} />} to="/together" />
+            <AppIcon label="朋友圈" tile="blue" icon={<IconMoments width={18} height={18} />} to="/moments" />
             <AppIcon
               label="一对一"
               tile="sand"
-              icon={<IconPhone width={22} height={22} />}
+              icon={<IconPhone width={18} height={18} />}
               onClick={() => say("正在呼叫 淼淼…（演示）")}
             />
           </div>
@@ -158,7 +158,7 @@ export function Home() {
         {/* ───────── 第 2 屏：记录 & 创作 ───────── */}
         <section className="desk-page px-6 pb-8 pt-12">
           <SectionHead zh="记录" en="CREATE" />
-          <div className="grid grid-cols-4 gap-x-4 gap-y-6">
+          <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 摘抄 / 短句卡片 */}
             <section className="card col-span-4 rounded-3xl p-5">
               <div className="flex items-center justify-between">
@@ -186,18 +186,18 @@ export function Home() {
               </div>
             </section>
 
-            <AppIcon label="日记" tile="cream" icon={<IconEdit width={22} height={22} />} to="/diary" />
-            <AppIcon label="相册" tile="blue" icon={<IconImages width={22} height={22} />} to="/memory" />
-            <AppIcon label="生图室" tile="blush" icon={<IconStudio width={22} height={22} />} to="/studio" />
-            <AppIcon label="共读听影" tile="mint" icon={<IconLounge width={22} height={22} />} to="/lounge" />
-            <AppIcon label="记忆" tile="sand" icon={<IconMemory width={22} height={22} />} to="/memory" />
+            <AppIcon label="日记" tile="cream" icon={<IconEdit width={18} height={18} />} to="/diary" />
+            <AppIcon label="相册" tile="blue" icon={<IconImages width={18} height={18} />} to="/memory" />
+            <AppIcon label="生图室" tile="blush" icon={<IconStudio width={18} height={18} />} to="/studio" />
+            <AppIcon label="共读听影" tile="mint" icon={<IconLounge width={18} height={18} />} to="/lounge" />
+            <AppIcon label="记忆" tile="sand" icon={<IconMemory width={18} height={18} />} to="/memory" />
           </div>
         </section>
 
         {/* ───────── 第 3 屏：生活工具 ───────── */}
         <section className="desk-page px-6 pb-8 pt-12">
           <SectionHead zh="工具" en="TOOLS" />
-          <div className="grid grid-cols-4 gap-x-4 gap-y-6">
+          <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 日程概览卡片 */}
             <div className="card col-span-4 flex items-center justify-between rounded-3xl px-5 py-5">
               <div className="flex items-end gap-3">
@@ -220,12 +220,12 @@ export function Home() {
               </div>
             </div>
 
-            <AppIcon label="日历" tile="cream" icon={<IconCalendar width={22} height={22} />} to="/calendar" />
-            <AppIcon label="旅游" tile="blue" icon={<IconTravel width={22} height={22} />} to="/travel" />
-            <AppIcon label="音乐" tile="blush" icon={<IconMusic width={22} height={22} />} to="/music" />
-            <AppIcon label="健康" tile="mint" icon={<IconHealth width={22} height={22} />} to="/health" />
-            <AppIcon label="账本" tile="sand" icon={<IconCoin width={22} height={22} />} to="/ledger" />
-            <AppIcon label="额度" tile="cream" icon={<IconWallet width={22} height={22} />} to="/budget" />
+            <AppIcon label="日历" tile="cream" icon={<IconCalendar width={18} height={18} />} to="/calendar" />
+            <AppIcon label="旅游" tile="blue" icon={<IconTravel width={18} height={18} />} to="/travel" />
+            <AppIcon label="音乐" tile="blush" icon={<IconMusic width={18} height={18} />} to="/music" />
+            <AppIcon label="健康" tile="mint" icon={<IconHealth width={18} height={18} />} to="/health" />
+            <AppIcon label="账本" tile="sand" icon={<IconCoin width={18} height={18} />} to="/ledger" />
+            <AppIcon label="额度" tile="cream" icon={<IconWallet width={18} height={18} />} to="/budget" />
 
             {/* 音乐小组件（同步听歌） */}
             <MusicCard />
