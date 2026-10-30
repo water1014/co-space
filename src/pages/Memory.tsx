@@ -26,7 +26,7 @@ export function Memory() {
   const t = useText();
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden">
+    <div className="memory-page relative flex h-full flex-col overflow-hidden">
       {/* 页头：‹ Memory / Things I remember. + 绿点 */}
       <header className="px-5 pt-6">
         <div className="flex items-start gap-2">
