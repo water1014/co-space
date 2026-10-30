@@ -31,7 +31,7 @@ export type Wallpaper = {
 export const WALLPAPERS: Wallpaper[] = [
   { id: "none", name: "默认", css: "" },
   { id: "blush", name: "柔粉", css: "linear-gradient(165deg,#fdf2ef 0%,#f9e0df 52%,#f2d2cd 100%)" },
-  { id: "moonwater", name: "镜花水月", css: "radial-gradient(ellipse at 50% 24%,rgba(255,255,255,.94) 0 7%,rgba(255,255,255,.28) 7.5% 14%,transparent 28%), radial-gradient(ellipse at 50% 72%,rgba(133,157,190,.24),transparent 42%), linear-gradient(165deg,#edf1f6 0%,#dce5ef 42%,#c8d6e5 72%,#e8e9ef 100%)" },
+  { id: "moonwater", name: "月照水面", css: "radial-gradient(ellipse at 50% 24%,rgba(255,255,255,.94) 0 7%,rgba(255,255,255,.28) 7.5% 14%,transparent 28%), radial-gradient(ellipse at 50% 72%,rgba(133,157,190,.24),transparent 42%), linear-gradient(165deg,#edf1f6 0%,#dce5ef 42%,#c8d6e5 72%,#e8e9ef 100%)" },
   { id: "mist", name: "雾蓝", css: "linear-gradient(165deg,#eef5f9 0%,#dfeaf2 52%,#d2e1ee 100%)" },
   { id: "cream", name: "奶油", css: "linear-gradient(165deg,#faf6ef 0%,#f3e8d6 52%,#ecdcC2 100%)" },
   { id: "matcha", name: "薄荷", css: "linear-gradient(165deg,#f1f6ee 0%,#e2ecdb 52%,#d5e4cf 100%)" },
