@@ -32,11 +32,11 @@ const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周�
 
 /* 图标底色的几组奶油渐变 */
 const TILES = {
-  cream: { "--tile-a": "#ffffff", "--tile-b": "#f7ece5" },
-  blue: { "--tile-a": "#ffffff", "--tile-b": "#eef0f4" },
-  sand: { "--tile-a": "#ffffff", "--tile-b": "#f5efe2" },
-  blush: { "--tile-a": "#fbeeeb", "--tile-b": "#f3d3ce" },
-  mint: { "--tile-a": "#ffffff", "--tile-b": "#e9f0e8" },
+  cream: { "--tile-a": "#f7f8fb", "--tile-b": "#dfe7f2" },
+  blue: { "--tile-a": "#f2f6fb", "--tile-b": "#d4e2f4" },
+  sand: { "--tile-a": "#f7f5fb", "--tile-b": "#e8e0f5" },
+  blush: { "--tile-a": "#f8f3f7", "--tile-b": "#ead8e7" },
+  mint: { "--tile-a": "#f1f7f5", "--tile-b": "#d8ebe5" },
 } as const;
 type TileKey = keyof typeof TILES;
 
