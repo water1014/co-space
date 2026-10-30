@@ -51,6 +51,28 @@ const STREAM_CONTRACT =
 /** 协议里允许出现的工具名。模型说别的就不认。 */
 const KNOWN_TOOLS = ["life", "recall", "project", "write"];
 
+/** Parse optional OpenAI-compatible gateway headers from the model settings. */
+function buildRequestHeaders(raw: string, key: string): Headers {
+  const headers = new Headers({
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json",
+  });
+  const value = raw.trim();
+  if (!value) return headers;
+
+  const parsed: unknown = JSON.parse(value);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("自定义请求头必须是 JSON 对象");
+  }
+  for (const [name, headerValue] of Object.entries(parsed)) {
+    if (typeof headerValue !== "string") {
+      throw new Error(`请求头 ${name} 的值必须是字符串`);
+    }
+    headers.set(name, headerValue);
+  }
+  return headers;
+}
+
 
 /**
  * 把当前状态压成逐行纯文本。
@@ -204,10 +226,7 @@ export async function composePlanLive(
   try {
     const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
+      headers: buildRequestHeaders(model.headers || "", key),
       body: JSON.stringify({
         model: model.model,
         messages: buildMessages(input, ctx, OUTPUT_CONTRACT),
@@ -333,10 +352,7 @@ export async function* openTurn(
   try {
     const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
+      headers: buildRequestHeaders(model.headers || "", key),
       body: JSON.stringify({
         model: model.model,
         messages: buildMessages(input, ctx, STREAM_CONTRACT),
