@@ -26,7 +26,7 @@ export function Memory() {
   const t = useText();
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden">
+    <div className="memory-page relative flex h-full flex-col overflow-hidden">
       {/* 页头：‹ Memory / Things I remember. + 绿点 */}
       <header className="px-5 pt-6">
         <div className="flex items-start gap-2">
@@ -375,7 +375,7 @@ function ImprintTab() {
         )}
       </div>
 
-      <Sheet open={Boolean(current)} onClose={() => setOpenId(null)} title={current?.title}>
+      <Sheet open={Boolean(current)} onClose={() => setOpenId(null)} title={current?.title} panelClassName="memory-mirror-sheet">
         {current && (
           <div>
             <div
@@ -412,7 +412,7 @@ function EditSheet({
   }, [current]);
 
   return (
-    <Sheet open={Boolean(current)} onClose={onClose} title="这一条">
+    <Sheet open={Boolean(current)} onClose={onClose} title="这一条" panelClassName="memory-mirror-sheet">
       {current && (
         <div>
           <textarea

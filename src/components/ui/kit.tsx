@@ -370,11 +370,13 @@ export function Sheet({
   onClose,
   title,
   children,
+  panelClassName = "",
 }: {
   open: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
+  panelClassName?: string;
 }) {
   // 仅在打开时挂键盘监听，关掉即移除。
   useEsc(onClose, open);
@@ -392,7 +394,7 @@ export function Sheet({
         }`}
       />
       <div
-        className={`sheet-solid absolute inset-x-0 bottom-0 mx-auto w-full max-w-[560px] overflow-hidden rounded-t-[24px] transition-transform duration-300 ${
+        className={`sheet-solid ${panelClassName} absolute inset-x-0 bottom-0 mx-auto w-full max-w-[560px] overflow-hidden rounded-t-[24px] transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-full"
         }`}
         style={{

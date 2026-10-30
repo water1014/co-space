@@ -10,7 +10,7 @@ export function BoundaryTraceCard({ hits }: { hits: BoundaryHit[] }) {
   const rules = Array.from(new Set(hits.map((h) => h.rule)));
 
   return (
-    <div className="mt-2">
+    <div className="chat-boundary-card mt-2">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span className="text-[10px] tracking-[0.2em] text-ink-faint uppercase">
           已校准
@@ -22,7 +22,7 @@ export function BoundaryTraceCard({ hits }: { hits: BoundaryHit[] }) {
           </span>
         ))}
       </div>
-      <details className="mt-1">
+      <details className="chat-boundary-details mt-1">
         <summary className="cursor-pointer list-none text-[10.5px] text-ink-faint/75 hover:text-ink-faint">
           看改了什么
         </summary>

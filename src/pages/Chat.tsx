@@ -90,7 +90,7 @@ export function Chat() {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="flex h-full flex-col overflow-hidden">
+      <div className="chat-page relative flex h-full flex-col overflow-hidden">
         <ChatHeader />
         <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
           <ThreadPrimitive.Viewport
@@ -231,7 +231,7 @@ function ChatHeader() {
   })();
 
   return (
-    <header className="relative flex items-center gap-2 px-4 pt-4 pb-2">
+    <header className="chat-header relative flex items-center gap-2 px-4 pt-4 pb-2">
       <button onClick={back} aria-label="返回" className="chat-round press">
         <IconChevron width={18} height={18} className="rotate-180" />
       </button>
@@ -538,7 +538,7 @@ function EmptyChat() {
   const chips = [...EMPTY_STATES.chatChips];
   const records = [...EMPTY_STATES.chatRecordChips];
   return (
-    <div className="fadein flex flex-1 flex-col justify-center py-16">
+    <div className="chat-empty fadein flex flex-1 flex-col justify-center py-16">
       <p className="text-[17px] leading-[2] text-ink-soft">
         {EMPTY_STATES.chatTitle}
       </p>
@@ -580,7 +580,7 @@ function MessageRow({ id, divider }: { id: string; divider?: string }) {
   return (
     <>
       {divider && (
-        <div className="my-5 flex justify-center">
+        <div className="chat-date-divider my-5 flex justify-center">
           <span className="rounded-full bg-white/55 px-3 py-[3px] text-[10px] tracking-[0.04em] text-ink-faint backdrop-blur">
             {divider}
           </span>
@@ -593,7 +593,7 @@ function MessageRow({ id, divider }: { id: string; divider?: string }) {
 
 function UserRow({ meta }: { meta: ChatMessage }) {
   return (
-    <div className="rise mt-2 flex flex-col items-end first:mt-0">
+    <div className="chat-user-row rise mt-2 flex flex-col items-end first:mt-0">
       <div className="max-w-[80%]">
         <MessagePrimitive.Root className="bubble user-bubble">
           <MessagePrimitive.Parts>
@@ -601,7 +601,7 @@ function UserRow({ meta }: { meta: ChatMessage }) {
           </MessagePrimitive.Parts>
         </MessagePrimitive.Root>
       </div>
-      <span className="mt-[5px] pr-1.5 text-[10px] tracking-[0.02em] text-ink-faint">
+      <span className="chat-message-time mt-[5px] pr-1.5 text-[10px] tracking-[0.02em] text-ink-faint">
         {formatClock(meta.createdAt)}
       </span>
     </div>
@@ -614,10 +614,10 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
   const initiative = meta.origin === "initiative";
 
   return (
-    <div className="rise mt-3 flex items-start gap-2 first:mt-0">
+    <div className="chat-assistant-row rise mt-3 flex items-start gap-2 first:mt-0">
       <ChatAvatar initial={t.people.yan[0]} />
       <div className="flex min-w-0 max-w-[80%] flex-col items-start">
-        <span className="mb-[5px] pl-2 text-[10px] tracking-[0.02em] text-ink-faint">
+        <span className="chat-assistant-label mb-[5px] pl-2 text-[10px] tracking-[0.02em] text-ink-faint">
           {t.people.yan}
         </span>
         <MessagePrimitive.Root className="bubble assistant-bubble">
@@ -646,7 +646,7 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
 /** 聊天头像：参考图里那颗带白环的圆头像 */
 function ChatAvatar({ initial }: { initial: string; warm?: boolean }) {
   return (
-    <span className="mt-[13px] flex h-8 w-8 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[#f7e7e3] to-[#e9c9c0] text-[12px] font-semibold text-[#9c6b52] shadow-[0_4px_12px_-8px_rgba(40,30,28,0.5)] ring-[2px] ring-white/80">
+    <span className="chat-avatar mt-[13px] flex h-8 w-8 flex-none items-center justify-center rounded-full text-[12px] font-semibold">
       {initial}
     </span>
   );
@@ -838,7 +838,7 @@ function Composer() {
 
   return (
     <div
-      className="relative px-4"
+      className="chat-composer-shell relative px-4"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)" }}
     >
       <Sheet open={sheet} onClose={() => setSheet(false)} title="附上点什么">
@@ -947,7 +947,7 @@ function Composer() {
           <button
             onClick={submit}
             aria-label="发送"
-            className="press flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-[0_10px_22px_-12px_rgba(226,96,95,0.9)]"
+            className="chat-send press flex h-11 w-11 flex-none items-center justify-center rounded-full text-white"
           >
             <IconSend width={18} height={18} />
           </button>

@@ -152,7 +152,7 @@ export function Diary() {
   }
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden">
+    <div className="diary-page editorial-page relative flex h-full flex-col overflow-hidden">
       {/* 品牌行：返回 · Miao & Song · 时间线 */}
       <header className="flex items-center gap-3 px-5 pt-5">
         <BackButton />
@@ -169,10 +169,10 @@ export function Diary() {
       </header>
 
       {/* 标题：Diary + 月份 + 篇数 */}
-      <div className="px-5 pt-7">
+      <div className="diary-heading relative px-5 pt-7">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="serif-display text-[42px] leading-[0.9] text-ink">
+            <h1 className="diary-title serif-display text-[42px] leading-[0.9] text-ink">
               {t.pages.diary.title}
             </h1>
             <p className="mt-3 text-[9.5px] uppercase tracking-[0.26em] text-ink-ghost">
@@ -438,7 +438,7 @@ function DiaryCard({
   const time = `${pad(created.getHours())}:${pad(created.getMinutes())}`;
 
   return (
-    <button onClick={onOpen} className="diary-card block w-full text-left">
+    <button onClick={onOpen} className="diary-card editorial-card block w-full text-left">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-baseline gap-2">
           <span className="serif-display text-[33px] leading-[0.85] text-ink">

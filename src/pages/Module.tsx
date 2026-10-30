@@ -60,7 +60,7 @@ export function Module({ kind }: { kind: Kind }) {
   const Icon = m.icon;
 
   return (
-    <div className="px-5 pt-6 pb-10">
+    <div className="module-page px-5 pt-6 pb-10">
       <div className="flex items-start gap-2 pb-2 pt-1">
         <button onClick={() => navigate(-1)} aria-label="返回" className="press mt-2 text-ink-faint">
           <IconChevron width={16} height={16} className="rotate-180" />

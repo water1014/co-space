@@ -32,11 +32,11 @@ const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周�
 
 /* 图标底色的几组奶油渐变 */
 const TILES = {
-  cream: { "--tile-a": "#ffffff", "--tile-b": "#f7ece5" },
-  blue: { "--tile-a": "#ffffff", "--tile-b": "#eef0f4" },
-  sand: { "--tile-a": "#ffffff", "--tile-b": "#f5efe2" },
-  blush: { "--tile-a": "#fbeeeb", "--tile-b": "#f3d3ce" },
-  mint: { "--tile-a": "#ffffff", "--tile-b": "#e9f0e8" },
+  cream: { "--tile-a": "#f7f8fb", "--tile-b": "#dfe7f2" },
+  blue: { "--tile-a": "#f2f6fb", "--tile-b": "#d4e2f4" },
+  sand: { "--tile-a": "#f7f5fb", "--tile-b": "#e8e0f5" },
+  blush: { "--tile-a": "#f8f3f7", "--tile-b": "#ead8e7" },
+  mint: { "--tile-a": "#f1f7f5", "--tile-b": "#d8ebe5" },
 } as const;
 type TileKey = keyof typeof TILES;
 
@@ -104,21 +104,22 @@ export function Home() {
         ref={trackRef}
         onScroll={onTrackScroll}
         className="desk-track rise mt-1 min-h-0 flex-1"
+        aria-label="首页内容，可横向滑动"
       >
         {/* ───────── 第 1 屏：社交互动 ───────── */}
-        <section className="desk-page px-6 pb-8 pt-12">
+        <section className="desk-page home-page home-page-cover px-5 pb-8 pt-9" aria-label="我们的日常">
           <header className="mb-7">
-            <p className="text-[12px] tracking-[0.08em] text-ink-faint">
+            <p className="home-date text-[11px] tracking-[0.16em] text-ink-faint">
               {`${new Date().getMonth() + 1}月${new Date().getDate()}日 ${WEEK[new Date().getDay()]}`}
             </p>
-            <h1 className="serif-display mt-1 text-[34px] italic leading-[1.05] text-ink">
-              Fall in love
+            <h1 className="serif-display home-wordmark mt-1 text-[38px] italic leading-[1.02] text-ink">
+              镜花水月
             </h1>
           </header>
 
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 双人头像 + days together：柔粉玻璃主卡（参考 Rifugio） */}
-            <div className="soft-rose-card col-span-4 rounded-[26px] px-6 py-8 text-center">
+            <div className="soft-rose-card home-love-card col-span-4 rounded-[30px] px-6 py-8 text-center">
               <div className="flex items-center justify-center gap-5">
                 <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[19px] font-semibold text-[#9c6b52] shadow-md ring-4 ring-white/70">
                   {t.people.wan[0]}
@@ -156,11 +157,11 @@ export function Home() {
         </section>
 
         {/* ───────── 第 2 屏：记录 & 创作 ───────── */}
-        <section className="desk-page px-6 pb-8 pt-12">
+        <section className="desk-page home-page-create px-6 pb-8 pt-12" aria-label="记录与创作">
           <SectionHead zh="记录" en="CREATE" />
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 摘抄 / 短句卡片 */}
-            <section className="card col-span-4 rounded-3xl p-5">
+            <section className="card home-glass-card col-span-4 rounded-[26px] p-5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] tracking-[0.2em] text-ink-faint">摘句 · FRAGMENT</span>
                 <button
@@ -195,11 +196,11 @@ export function Home() {
         </section>
 
         {/* ───────── 第 3 屏：生活工具 ───────── */}
-        <section className="desk-page px-6 pb-8 pt-12">
+        <section className="desk-page home-page-tools px-6 pb-8 pt-12" aria-label="生活工具">
           <SectionHead zh="工具" en="TOOLS" />
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 日程概览卡片 */}
-            <div className="card col-span-4 flex items-center justify-between rounded-3xl px-5 py-5">
+            <div className="card home-glass-card col-span-4 flex items-center justify-between rounded-[26px] px-5 py-5">
               <div className="flex items-end gap-3">
                 <span className="serif-display text-[40px] leading-none text-ink">
                   {new Date().getDate()}
@@ -233,17 +234,24 @@ export function Home() {
         </section>
       </div>
 
-      {/* 翻页指示点 */}
-      <div className="flex items-center justify-center gap-1.5 pb-3 pt-1">
+      {/* 可触达的分屏导航 */}
+      <nav className="home-page-indicator flex items-center justify-center gap-2 pb-3 pt-1" aria-label="首页分屏导航">
         {[0, 1, 2].map((i) => (
-          <span
+          <button
             key={i}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              page === i ? "w-4 bg-[var(--accent)]" : "w-1.5 bg-[var(--line-strong)]"
-            }`}
+            type="button"
+            aria-label={`第 ${i + 1} 屏`}
+            aria-current={page === i ? "page" : undefined}
+            onClick={() => {
+              const el = trackRef.current;
+              if (!el) return;
+              el.scrollTo({ left: el.clientWidth * i, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+            }}
+            className={`home-page-dot ${page === i ? "is-active" : ""}`}
           />
         ))}
-      </div>
+        <span className="home-page-count" aria-live="polite">{page + 1} / 3</span>
+      </nav>
 
       {toast && (
         <div className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center">
@@ -343,7 +351,7 @@ function HomeAlbumCard() {
   };
 
   return (
-    <div className="card col-span-4 overflow-hidden rounded-3xl">
+    <div className="card home-glass-card col-span-4 overflow-hidden rounded-[26px]">
       <div className="grid grid-cols-3 gap-2 p-3">
         {[0, 1, 2].map((i) => {
           const p = slots[i];
@@ -401,7 +409,7 @@ function MusicCard() {
   }, [playing]);
 
   return (
-    <section className="card col-span-4 flex items-center gap-4 overflow-hidden rounded-3xl p-5">
+    <section className="card home-glass-card col-span-4 flex items-center gap-4 overflow-hidden rounded-[26px] p-5">
       <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white shadow-md shadow-[var(--accent-soft)]">
         <IconPlay width={19} height={19} />
       </span>
