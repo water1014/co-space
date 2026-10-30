@@ -3012,3 +3012,32 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:
   .moon-scene-viewport { scroll-behavior: auto; }
   .moon-hotspot, .moon-hotspot-name, .moon-hotspot-note { transition: none; }
 }
+
+
+/* 月庭细节：手机触碰时完整显露入口说明，增强可读性与触控反馈 */
+.moon-hotspot.is-active::before { opacity: 1; }
+.moon-hotspot.is-active .moon-hotspot-name {
+  color: #fff;
+  letter-spacing: .26em;
+  text-shadow: 0 0 18px rgba(255,255,255,.8), 0 2px 16px rgba(22,45,61,.65);
+}
+.moon-hotspot.is-active .moon-hotspot-name::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+.moon-hotspot.is-active .moon-hotspot-note {
+  opacity: 1;
+  transform: translateY(0);
+}
+.moon-hotspot:focus-visible {
+  outline: 2px solid rgba(246, 239, 220, .9);
+  outline-offset: 4px;
+}
+.moon-explore-hint {
+  user-select: none;
+}
+@media (max-width: 640px) {
+  .moon-scene-viewport { min-height: 0; }
+  .moon-scene { height: max(540px, calc(100svh - 220px)); }
+  .moon-hotspot { min-height: 58px; }
+}
