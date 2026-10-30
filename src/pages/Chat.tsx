@@ -812,7 +812,10 @@ function Composer() {
   };
 
   return (
-    <div className="relative px-4 pb-3">
+    <div
+      className="relative px-4"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)" }}
+    >
       <Sheet open={sheet} onClose={() => setSheet(false)} title="附上点什么">
         <div className="grid grid-cols-3 gap-3 pt-2">
           <AttachTile

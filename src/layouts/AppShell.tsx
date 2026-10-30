@@ -22,6 +22,8 @@ const TAB_DEFS: TabDef[] = [
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [beauty, setBeauty] = useState(false);
+  // 底栏只属于首页；进入任何子页（聊天 / 日记 / 记忆 …）立即隐藏。
+  const isHome = location.pathname === "/";
 
   return (
     <div className="relative h-full w-full overflow-hidden">
@@ -29,11 +31,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="relative flex h-full w-full justify-center">
         <div className="relative flex h-full w-full max-w-[600px] flex-col">
-          <main key={location.pathname} className="scroll-area fadein min-h-0 flex-1 pb-24">
+          <main
+            key={location.pathname}
+            className={`scroll-area fadein min-h-0 flex-1 ${isHome ? "pb-24" : "pb-0"}`}
+          >
             {children}
           </main>
 
-          <TabBar onBeauty={() => setBeauty(true)} />
+          {isHome && <TabBar onBeauty={() => setBeauty(true)} />}
         </div>
       </div>
 
