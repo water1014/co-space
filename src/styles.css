@@ -318,30 +318,52 @@ body {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* 用户气泡：纯黑反白，iOS 的做法 */
+/* 用户气泡：磨砂白 + 细描边，深色字（参考图气质） */
 .user-bubble {
   position: relative;
-  background: var(--mine-bubble);
-  color: var(--mine-bubble-ink);
-  border-radius: 18px 18px 6px 18px;
-  transition: background-color 0.35s ease;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px 20px 6px 20px;
+  box-shadow:
+    0 1px 2px rgba(40, 30, 28, 0.05),
+    0 8px 18px -12px rgba(40, 30, 28, 0.22);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  transition: background-color 0.35s ease, border-color 0.35s ease;
 }
 
 .user-bubble::before {
   content: none;
 }
 
-/* AI 气泡：浅灰填充面 */
+/* AI 气泡：更透的磨砂白，同样细描边 */
 .assistant-bubble {
   position: relative;
-  background: var(--peer-bubble);
-  color: var(--peer-bubble-ink);
-  border-radius: 18px 18px 18px 6px;
-  transition: background-color 0.35s ease;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 20px 20px 20px 6px;
+  box-shadow:
+    0 1px 2px rgba(40, 30, 28, 0.04),
+    0 8px 18px -14px rgba(40, 30, 28, 0.2);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  transition: background-color 0.35s ease, border-color 0.35s ease;
 }
 
 .assistant-bubble::before {
   content: none;
+}
+
+/* 夜间：深色半透明磨砂气泡 */
+[data-theme="night"] .user-bubble {
+  background: rgba(64, 57, 51, 0.85);
+  border-color: rgba(255, 240, 232, 0.1);
+}
+[data-theme="night"] .assistant-bubble {
+  background: rgba(48, 42, 37, 0.7);
+  border-color: rgba(255, 240, 232, 0.08);
 }
 
 /* ---------------- 排版 ---------------- */

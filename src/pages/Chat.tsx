@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   AssistantRuntimeProvider,
   MessagePrimitive,
@@ -53,6 +53,25 @@ export function Chat() {
   const messages = useChatStore((s) => s.messages);
   const isRunning = useChatStore((s) => s.isRunning);
 
+  /* 每天的第一条消息前放一个居中日期胶囊（参考图） */
+  const dayDividers = useMemo(() => {
+    const map: Record<string, string> = {};
+    let lastKey = "";
+    const now = new Date();
+    for (const m of messages) {
+      const d = new Date(m.createdAt);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      if (key !== lastKey) {
+        map[m.id] =
+          d.toDateString() === now.toDateString()
+            ? "今天"
+            : `${d.getMonth() + 1}月${d.getDate()}日`;
+        lastKey = key;
+      }
+    }
+    return map;
+  }, [messages]);
+
   const runtime = useExternalStoreRuntime<ChatMessage>({
     messages,
     isRunning,
@@ -80,7 +99,9 @@ export function Chat() {
             <div className="flex min-h-full flex-col justify-end pb-4">
               {messages.length === 0 && <EmptyChat />}
               <ThreadPrimitive.Messages>
-                {({ message }) => <MessageRow id={message.id} />}
+                {({ message }) => (
+                  <MessageRow id={message.id} divider={dayDividers[message.id]} />
+                )}
               </ThreadPrimitive.Messages>
             </div>
           </ThreadPrimitive.Viewport>
@@ -210,14 +231,13 @@ function ChatHeader() {
       <button
         onClick={() => setDrawer("history")}
         aria-label="我们说过的话"
-        className="press flex h-9 w-9 flex-none items-center justify-center text-ink-faint hover:text-ink"
+        className="press flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[var(--line)] bg-white/60 text-ink-soft backdrop-blur hover:text-ink"
       >
         <IconChevron width={17} height={17} className="rotate-180" />
       </button>
 
       <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
-        <IconMoon width={16} height={16} className="flex-none text-ink-soft" />
-        <h1 className="truncate text-[19px] font-semibold text-ink">
+        <h1 className="truncate text-[17px] font-semibold text-ink">
           {activeProject?.name ?? t.pages.chat.title}
         </h1>
         <span
@@ -227,20 +247,20 @@ function ChatHeader() {
         />
       </div>
 
-      <div className="flex flex-none items-center gap-1">
+      <div className="flex flex-none items-center gap-1.5">
         <button
           onClick={() => setDrawer("history")}
           aria-label="搜索"
-          className="press flex h-9 w-9 items-center justify-center text-ink-soft hover:text-ink"
+          className="press flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-white/60 text-ink-soft backdrop-blur hover:text-ink"
         >
-          <IconSearch width={18} height={18} />
+          <IconSearch width={17} height={17} />
         </button>
         <button
           onClick={toggleTheme}
           aria-label="切换主题"
-          className="press flex h-9 w-9 items-center justify-center text-ink-soft hover:text-ink"
+          className="press flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-white/60 text-ink-soft backdrop-blur hover:text-ink"
         >
-          <IconMoon width={18} height={18} />
+          <IconMoon width={17} height={17} />
         </button>
       </div>
 
@@ -523,44 +543,51 @@ function EmptyChat() {
 
 /* ---------------- 消息 ---------------- */
 
-function MessageRow({ id }: { id: string }) {
+function MessageRow({ id, divider }: { id: string; divider?: string }) {
   const meta = useChatStore((s) => s.messages.find((m) => m.id === id));
   if (!meta) return null;
-  return meta.role === "user" ? (
-    <UserRow meta={meta} />
-  ) : (
-    <AssistantRow meta={meta} />
+  return (
+    <>
+      {divider && (
+        <div className="my-4 flex justify-center">
+          <span className="rounded-full bg-white/60 px-3 py-1 text-[10.5px] text-ink-faint backdrop-blur">
+            {divider}
+          </span>
+        </div>
+      )}
+      {meta.role === "user" ? <UserRow meta={meta} /> : <AssistantRow meta={meta} />}
+    </>
   );
 }
 
 function UserRow({ meta }: { meta: ChatMessage }) {
+  const t = useText();
   return (
-    <div className="rise mt-4 flex flex-col items-end first:mt-0">
-      <span className="mb-1 pr-1.5 text-[10px] text-ink-faint">
-        {formatClock(meta.createdAt)}
-      </span>
-      <div className="max-w-[84%]">
+    <div className="rise mt-3 flex items-end justify-end gap-2 first:mt-0">
+      <div className="flex max-w-[78%] flex-col items-end gap-1">
         <MessagePrimitive.Root className="user-bubble px-3.5 py-2.5">
           <MessagePrimitive.Parts>
             {({ part }) => <PartView part={part} side="user" />}
           </MessagePrimitive.Parts>
         </MessagePrimitive.Root>
+        <span className="pr-0.5 text-[9.5px] text-ink-ghost">
+          {formatClock(meta.createdAt)}
+        </span>
       </div>
+      <ChatAvatar initial={t.people.wan[0]} warm />
     </div>
   );
 }
 
 function AssistantRow({ meta }: { meta: ChatMessage }) {
+  const t = useText();
   const streaming = meta.status === "streaming";
   const initiative = meta.origin === "initiative";
 
   return (
-    <div className="rise mt-5 first:mt-0">
-      <div className="mb-1 flex items-center gap-1.5 pl-1">
-        <CloudDot />
-        <span className="text-[10px] text-ink-faint">{formatClock(meta.createdAt)}</span>
-      </div>
-      <div className="max-w-[90%]">
+    <div className="rise mt-3 flex items-start gap-2 first:mt-0">
+      <ChatAvatar initial={t.people.yan[0]} />
+      <div className="flex max-w-[82%] flex-col items-start gap-1">
         <MessagePrimitive.Root className="assistant-bubble px-3.5 py-2.5">
           <MessagePrimitive.Parts>
             {({ part }) => (
@@ -568,28 +595,34 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
             )}
           </MessagePrimitive.Parts>
         </MessagePrimitive.Root>
-      </div>
-
-      {!streaming && (
-        <div className="mt-1 flex items-center gap-4 pl-2 text-[10px] text-ink-faint opacity-0 transition-opacity hover:opacity-100">
-          <button
-            onClick={() => void regenerateLast()}
-            className="transition-colors hover:text-ink-soft"
-          >
-            重新回应
-          </button>
+        <div className="flex items-center gap-3 pl-0.5 text-[9.5px] text-ink-ghost">
+          <span>{formatClock(meta.createdAt)}</span>
+          {!streaming && (
+            <button
+              onClick={() => void regenerateLast()}
+              className="opacity-0 transition-opacity hover:opacity-100 hover:text-ink-soft"
+            >
+              重新回应
+            </button>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
-/** 小云朵头像：参考图里 AI 消息上方那只 */
-function CloudDot() {
+/** 聊天头像（小圆，环白边） */
+function ChatAvatar({ initial, warm }: { initial: string; warm?: boolean }) {
   return (
-    <svg width="14" height="10" viewBox="0 0 24 16" fill="none" stroke="currentColor" strokeWidth="1.4" className="text-ink-faint">
-      <path d="M6 13h11a4 4 0 0 0 .6-7.96A5.5 5.5 0 0 0 7.2 6.2 3.4 3.4 0 0 0 6 13z" />
-    </svg>
+    <span
+      className={`flex h-8 w-8 flex-none items-center justify-center rounded-full text-[12px] font-semibold shadow-sm ring-2 ring-white/70 ${
+        warm
+          ? "bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[#9c6b52]"
+          : "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white"
+      }`}
+    >
+      {initial}
+    </span>
   );
 }
 
@@ -920,7 +953,7 @@ function Composer() {
               onClick={submit}
               disabled={!canSend}
               aria-label="发送"
-              className="press flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--mine-bubble)] text-[var(--mine-bubble-ink)] disabled:opacity-30"
+              className="press flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-sm shadow-[var(--accent-soft)] disabled:opacity-30"
             >
               <IconSend width={16} height={16} />
             </button>
