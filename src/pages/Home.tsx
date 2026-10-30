@@ -112,7 +112,7 @@ export function Home() {
               {`${new Date().getMonth() + 1}月${new Date().getDate()}日 ${WEEK[new Date().getDay()]}`}
             </p>
             <h1 className="serif-display home-wordmark mt-1 text-[38px] italic leading-[1.02] text-ink">
-              Fall in love
+              镜花水月
             </h1>
           </header>
 
