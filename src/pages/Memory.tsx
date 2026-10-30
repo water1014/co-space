@@ -375,7 +375,7 @@ function ImprintTab() {
         )}
       </div>
 
-      <Sheet open={Boolean(current)} onClose={() => setOpenId(null)} title={current?.title}>
+      <Sheet open={Boolean(current)} onClose={() => setOpenId(null)} title={current?.title} panelClassName="memory-mirror-sheet">
         {current && (
           <div>
             <div
@@ -412,7 +412,7 @@ function EditSheet({
   }, [current]);
 
   return (
-    <Sheet open={Boolean(current)} onClose={onClose} title="这一条">
+    <Sheet open={Boolean(current)} onClose={onClose} title="这一条" panelClassName="memory-mirror-sheet">
       {current && (
         <div>
           <textarea
