@@ -1513,3 +1513,47 @@ textarea:focus {
 [data-theme="night"] .pocket-shell > div.relative.flex.h-full.w-full.max-w-\[600px\] {
   filter: drop-shadow(0 18px 48px rgba(0, 0, 0, .18));
 }
+
+
+/* Shared pocket navigation treatment for secondary screens */
+.pocket-page-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  isolation: isolate;
+  padding-bottom: 10px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg) 72%, transparent),
+    color-mix(in srgb, var(--bg) 42%, transparent));
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+.pocket-page-header::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0;
+  z-index: -1;
+  border-bottom: 1px solid var(--line);
+  pointer-events: none;
+}
+.pocket-page-header .chat-round,
+.pocket-page-header button[aria-label="返回"] {
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  box-shadow: inset 0 1px 0 var(--glass-sheen), 0 5px 16px -12px rgba(45, 30, 26, .4);
+}
+.pocket-page-header h1 {
+  letter-spacing: -.025em;
+}
+.pocket-page-header button:active {
+  transform: scale(.94);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pocket-page-header {
+    animation: pocket-header-in .32s ease both;
+  }
+  @keyframes pocket-header-in {
+    from { opacity: .65; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
