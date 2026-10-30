@@ -90,7 +90,7 @@ export function Chat() {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="flex h-full flex-col overflow-hidden">
+      <div className="chat-page relative flex h-full flex-col overflow-hidden">
         <ChatHeader />
         <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
           <ThreadPrimitive.Viewport
