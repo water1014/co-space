@@ -1,3 +1,4 @@
+// 月庭首页：移动端优先的横向沉浸式场景入口。
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLifeStore } from "../stores/lifeStore";
