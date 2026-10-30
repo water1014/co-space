@@ -61,15 +61,19 @@ export const useBeautyStore = create<Beauty>()(
         const p = PRESETS.find((x) => x.id === id);
         if (p) apply(p);
       },
-      wallpaperId: "none",
+      wallpaperId: "moonwater",
       setWallpaper: (id) => set({ wallpaperId: id }),
     }),
     {
       name: "co-space::beauty",
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
-        const p = PRESETS.find((x) => x.id === state?.presetId) ?? PRESETS[0];
-        apply(p);
+        if (state?.presetId === "rose") state.setPreset("moonmirror");
+        else {
+          const p = PRESETS.find((x) => x.id === state?.presetId) ?? PRESETS[0];
+          apply(p);
+        }
+        if (state?.wallpaperId === "none") state.setWallpaper("moonwater");
       },
     },
   ),
