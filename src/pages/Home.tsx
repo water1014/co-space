@@ -47,7 +47,6 @@ export function Home() {
   const life = useLifeStore();
 
   const days = daysTogether(life.anniversary);
-  const since = life.anniversary?.slice(5).replace("-", ".") ?? "";
   const pending = life.todos.filter((x) => !x.done).length;
 
   const [page, setPage] = useState(0);
@@ -103,19 +102,25 @@ export function Home() {
           </header>
 
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
-            {/* 双人头像 + 在一起时间：长方形主卡 */}
-            <div className="card col-span-4 rounded-[28px] px-6 py-7 text-center">
-              <div className="flex items-center justify-center gap-6">
-                <MiniAvatar initial={t.people.wan[0]} name={t.people.wan} />
-                <IconHeart width={18} height={18} className="text-[var(--accent)]" />
-                <MiniAvatar initial={t.people.yan[0]} name={t.people.yan} accent />
+            {/* 双人头像 + days together：柔粉玻璃主卡（参考 Rifugio） */}
+            <div className="soft-rose-card col-span-4 rounded-[26px] px-6 py-8 text-center">
+              <div className="flex items-center justify-center gap-5">
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[19px] font-semibold text-[#9c6b52] shadow-md ring-4 ring-white/70">
+                  {t.people.wan[0]}
+                </span>
+                <Squiggle />
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-[19px] font-semibold text-white shadow-md ring-4 ring-white/70">
+                  {t.people.yan[0]}
+                </span>
               </div>
-              <p className="mt-6 text-[12px] tracking-[0.34em] text-ink-faint">
-                我 们 在 一 起 的 时 间
+              <p className="serif-display mt-5 text-[46px] italic leading-none text-[var(--accent)]">
+                {days}
               </p>
-              <p className="num mt-2 text-[58px] leading-none text-[var(--accent)]">{days}</p>
-              <p className="mt-1.5 text-[11px] tracking-[0.22em] text-ink-faint">
-                DAYS · SINCE {since}
+              <p className="mt-1.5 text-[13px] tracking-[0.08em] text-[#b98a90]">
+                days together
+              </p>
+              <p className="mt-1.5 text-[11px] tracking-[0.04em] text-ink-faint">
+                从 {life.anniversary ?? ""} 开始 · 含当天
               </p>
             </div>
 
@@ -292,21 +297,24 @@ function AppIcon({
   );
 }
 
-/** 圆形头像（小） */
-function MiniAvatar({ initial, name, accent }: { initial: string; name: string; accent?: boolean }) {
+/** 头像间的小波浪（参考 Rifugio 的 〜 装饰） */
+function Squiggle() {
   return (
-    <div className="flex flex-col items-center gap-1.5">
-      <span
-        className={`flex h-14 w-14 items-center justify-center rounded-full text-[18px] font-semibold shadow-md ${
-          accent
-            ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white"
-            : "bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[#9c6b52]"
-        }`}
-      >
-        {initial}
-      </span>
-      <span className="text-[12px] text-ink-soft">{name}</span>
-    </div>
+    <svg
+      width="24"
+      height="14"
+      viewBox="0 0 24 14"
+      fill="none"
+      className="text-[#d98f97]"
+      aria-hidden
+    >
+      <path
+        d="M2 8.5 C5 2, 9 2, 12 8.5 S 19 15, 22 8.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
