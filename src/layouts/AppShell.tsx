@@ -27,7 +27,6 @@ const depthOf = (p: string) => p.split("/").filter(Boolean).length;
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [beauty, setBeauty] = useState(false);
-  const isHome = location.pathname === "/";
 
   const mainRef = useRef<HTMLElement>(null);
   const scrollMem = useRef<Record<string, number>>({});
