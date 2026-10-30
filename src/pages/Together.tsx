@@ -64,7 +64,7 @@ export function Together() {
   const cfg = t.rooms.find((r) => r.key === room)!;
 
   return (
-    <div className="flex flex-col px-4 pb-12 pt-6">
+    <div className="together-page relative flex flex-col px-4 pb-12 pt-6">
       {/* 头部：‹ Together / life, kept */}
       <div className="flex items-start gap-2 px-1">
         <BackButton className="mt-1.5" />
