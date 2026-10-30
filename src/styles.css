@@ -2047,3 +2047,21 @@ main.scroll-area > div > header:has(+ div) {
 @media (prefers-reduced-motion: reduce) {
   .home-love-card::before, .home-love-card::after { animation: none !important; }
 }
+
+/* Avatar medallions: cool porcelain + ink, rather than warm blush. */
+.home-love-card > div:first-child > span:first-child {
+  background: linear-gradient(145deg, #dce5f1, #aebed8) !important;
+  color: #465775 !important;
+}
+.home-love-card > div:first-child > span:last-child {
+  background: linear-gradient(145deg, #7186c9, #465da7) !important;
+}
+.pocket-dock a[aria-current="page"] {
+  box-shadow: inset 0 0 0 1px rgba(103,123,190,.12);
+}
+.pocket-dock a, .pocket-dock button {
+  -webkit-tap-highlight-color: transparent;
+}
+@media (max-width: 360px) {
+  .pocket-dock { width: min(96%, 420px); }
+}
