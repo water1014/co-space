@@ -1,16 +1,17 @@
 import { NavLink, useLocation } from "react-router-dom";
 import type { ReactNode, SVGProps } from "react";
 import { BackgroundLayer } from "./BackgroundLayer";
-import { IconHome, IconHeart, IconUser } from "../components/ui/icons";
+import { IconHome, IconHeart, IconChat, IconGear } from "../components/ui/icons";
 
 /**
- * 底部三栏导航：主页 / 共处 / 我。
- * 其余页面（聊天 / 日记 / 记忆）走首页左上汉堡拉出的侧边栏。
+ * 底部 dock：主页 / 共处 / 聊天 / 设置 —— 桌面式的固定四项。
+ * 其余页面（日记 / 记忆 / 工具）从首页桌面的 app 图标进入。
  */
 const TAB_DEFS = [
   { to: "/", label: "主页", icon: IconHome },
   { to: "/together", label: "共处", icon: IconHeart },
-  { to: "/mit", label: "我", icon: IconUser },
+  { to: "/chat", label: "聊天", icon: IconChat },
+  { to: "/mit", label: "设置", icon: IconGear },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {

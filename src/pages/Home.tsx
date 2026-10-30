@@ -1,22 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  IconMenu,
-  IconRefresh,
-  IconPlay,
-  IconPause,
-  IconImages,
-  IconClose,
-  IconHome,
-  IconChat,
   IconEdit,
   IconSpark,
-  IconHeart,
-  IconGear,
-  IconSun,
+  IconImages,
   IconPlus,
+  IconBowl,
+  IconCoin,
+  IconCup,
+  IconBook,
+  IconSun,
+  IconPlay,
+  IconPause,
+  IconRefresh,
+  IconHeart,
 } from "../components/ui/icons";
-import { Avatar } from "../components/ui/kit";
 import { useText } from "../lib/content/useText";
 import { useLifeStore } from "../stores/lifeStore";
 import { daysTogether, todayKey, todayLedger, todayBobaCount } from "../lib/life/derive";
@@ -31,53 +29,44 @@ const CODE_MAP: Record<number, string> = {
   82: "暴雨", 95: "雷阵雨",
 };
 
-function nowTime() {
-  const d = new Date();
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
 function todayLabel(d = new Date()) {
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${WEEK[d.getDay()]}`;
+  return `${d.getMonth() + 1}月${d.getDate()}日 ${WEEK[d.getDay()]}`;
 }
-function dateNo(d = new Date()) {
-  return `${String(d.getFullYear()).slice(2)}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
-    d.getDate(),
-  ).padStart(2, "0")}`;
-}
+
+/* 图标底色的几组奶油渐变：暖白粉 / 暖白蓝 / 暖白杏 / 浅绯 */
+const TILES = {
+  cream: { "--tile-a": "#ffffff", "--tile-b": "#f7ece5" },
+  blue: { "--tile-a": "#ffffff", "--tile-b": "#eef0f4" },
+  sand: { "--tile-a": "#ffffff", "--tile-b": "#f5efe2" },
+  blush: { "--tile-a": "#fbeeeb", "--tile-b": "#f3d3ce" },
+} as const;
+type TileKey = keyof typeof TILES;
 
 const rise = (ms: number) => ({ animationDelay: `${ms}ms` } as const);
 
-/** 杂志式栏目眉题：编号 + 大写英文 + 中文副标 + 右侧细线 */
-function Kicker({ no, en, zh }: { no: string; en: string; zh?: string }) {
-  return (
-    <div className="mag-kicker">
-      <span className="no">{no}</span>
-      <span>{en}</span>
-      {zh && <span className="zh">{zh}</span>}
-      <span className="rule" />
-    </div>
-  );
-}
-
 /**
- * 首页 v3（杂志风 · 玻璃拟态）：
- * 刊头（Playfair 大刊名 + 期号）→ 玻璃拟态封面（超大天数）→
- * 卷首语（衬线大字 + 首字下沉）→ 写给你的话 →
- * 编号栏目：打卡 / 待办 / 天气 / 音乐 / 相册（带图说）。
+ * 首页（桌面式 · Rifugio 排版 × 杂志风）：
+ * 功能像 app 图标一样摆在网格里，与纪念日卡 / 拱形照片 / 引言卡混排，
+ * 横滑翻页 + 指示点，右上「编辑 / ＋」装修入口，底部 dock（AppShell）。
  */
 export function Home() {
   const t = useText();
   const life = useLifeStore();
 
   const days = daysTogether(life.anniversary);
-  const [time, setTime] = useState(nowTime());
+  const since = life.anniversary?.slice(5).replace("-", ".") ?? "";
+  const [editing, setEditing] = useState(false);
+  const [toast, setToast] = useState("");
+  const [page, setPage] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+
   const [msg, setMsg] = useState<{ text: string; mock: boolean } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sidebar, setSidebar] = useState(false);
 
-  useEffect(() => {
-    const id = setInterval(() => setTime(nowTime()), 30_000);
-    return () => clearInterval(id);
-  }, []);
+  const say = (s: string) => {
+    setToast(s);
+    window.setTimeout(() => setToast(""), 2200);
+  };
 
   const refresh = () => {
     setLoading(true);
@@ -103,229 +92,322 @@ export function Home() {
 
   const mealCount = life.meals[todayKey()]?.length ?? 0;
   const checkinCount = mealCount + todayLedger(life.ledger).length + todayBobaCount(life.bobas);
-  const pendingTodos = life.todos.filter((x) => !x.done).slice(0, 3);
+
+  const onTrackScroll = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    setPage(Math.round(el.scrollLeft / el.clientWidth));
+  };
+
+  /** 编辑态点击任何图标都只是提示，不导航 */
+  const guard = (fn: () => void) => () => {
+    if (editing) {
+      say("装修模式：先点「完成」再使用");
+      return;
+    }
+    fn();
+  };
 
   return (
-    <div className="relative flex flex-col px-5 pb-6 pt-9">
-      {/* 刊头 masthead：双层杂志刊头 */}
-      <header className="rise" style={rise(0)}>
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => setSidebar(true)}
-            className="tap -ml-1 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] text-ink-soft transition-colors hover:bg-[var(--surface-2)]"
-            aria-label="菜单"
-          >
-            <IconMenu width={20} height={20} />
-          </button>
-          <div className="text-right">
-            <p className="num text-[15px] font-semibold leading-none text-ink">{time}</p>
-            <p className="mt-0.5 text-[11px] tracking-[0.12em] text-ink-faint">{todayLabel()}</p>
-          </div>
-        </div>
-
-        <div className="mt-7 flex items-end justify-between">
+    <div className={`relative flex h-full flex-col ${editing ? "editing" : ""}`}>
+      {/* 顶栏：日期 + 花体刊名 | 编辑/＋/美化 */}
+      <header className="rise px-5 pt-9" style={rise(0)}>
+        <div className="flex items-start justify-between">
           <div>
-            <p className="serif-display text-[12px] tracking-[0.24em] text-ink-faint">
-              CO·SPACE
-            </p>
-            <h1 className="serif-display mt-1 text-[40px] leading-[0.92] text-ink">
+            <p className="text-[12px] tracking-[0.08em] text-ink-faint">{todayLabel()}</p>
+            <h1 className="serif-display mt-0.5 text-[34px] italic leading-[1.05] text-ink">
               Fall in love
             </h1>
-            <p className="mt-2 text-[13px] text-ink-soft">我们的第 {days} 天 · 月刊</p>
           </div>
-          <div className="text-right">
-            <p className="serif-display text-[11px] tracking-[0.2em] text-ink-faint">Nº</p>
-            <p className="serif-display text-[34px] leading-none text-[var(--accent)]">
-              {String(days).padStart(3, "0")}
-            </p>
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              onClick={() => setEditing((v) => !v)}
+              className={`tap flex h-9 items-center rounded-full px-3.5 text-[12.5px] font-medium transition-colors ${
+                editing
+                  ? "bg-[var(--accent)] text-white"
+                  : "border border-[var(--line)] bg-[var(--glass-bg-strong)] text-ink-soft"
+              }`}
+            >
+              {editing ? "完成" : "编辑"}
+            </button>
+            <button
+              onClick={() => say("新小组件即将上线，先把家布置舒服")}
+              className="tap flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--glass-bg-strong)] text-ink-soft"
+              aria-label="添加"
+            >
+              <IconPlus width={16} height={16} />
+            </button>
+            <button
+              onClick={() => say("美化面板装修中，敬请期待")}
+              className="tap flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--glass-bg-strong)] text-ink-soft"
+              aria-label="美化"
+            >
+              <IconSpark width={16} height={16} />
+            </button>
           </div>
-        </div>
-        <div className="mag-rule-dot mt-5">
-          <span />
         </div>
       </header>
 
-      {/* 封面：玻璃拟态大卡，超大 Playfair 天数 + 编辑式元信息 */}
-      <section
-        className="glass-cover rise mt-5 px-6 py-7 text-center"
+      {/* 桌面：横滑两页 */}
+      <div
+        ref={trackRef}
+        onScroll={onTrackScroll}
+        className="desk-track rise mt-3 min-h-0 flex-1"
         style={rise(80)}
       >
-        <div className="cover-meta">
-          <span>ISSUE Nº {String(days).padStart(3, "0")}</span>
-          <span>MONTHLY</span>
-        </div>
-        <div className="mt-5 flex items-center justify-center gap-4">
-          <AvatarBlock initial={t.people.wan[0]} name={t.people.wan} />
-          <IconHeart width={17} height={17} strokeWidth={1.6} className="text-[var(--accent)]" />
-          <AvatarBlock initial={t.people.yan[0]} name={t.people.yan} accent />
-        </div>
-        <p className="mt-6 flex items-baseline justify-center gap-2">
-          <span className="serif-display text-[78px] font-medium leading-none text-[var(--accent)]">
-            {days}
-          </span>
-          <span className="text-[13px] font-semibold tracking-[0.2em] text-ink-soft">
-            DAYS 天
-          </span>
-        </p>
-        <p className="mt-3 text-[12px] tracking-[0.34em] text-ink-faint">在 一 起</p>
-        <div className="mag-rule-dot mt-5">
-          <span />
-        </div>
-        <p className="num mt-3 text-[12px] tracking-[0.1em] text-ink-faint">{dateNo()}</p>
-      </section>
+        {/* ── 第 1 页：家 ── */}
+        <div className="desk-page px-5 pb-4">
+          <div className="grid grid-cols-4 gap-x-3 gap-y-4">
+            <AppIcon
+              editing={editing}
+              label="日记"
+              tile="cream"
+              icon={<IconEdit width={22} height={22} />}
+              onClick={guard(() => say("日记在左下的 dock 里也可以进"))}
+              to="/diary"
+            />
+            <AppIcon
+              editing={editing}
+              label="记忆"
+              tile="blue"
+              icon={<IconSpark width={22} height={22} />}
+              onClick={guard(() => say("记忆在左下的 dock 里也可以进"))}
+              to="/memory"
+            />
+            <Link
+              to="/together"
+              className="glass press col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-4 text-center"
+            >
+              <span className="text-[11px] tracking-[0.24em] text-ink-faint">纪念日</span>
+              <span className="serif-display mt-0.5 text-[38px] leading-none text-[var(--accent)]">
+                {days}
+              </span>
+              <span className="num mt-1 text-[11px] tracking-[0.08em] text-ink-faint">
+                days since {since}
+              </span>
+            </Link>
 
-      {/* 卷首语 pull quote（大引号装饰 + 衬线引言） */}
-      <section className="rise mt-8" style={rise(160)}>
-        <Kicker no="01" en="Manifesto" zh="卷首" />
-        <p className="lead-mark text-center">“</p>
-        <p className="mag-quote mt-1 text-center">{t.home.quote}</p>
-        <p className="mt-2 text-right text-[12px] text-ink-faint">
-          — {t.home.quoteAuthor}
-        </p>
-      </section>
+            <AppIcon
+              editing={editing}
+              label="相册"
+              tile="sand"
+              icon={<IconImages width={22} height={22} />}
+              onClick={guard(() => say("相册在左下的 dock 里也可以进"))}
+              to="/memory"
+            />
+            <AppIcon
+              editing={editing}
+              label="待办"
+              tile="cream"
+              icon={<IconPlus width={22} height={22} />}
+              onClick={guard(() => say("待办在「共处」里记录"))}
+              to="/together"
+            />
+            {/* 拱形照片卡：跨两行 */}
+            <Link
+              to="/memory"
+              className="glass press arch-card col-span-2 row-span-2 flex flex-col"
+            >
+              <div className="flex flex-1 items-center justify-center bg-gradient-to-br from-[#f6e3dc] to-[#f0d2c8] text-[#b3a08f]">
+                <IconHeart width={30} height={30} strokeWidth={1.2} />
+              </div>
+              <div className="bg-white/70 px-3 py-2 text-center backdrop-blur-sm">
+                <p className="serif-display text-[12px] italic tracking-[0.06em] text-ink-soft">
+                  our little world
+                </p>
+              </div>
+            </Link>
 
-      {/* 写给你的话（模型生成，信件式玻璃卡） */}
-      <section className="rise mt-8" style={rise(220)}>
-        <Kicker no="02" en="A Note" zh="信" />
-        <div className="glass rounded-3xl p-5">
-          <div className="flex items-center gap-2">
-            <IconHeart width={14} height={14} strokeWidth={1.6} className="text-[var(--accent)]" />
-            <span className="text-[13.5px] font-semibold text-ink">写给你的话</span>
-          </div>
-          <p className="kai mt-3 min-h-[76px] text-[18px] leading-[1.95] text-ink">
-            {loading ? "正在想今天要对你说的话…" : msg?.text}
-          </p>
-          <div className="mt-3 flex items-center justify-between border-t border-[var(--line)] pt-3">
-            <span className="text-[12px] text-ink-faint">
-              — {t.people.yan}
-              {msg?.mock ? "（示例）" : ""}
-            </span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={refresh}
-                disabled={loading}
-                className="tap flex items-center gap-1 text-[12px] text-ink-faint disabled:opacity-50"
-              >
-                <IconRefresh width={13} height={13} className={loading ? "animate-spin" : ""} />
-                换一句
-              </button>
-              <Link to="/chat" className="text-[13px] font-medium text-[var(--accent)]">
-                去聊聊 ›
-              </Link>
+            {/* 引言卡：跨两列，与拱形卡同排 */}
+            <div className="glass col-span-2 flex flex-col justify-center rounded-3xl px-4 py-4">
+              <p className="text-[10px] font-semibold tracking-[0.24em] text-ink-faint">
+                GIVE ME YOUR LOVE
+              </p>
+              <p className="kai mt-2 text-[16px] leading-[1.8] text-ink">{t.home.quote}</p>
+              <p className="mt-1.5 text-right text-[11px] text-ink-faint">— {t.home.quoteAuthor}</p>
+            </div>
+
+            {/* 打卡速览 + 拍立得三张斜叠 */}
+            <Link
+              to="/together"
+              className="glass press col-span-4 flex items-center justify-between rounded-3xl px-5 py-4"
+            >
+              <div>
+                <p className="text-[11px] tracking-[0.2em] text-ink-faint">DAILY · 今日</p>
+                <p className="num mt-1 text-[24px] font-semibold leading-none text-ink">
+                  {checkinCount}
+                  <span className="ml-1.5 text-[12px] font-normal text-ink-faint">件小事已记录</span>
+                </p>
+              </div>
+              <span className="text-[12px] font-medium text-[var(--accent)]">去记录 ›</span>
+            </Link>
+
+            <div className="col-span-4 mt-1 flex items-end justify-center">
+              <div className="polaroid z-10 -rotate-6" style={{ width: "34%" }}>
+                <div className="ph bg-gradient-to-br from-[#e9eef2] to-[#dbe5ec] text-[#9aa7b1]">
+                  <IconImages width={20} height={20} />
+                </div>
+              </div>
+              <div className="polaroid z-20 -mx-3 rotate-1" style={{ width: "38%" }}>
+                <div className="ph bg-gradient-to-br from-[#f6e3dc] to-[#f0d2c8] text-[#b3a08f]">
+                  <IconHeart width={20} height={20} />
+                </div>
+              </div>
+              <div className="polaroid z-10 -mx-2 rotate-6" style={{ width: "34%" }}>
+                <div className="ph bg-gradient-to-br from-[#f4ecdd] to-[#eadcc2] text-[#b3a08f]">
+                  <IconImages width={20} height={20} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* 今日打卡 / 待办清单 */}
-      <div className="rise mt-8 grid grid-cols-2 gap-3" style={rise(280)}>
-        <section>
-          <Kicker no="03" en="Daily" zh="今日" />
-          <Link to="/together" className="glass press block rounded-3xl p-[18px] text-left">
-            <h3 className="text-[15px] font-semibold text-ink">今日打卡</h3>
-            <p className="num mt-2.5 text-[26px] font-semibold leading-none text-ink">
-              {checkinCount}
-            </p>
-            <p className="mt-1.5 text-[12px] leading-[1.5] text-ink-faint">件小事已记录</p>
-            <span className="mt-3 inline-block text-[12px] font-medium text-[var(--accent)]">
-              去记录 ›
-            </span>
-          </Link>
-        </section>
+        {/* ── 第 2 页：工具 ── */}
+        <div className="desk-page px-5 pb-4">
+          <div className="grid grid-cols-4 gap-x-3 gap-y-4">
+            <AppIcon
+              editing={editing}
+              label="三餐"
+              tile="cream"
+              icon={<IconBowl width={22} height={22} />}
+              onClick={guard(() => say("三餐在「共处」里记录"))}
+              to="/together"
+            />
+            <AppIcon
+              editing={editing}
+              label="记账"
+              tile="sand"
+              icon={<IconCoin width={22} height={22} />}
+              onClick={guard(() => say("记账在「共处」里记录"))}
+              to="/together"
+            />
+            <AppIcon
+              editing={editing}
+              label="奶茶"
+              tile="blush"
+              icon={<IconCup width={22} height={22} />}
+              onClick={guard(() => say("奶茶在「共处」里记录"))}
+              to="/together"
+            />
+            <AppIcon
+              editing={editing}
+              label="单词"
+              tile="blue"
+              icon={<IconBook width={22} height={22} />}
+              onClick={guard(() => say("单词在「共处」里备考"))}
+              to="/together"
+            />
 
-        <section>
-          <Kicker no="04" en="To-do" zh="待办" />
-          <div className="glass rounded-3xl p-[18px]">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[15px] font-semibold text-ink">待办清单</h3>
-              <Link
-                to="/together"
-                aria-label="添加待办"
-                className="tap flex h-6 w-6 items-center justify-center rounded-full text-ink-faint transition-colors hover:bg-[var(--accent-soft)] hover:text-[var(--accent)]"
-              >
-                <IconPlus width={15} height={15} />
-              </Link>
+            {/* 大日期卡 + 天气卡 */}
+            <div className="glass col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-5">
+              <span className="serif-display text-[12px] tracking-[0.3em] text-ink-faint">
+                {new Date().getFullYear()}
+              </span>
+              <span className="serif-display mt-1 text-[44px] leading-none text-ink">
+                {new Date().getDate()}
+              </span>
+              <span className="mt-1.5 text-[12px] tracking-[0.2em] text-[var(--accent)]">
+                {WEEK[new Date().getDay()]}
+              </span>
             </div>
-            <ul className="mt-3 space-y-2">
-              {pendingTodos.length === 0 ? (
-                <li className="text-[12px] text-ink-faint">都清空啦，真棒</li>
-              ) : (
-                pendingTodos.map((td) => (
-                  <li key={td.id} className="flex items-center gap-2">
-                    <span className="h-[13px] w-[13px] flex-none rounded-full border border-[var(--line-strong)]" />
-                    <span className="min-w-0 flex-1 truncate text-[12.5px] text-ink">
-                      {td.text}
-                    </span>
-                  </li>
-                ))
-              )}
-            </ul>
+            <WeatherCard />
+
+            <MusicCard />
+
+            {/* 写给你的话（每日情话） */}
+            <section className="glass col-span-4 rounded-3xl p-5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] tracking-[0.24em] text-ink-faint">每日情话</span>
+                <button
+                  onClick={refresh}
+                  disabled={loading}
+                  className="tap flex items-center gap-1 text-[12px] text-ink-faint disabled:opacity-50"
+                >
+                  <IconRefresh width={13} height={13} className={loading ? "animate-spin" : ""} />
+                  换一句
+                </button>
+              </div>
+              <p className="kai mt-2.5 min-h-[66px] text-[17px] leading-[1.9] text-ink">
+                {loading ? "正在想今天要对你说的话…" : msg?.text}
+              </p>
+              <div className="mt-2 flex items-center justify-between border-t border-[var(--line)] pt-2.5">
+                <span className="text-[12px] text-ink-faint">
+                  — {t.people.yan}
+                  {msg?.mock ? "（示例）" : ""}
+                </span>
+                <Link to="/chat" className="text-[13px] font-medium text-[var(--accent)]">
+                  去聊聊 ›
+                </Link>
+              </div>
+            </section>
           </div>
-        </section>
+        </div>
       </div>
 
-      {/* 天气 */}
-      <section className="rise mt-8" style={rise(340)}>
-        <Kicker no="05" en="Weather" zh="天气" />
-        <WeatherCard />
-      </section>
+      {/* 翻页指示点 */}
+      <div className="flex items-center justify-center gap-1.5 pb-2 pt-1">
+        {[0, 1].map((i) => (
+          <span
+            key={i}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              page === i ? "w-4 bg-[var(--accent)]" : "w-1.5 bg-[var(--line-strong)]"
+            }`}
+          />
+        ))}
+      </div>
 
-      {/* 音乐 */}
-      <section className="rise mt-8" style={rise(400)}>
-        <Kicker no="06" en="Playlist" zh="歌单" />
-        <MusicCard />
-      </section>
-
-      {/* 相册 */}
-      <section className="rise mt-8" style={rise(460)}>
-        <Kicker no="07" en="Gallery" zh="影像" />
-        <AlbumCard />
-      </section>
-
-      <footer className="mt-9">
-        <p className="text-center text-[11.5px] tracking-[0.04em] text-ink-faint">
-          {t.home.footer}
-        </p>
-      </footer>
-
-      <Sidebar open={sidebar} onClose={() => setSidebar(false)} footer={t.home.footer} />
+      {/* 装修提示 toast */}
+      {toast && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center">
+          <p className="glass-solid rounded-full px-4 py-2 text-[12.5px] text-ink shadow-[var(--shadow-float)]">
+            {toast}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
 
-/** 头像 + 名字 */
-function AvatarBlock({
-  initial,
-  name,
-  accent,
+/** 桌面 app 图标：squircle 瓷砖 + 标签，编辑态摇摆 */
+function AppIcon({
+  label,
+  tile,
+  icon,
+  to,
+  onClick,
+  editing,
 }: {
-  initial: string;
-  name: string;
-  accent?: boolean;
+  label: string;
+  tile: TileKey;
+  icon: React.ReactNode;
+  to?: string;
+  onClick?: () => void;
+  editing: boolean;
 }) {
+  const cls = "app-icon jiggle select-none";
+  const body = (
+    <>
+      <span className="tile" style={TILES[tile] as React.CSSProperties}>
+        {icon}
+      </span>
+      <span className="label">{label}</span>
+    </>
+  );
+  if (to && !editing) {
+    return (
+      <Link to={to} className={cls}>
+        {body}
+      </Link>
+    );
+  }
   return (
-    <div className="flex flex-col items-center gap-2">
-      <Avatar
-        size={56}
-        className={
-          accent
-            ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] shadow-lg shadow-[var(--accent-soft)] ring-2 ring-white/70"
-            : "bg-gradient-to-br from-[#f6e7dc] to-[#e9cdbd] shadow-md ring-2 ring-white/70"
-        }
-      >
-        <span
-          className={`text-[18px] font-semibold ${
-            accent ? "text-white" : "text-[#9c6b52]"
-          }`}
-        >
-          {initial}
-        </span>
-      </Avatar>
-      <span className="text-[12px] font-medium text-ink-soft">{name}</span>
-    </div>
+    <button onClick={onClick} className={`${cls} tap`}>
+      {body}
+    </button>
   );
 }
 
+/** 天气卡（Open-Meteo，无需 key；无定位时显示占位） */
 function WeatherCard() {
   const [w, setW] = useState<{ state: string; temp?: number; label?: string }>({
     state: "loading",
@@ -371,26 +453,25 @@ function WeatherCard() {
   }, []);
 
   return (
-    <section className="glass flex items-center gap-4 rounded-3xl p-5">
-      <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-[var(--accent-soft)] text-[var(--accent-deep)]">
-        <IconSun width={22} height={22} />
+    <div className="glass col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-5">
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
+        <IconSun width={19} height={19} />
       </span>
-      <div className="min-w-0 flex-1">
-        {w.state === "ok" ? (
-          <p className="num text-[26px] leading-none text-ink">
-            {w.temp}°<span className="ml-2 text-[13px] text-ink-faint">{w.label}</span>
-          </p>
-        ) : (
-          <p className="num text-[19px] leading-none text-ink-faint">
-            {w.state === "loading" ? "定位中…" : "未连接定位"}
-          </p>
-        )}
-        <p className="mt-1.5 text-[12px] text-ink-faint">今天天气</p>
-      </div>
-    </section>
+      {w.state === "ok" ? (
+        <p className="num mt-2 text-[24px] leading-none text-ink">
+          {w.temp}°<span className="ml-1.5 text-[12px] text-ink-faint">{w.label}</span>
+        </p>
+      ) : (
+        <p className="num mt-2 text-[15px] leading-none text-ink-faint">
+          {w.state === "loading" ? "定位中…" : "未连接定位"}
+        </p>
+      )}
+      <p className="mt-1.5 text-[11px] text-ink-faint">今天天气</p>
+    </div>
   );
 }
 
+/** 音乐播放器卡（本地演示进度） */
 function MusicCard() {
   const [playing, setPlaying] = useState(false);
   const [p, setP] = useState(38);
@@ -402,10 +483,10 @@ function MusicCard() {
   }, [playing]);
 
   return (
-    <section className="glass overflow-hidden rounded-3xl p-5">
+    <section className="glass col-span-4 overflow-hidden rounded-3xl p-5">
       <div className="flex items-center gap-4">
-        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white shadow-md shadow-[var(--accent-soft)]">
-          <IconPlay width={22} height={22} />
+        <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white shadow-md shadow-[var(--accent-soft)]">
+          <IconPlay width={19} height={19} />
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[14.5px] font-medium text-ink">晚安，淼淼</p>
@@ -413,10 +494,10 @@ function MusicCard() {
         </div>
         <button
           onClick={() => setPlaying((v) => !v)}
-          className="tap flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink transition-colors hover:bg-[var(--accent-soft)]"
+          className="tap flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[var(--surface-2)] text-ink transition-colors hover:bg-[var(--accent-soft)]"
           aria-label={playing ? "暂停" : "播放"}
         >
-          {playing ? <IconPause width={18} height={18} /> : <IconPlay width={18} height={18} />}
+          {playing ? <IconPause width={17} height={17} /> : <IconPlay width={17} height={17} />}
         </button>
       </div>
       <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
@@ -426,103 +507,5 @@ function MusicCard() {
         />
       </div>
     </section>
-  );
-}
-
-/** 相册模块：feature 布局（左一大图 + 右两小图）+ 杂志式图说 */
-function AlbumCard() {
-  return (
-    <section className="glass rounded-3xl p-5">
-      <div className="mt-1 album-grid">
-        <figure className="album-fig feature">
-          <div className="thumb bg-gradient-to-br from-[#f6e3dc] to-[#f0d2c8] text-[#b3a08f]">
-            <IconImages width={30} height={30} />
-          </div>
-          <figcaption className="caption">我们的日常</figcaption>
-        </figure>
-        <div className="album-col">
-          <figure className="album-fig flex-1">
-            <div className="thumb square bg-gradient-to-br from-[#e9eef2] to-[#dbe5ec] text-[#9aa7b1]">
-              <IconImages width={22} height={22} />
-            </div>
-            <figcaption className="caption">未命名 · 秋</figcaption>
-          </figure>
-          <figure className="album-fig flex-1">
-            <div className="thumb square bg-gradient-to-br from-[#f4ecdd] to-[#eadcc2] text-[#b3a08f]">
-              <IconImages width={22} height={22} />
-            </div>
-            <figcaption className="caption">某年某月</figcaption>
-          </figure>
-        </div>
-      </div>
-      <Link
-        to="/memory"
-        className="mt-3 inline-block text-[12px] text-ink-faint"
-      >
-        全部照片 ›
-      </Link>
-    </section>
-  );
-}
-
-/** 左侧抽屉式侧边栏（汉堡拉出） */
-function Sidebar({
-  open,
-  onClose,
-  footer,
-}: {
-  open: boolean;
-  onClose: () => void;
-  footer: string;
-}) {
-  const items = [
-    { to: "/", label: "主页", icon: IconHome },
-    { to: "/chat", label: "聊天", icon: IconChat },
-    { to: "/diary", label: "日记", icon: IconEdit },
-    { to: "/memory", label: "记忆", icon: IconSpark },
-    { to: "/together", label: "共处", icon: IconHeart },
-    { to: "/mit", label: "设置", icon: IconGear },
-  ];
-  return (
-    <>
-      {open && (
-        <div
-          className="fixed inset-0 z-[55] bg-black/30 backdrop-blur-[1px]"
-          onClick={onClose}
-          aria-hidden
-        />
-      )}
-      <aside
-        className={`fixed left-0 top-0 z-[60] flex h-full w-[80%] max-w-[320px] flex-col border-r border-[var(--glass-border)] bg-[var(--glass-bg-strong)] shadow-2xl backdrop-blur-2xl transition-transform duration-300 ${
-          open ? "translate-x-0" : "-translate-x-full"
-        }`}
-        style={{ paddingTop: "env(safe-area-inset-top)" }}
-      >
-        <div className="flex items-center justify-between px-5 pb-4 pt-6">
-          <p className="display text-[20px] text-ink">co-space</p>
-          <button
-            onClick={onClose}
-            aria-label="关闭"
-            className="tap flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
-          >
-            <IconClose width={20} height={20} />
-          </button>
-        </div>
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
-          {items.map(({ to, label, icon: Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              onClick={onClose}
-              className="flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] text-ink transition-colors hover:bg-[var(--accent-soft)]"
-            >
-              <Icon width={19} height={19} className="text-ink-soft" />
-              {label}
-            </Link>
-          ))}
-        </nav>
-        <p className="px-5 pb-6 pt-2 text-center text-[11.5px] text-ink-ghost">{footer}</p>
-      </aside>
-    </>
   );
 }

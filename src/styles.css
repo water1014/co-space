@@ -937,3 +937,99 @@ textarea:focus {
 .album-fig .caption {
   margin-top: 6px;
 }
+
+/* ---------------- 桌面式排版（Rifugio 式小手机桌面 × 杂志风） ---------------- */
+
+/* app 图标容器：squircle 圆角方块 + 奶油渐变 + 内高光，像真正的桌面图标 */
+.app-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.app-icon .tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 24%;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.9) 0%, transparent 50%) no-repeat,
+    linear-gradient(165deg, var(--tile-a, #fff) 0%, var(--tile-b, #f7ece5) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 6px 16px -8px rgba(40, 30, 28, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  color: var(--ink-soft);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.app-icon:active .tile {
+  transform: scale(0.92);
+}
+.app-icon .label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+/* 编辑（装修）模式：图标轻轻摇摆，等待重排 */
+@keyframes jiggle {
+  0%,
+  100% {
+    transform: rotate(-1.6deg) scale(0.98);
+  }
+  50% {
+    transform: rotate(1.6deg) scale(0.98);
+  }
+}
+.editing .jiggle {
+  animation: jiggle 0.32s ease-in-out infinite;
+  transform-origin: 50% 60%;
+}
+
+/* 拱形照片卡：上圆下直，杂志封面拱窗 */
+.arch-card {
+  border-radius: 999px 999px 22px 22px;
+  overflow: hidden;
+}
+
+/* 拍立得：白框 + 底部留白 + 轻微旋转叠放 */
+.polaroid {
+  background: #fffdfb;
+  padding: 7px 7px 22px;
+  border-radius: 6px;
+  box-shadow:
+    0 10px 24px -10px rgba(40, 30, 28, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.polaroid .ph {
+  border-radius: 3px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 桌面横滑页：snap 翻页 */
+.desk-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.desk-track::-webkit-scrollbar {
+  display: none;
+}
+.desk-page {
+  flex: none;
+  width: 100%;
+  scroll-snap-align: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.desk-page::-webkit-scrollbar {
+  display: none;
+}
