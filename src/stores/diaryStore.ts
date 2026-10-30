@@ -36,16 +36,18 @@ type DiaryState = {
 };
 
 const seedEntries = (): DiaryEntry[] =>
-  diarySeed.map((d) => {
-    const date = dayKeyOf(new Date(Date.now() - d.daysAgo * 86_400_000));
-    const now = Date.now();
+  diarySeed.map((d, i) => {
+    const day = new Date(Date.now() - d.daysAgo * 86_400_000);
+    // 时间要落在那一天里，卡片上「Tue · 22:07」才不是同一个时刻。
+    day.setHours(21 - (i % 3) * 2, 7 + i * 11, 0, 0);
+    const at = day.getTime();
     return {
       id: uid("d"),
-      date,
+      date: dayKeyOf(day),
       text: d.text,
       mood: d.mood,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: at,
+      updatedAt: at,
     };
   });
 

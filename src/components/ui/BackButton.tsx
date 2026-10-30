@@ -8,7 +8,7 @@ export function BackButton({ className = "" }: { className?: string }) {
     <button
       onClick={back}
       aria-label="返回"
-      className={`press flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[var(--line)] bg-white/60 text-ink-soft backdrop-blur transition-colors hover:text-ink ${className}`}
+      className={`round-btn press flex h-9 w-9 flex-none items-center justify-center rounded-full transition-colors hover:text-ink ${className}`}
     >
       <IconChevron width={17} height={17} className="rotate-180" />
     </button>

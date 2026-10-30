@@ -11,6 +11,7 @@ export type Photo = {
 type Album = {
   photos: Photo[];
   add: (p: Omit<Photo, "id" | "at">) => void;
+  update: (id: string, patch: Partial<Omit<Photo, "id">>) => void;
   remove: (id: string) => void;
 };
 
@@ -25,6 +26,10 @@ export const useAlbumStore = create<Album>()(
         const id = `ph_${Date.now()}_${seq++}`;
         set((s) => ({ photos: [{ ...p, id, at: Date.now() }, ...s.photos] }));
       },
+      update: (id, patch) =>
+        set((s) => ({
+          photos: s.photos.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+        })),
       remove: (id) => set((s) => ({ photos: s.photos.filter((x) => x.id !== id) })),
     }),
     {

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { IconClose } from "./icons";
+import { Portal } from "./Portal";
 
 /* ---------------- 卡片 ---------------- */
 
@@ -379,10 +380,11 @@ export function Sheet({
   useEsc(onClose, open);
 
   return (
-    <div
-      className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`}
-      aria-hidden={!open}
-    >
+    <Portal>
+      <div
+        className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`}
+        aria-hidden={!open}
+      >
       <div
         onClick={onClose}
         className={`absolute inset-0 bg-black/25 transition-opacity duration-300 ${
@@ -390,7 +392,7 @@ export function Sheet({
         }`}
       />
       <div
-        className={`absolute inset-x-0 bottom-0 mx-auto w-full max-w-[560px] overflow-hidden rounded-t-[24px] border-t border-[var(--glass-border)] bg-[var(--glass-bg-strong)] backdrop-blur-2xl transition-transform duration-300 ${
+        className={`sheet-solid absolute inset-x-0 bottom-0 mx-auto w-full max-w-[560px] overflow-hidden rounded-t-[24px] transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-full"
         }`}
         style={{
@@ -410,8 +412,9 @@ export function Sheet({
           </button>
         </div>
         <div className="scroll-area max-h-[68vh] px-5 pt-2 pb-4">{children}</div>
+        </div>
       </div>
-    </div>
+    </Portal>
   );
 }
 
