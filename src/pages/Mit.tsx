@@ -69,6 +69,18 @@ export function Mit() {
   const [confirm, setConfirm] = useState<null | "memory" | "chat" | "all">(
     null,
   );
+
+  const headersValid = (() => {
+    const raw = connector.model.headers?.trim();
+    if (!raw) return true;
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      return !!parsed && typeof parsed === "object" && !Array.isArray(parsed) &&
+        Object.values(parsed).every((value) => typeof value === "string");
+    } catch {
+      return false;
+    }
+  })();
   const navigate = useNavigate();
   const [keyDraft, setKeyDraft] = useState("");
   const [customOpen, setCustomOpen] = useState(false);
@@ -411,8 +423,13 @@ export function Mit() {
               className="ghost-input mt-1.5 w-full resize-none rounded-xl border border-[var(--line)] bg-transparent px-3 py-2 font-mono text-[12px] leading-[1.7] text-ink placeholder:text-ink-faint"
             />
             <span className="mt-1.5 block text-[11.5px] text-ink-faint">
-              留空则只发 Authorization。某些中转 / 订阅服务（如 opencode go）需要在这里补自定义头。
+              支持 OpenAI 兼容网关的额外请求头，使用 JSON 键值对；会同时用于流式和非流式请求。
             </span>
+            {!headersValid && (
+              <span role="alert" className="mt-2 block text-[11.5px] text-[#c45d69]">
+                请求头格式有误：请填写 JSON 对象，且每个值都必须是字符串。配置无效时模型请求会回退到本地回复。
+              </span>
+            )}
           </label>
           <p className="mt-3 text-[12.5px] leading-[1.9] text-ink-faint">
             Key 只放在内存里，不写 localStorage，刷新就没了。自定义请求头会随配置持久化。
