@@ -4,6 +4,7 @@ import {
   IconEdit,
   IconSpark,
   IconImages,
+  IconFile,
   IconPlus,
   IconBowl,
   IconCoin,
@@ -125,21 +126,21 @@ export function Home() {
               className={`tap flex h-9 items-center rounded-full px-3.5 text-[12.5px] font-medium transition-colors ${
                 editing
                   ? "bg-[var(--accent)] text-white"
-                  : "border border-[var(--line)] bg-[var(--glass-bg-strong)] text-ink-soft"
+                  : "border border-[var(--line)] bg-[var(--surface)] text-ink-soft shadow-[var(--shadow-card)]"
               }`}
             >
               {editing ? "完成" : "编辑"}
             </button>
             <button
               onClick={() => say("新小组件即将上线，先把家布置舒服")}
-              className="tap flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--glass-bg-strong)] text-ink-soft"
+              className="tap flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-ink-soft shadow-[var(--shadow-card)]"
               aria-label="添加"
             >
               <IconPlus width={16} height={16} />
             </button>
             <button
               onClick={() => say("美化面板装修中，敬请期待")}
-              className="tap flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--glass-bg-strong)] text-ink-soft"
+              className="tap flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-ink-soft shadow-[var(--shadow-card)]"
               aria-label="美化"
             >
               <IconSpark width={16} height={16} />
@@ -176,7 +177,7 @@ export function Home() {
             />
             <Link
               to="/together"
-              className="glass press col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-4 text-center"
+              className="card press col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-4 text-center"
             >
               <span className="text-[11px] tracking-[0.24em] text-ink-faint">纪念日</span>
               <span className="serif-display mt-0.5 text-[38px] leading-none text-[var(--accent)]">
@@ -199,19 +200,19 @@ export function Home() {
               editing={editing}
               label="待办"
               tile="cream"
-              icon={<IconPlus width={22} height={22} />}
+              icon={<IconFile width={22} height={22} />}
               onClick={guard(() => say("待办在「共处」里记录"))}
               to="/together"
             />
             {/* 拱形照片卡：跨两行 */}
             <Link
               to="/memory"
-              className="glass press arch-card col-span-2 row-span-2 flex flex-col"
+              className="card press arch-card col-span-2 row-span-2 flex flex-col"
             >
               <div className="flex flex-1 items-center justify-center bg-gradient-to-br from-[#f6e3dc] to-[#f0d2c8] text-[#b3a08f]">
                 <IconHeart width={30} height={30} strokeWidth={1.2} />
               </div>
-              <div className="bg-white/70 px-3 py-2 text-center backdrop-blur-sm">
+              <div className="bg-[var(--surface-2)] px-3 py-2 text-center">
                 <p className="serif-display text-[12px] italic tracking-[0.06em] text-ink-soft">
                   our little world
                 </p>
@@ -219,7 +220,7 @@ export function Home() {
             </Link>
 
             {/* 引言卡：跨两列，与拱形卡同排 */}
-            <div className="glass col-span-2 flex flex-col justify-center rounded-3xl px-4 py-4">
+            <div className="card col-span-2 flex flex-col justify-center rounded-3xl px-4 py-4">
               <p className="text-[10px] font-semibold tracking-[0.24em] text-ink-faint">
                 GIVE ME YOUR LOVE
               </p>
@@ -230,7 +231,7 @@ export function Home() {
             {/* 打卡速览 + 拍立得三张斜叠 */}
             <Link
               to="/together"
-              className="glass press col-span-4 flex items-center justify-between rounded-3xl px-5 py-4"
+              className="card press col-span-4 flex items-center justify-between rounded-3xl px-5 py-4"
             >
               <div>
                 <p className="text-[11px] tracking-[0.2em] text-ink-faint">DAILY · 今日</p>
@@ -299,7 +300,7 @@ export function Home() {
             />
 
             {/* 大日期卡 + 天气卡 */}
-            <div className="glass col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-5">
+            <div className="card col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-5">
               <span className="serif-display text-[12px] tracking-[0.3em] text-ink-faint">
                 {new Date().getFullYear()}
               </span>
@@ -315,7 +316,7 @@ export function Home() {
             <MusicCard />
 
             {/* 写给你的话（每日情话） */}
-            <section className="glass col-span-4 rounded-3xl p-5">
+            <section className="card col-span-4 rounded-3xl p-5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] tracking-[0.24em] text-ink-faint">每日情话</span>
                 <button
@@ -453,7 +454,7 @@ function WeatherCard() {
   }, []);
 
   return (
-    <div className="glass col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-5">
+    <div className="card col-span-2 flex flex-col items-center justify-center rounded-3xl px-4 py-5">
       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
         <IconSun width={19} height={19} />
       </span>
@@ -483,7 +484,7 @@ function MusicCard() {
   }, [playing]);
 
   return (
-    <section className="glass col-span-4 overflow-hidden rounded-3xl p-5">
+    <section className="card col-span-4 overflow-hidden rounded-3xl p-5">
       <div className="flex items-center gap-4">
         <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white shadow-md shadow-[var(--accent-soft)]">
           <IconPlay width={19} height={19} />
