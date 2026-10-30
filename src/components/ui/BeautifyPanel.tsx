@@ -40,7 +40,7 @@ export function BeautifyPanel({ open, onClose }: { open: boolean; onClose: () =>
         <p className="mt-0.5 text-[12.5px] text-ink-faint">镜花、水月与月相，挑一层喜欢的光，全站即时生效</p>
 
         <p className="mt-5 mb-2.5 text-[11px] tracking-[0.16em] text-ink-faint">主题色</p>
-        <div className="grid grid-cols-5 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           {PRESETS.map((p) => {
             const active = p.id === presetId;
             return (
