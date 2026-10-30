@@ -2545,3 +2545,34 @@ main.scroll-area > div > header:has(+ div) {
   .keepsake-zoom { animation: none !important; }
   .memory-mirror-sheet textarea { transition: none !important; }
 }
+
+/* MIRROR FLOWER — porcelain tactility & moonlit navigation */
+.press { -webkit-tap-highlight-color:transparent; transform:translateZ(0); transition:transform .28s cubic-bezier(.2,.85,.25,1),opacity .2s ease,background-color .28s ease,border-color .28s ease,box-shadow .28s ease,color .24s ease; }
+.press:active { transform:scale(.972); }
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:focus-visible { outline:2px solid color-mix(in srgb,var(--accent) 62%,white); outline-offset:3px; }
+@media (hover:hover) and (pointer:fine) {
+  .press:hover:not(:disabled) { border-color:color-mix(in srgb,var(--accent) 20%,var(--glass-border)); }
+  .app-icon:hover .tile { transform:translateY(-2px) scale(1.025); box-shadow:0 12px 24px -13px rgba(65,84,124,.34),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -10px 16px -12px rgba(65,84,124,.12); }
+}
+.home-page .app-icon .tile,.desk-page .app-icon .tile { position:relative;overflow:hidden;isolation:isolate;transition:transform .34s cubic-bezier(.2,.85,.25,1),box-shadow .34s ease,filter .34s ease; }
+.home-page .app-icon .tile::after,.desk-page .app-icon .tile::after { content:"";position:absolute;inset:1px 1px auto;height:46%;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.62),rgba(255,255,255,0));opacity:.8;pointer-events:none;z-index:-1; }
+.home-page .app-icon:active .tile,.desk-page .app-icon:active .tile { transform:scale(.91);filter:saturate(.92) brightness(.985); }
+.pocket-dock { position:relative;border-color:rgba(255,255,255,.84);background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(235,240,248,.68));box-shadow:0 18px 44px -24px rgba(57,76,114,.34),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -1px 0 rgba(125,145,179,.08); }
+.pocket-dock a,.pocket-dock button { position:relative;isolation:isolate;transition:color .24s ease,background-color .28s ease,transform .28s cubic-bezier(.2,.85,.25,1),box-shadow .28s ease; }
+.pocket-dock a[aria-current="page"] { color:#52698f;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.98),rgba(255,255,255,.3) 72%),linear-gradient(145deg,rgba(220,230,244,.86),rgba(202,216,236,.62));box-shadow:inset 0 1px 0 rgba(255,255,255,.98),inset 0 0 0 1px rgba(255,255,255,.42),0 5px 14px -10px rgba(69,91,137,.36); }
+.pocket-dock a[aria-current="page"] svg { filter:drop-shadow(0 2px 3px rgba(80,101,145,.16));transform:translateY(-1px); }
+.pocket-dock a svg,.pocket-dock button svg { transition:transform .28s cubic-bezier(.2,.85,.25,1),filter .28s ease; }
+.pocket-dock button:active,.pocket-dock a:active { transform:scale(.94); }
+[data-theme="night"] .pocket-dock { border-color:rgba(218,229,247,.14);background:linear-gradient(145deg,rgba(42,55,76,.88),rgba(27,39,58,.84));box-shadow:0 18px 44px -24px rgba(0,0,0,.62),inset 0 1px 0 rgba(229,237,250,.12); }
+[data-theme="night"] .pocket-dock a[aria-current="page"] { color:#dce6f8;background:linear-gradient(145deg,rgba(117,139,178,.34),rgba(76,98,137,.24));box-shadow:inset 0 1px 0 rgba(235,241,251,.16),inset 0 0 0 1px rgba(207,220,241,.08); }
+@media (hover:hover) and (pointer:fine) {
+  .home-love-card,.home-glass-card,.diary-page .diary-card,.album-page .album-photo-card,.memory-page .scroll-area > div > button,.moments-page .card,.module-page .card,.studio-page .card { transition:transform .38s cubic-bezier(.2,.85,.25,1),box-shadow .38s ease,border-color .3s ease,background .3s ease; }
+  .home-love-card:hover,.home-glass-card:hover,.diary-page .diary-card:hover,.album-page .album-photo-card:hover,.memory-page .scroll-area > div > button:hover,.moments-page .card:hover,.module-page .card:hover,.studio-page .card:hover { transform:translateY(-2px);box-shadow:0 18px 38px -27px rgba(60,79,119,.42),inset 0 1px 0 rgba(255,255,255,.92); }
+}
+[data-theme="night"] .home-love-card:hover,[data-theme="night"] .home-glass-card:hover,[data-theme="night"] .diary-page .diary-card:hover,[data-theme="night"] .album-page .album-photo-card:hover,[data-theme="night"] .memory-page .scroll-area > div > button:hover,[data-theme="night"] .moments-page .card:hover,[data-theme="night"] .module-page .card:hover,[data-theme="night"] .studio-page .card:hover { box-shadow:0 18px 38px -27px rgba(0,0,0,.72),inset 0 1px 0 rgba(231,239,251,.08); }
+.page-push,.page-pop { backface-visibility:hidden; }
+@media (prefers-reduced-motion:reduce) {
+  .press,.pocket-dock a,.pocket-dock button,.pocket-dock svg,.home-page .app-icon .tile,.desk-page .app-icon .tile { transition:none!important; }
+  .press:active,.pocket-dock a:active,.pocket-dock button:active,.home-page .app-icon:active .tile,.desk-page .app-icon:active .tile { transform:none!important; }
+  .page-push,.page-pop { animation:none!important; }
+}
