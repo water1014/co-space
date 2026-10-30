@@ -2576,3 +2576,31 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:
   .press:active,.pocket-dock a:active,.pocket-dock button:active,.home-page .app-icon:active .tile,.desk-page .app-icon:active .tile { transform:none!important; }
   .page-push,.page-pop { animation:none!important; }
 }
+
+
+/* MIRROR FLOWER — editorial rhythm across the three home leaves */
+.desk-track { scroll-padding-inline:0; overscroll-behavior-x:contain; }
+.desk-page { position:relative; scroll-snap-stop:always; }
+.home-page-cover::before,.home-page-create::before,.home-page-tools::before { content:"";position:absolute;top:22px;right:26px;width:74px;height:74px;border:1px solid rgba(125,148,184,.13);border-radius:50%;box-shadow:0 0 0 9px rgba(125,148,184,.035),0 0 0 18px rgba(125,148,184,.025);pointer-events:none; }
+.home-page-create::before { top:32px;right:30px;width:58px;height:58px; }
+.home-page-tools::before { top:30px;right:28px;width:66px;height:66px; }
+.home-page .home-love-card { background:radial-gradient(ellipse at 50% -8%,rgba(255,255,255,.98),transparent 54%),radial-gradient(ellipse at 88% 100%,rgba(132,157,194,.2),transparent 48%),linear-gradient(150deg,rgba(255,255,255,.94),rgba(225,233,244,.88));border-color:rgba(255,255,255,.88);box-shadow:0 20px 48px -28px rgba(73,94,137,.34),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -1px 0 rgba(113,137,177,.08); }
+.home-page .home-love-card::after { content:"月";right:20px;top:4px;color:rgba(106,129,169,.09);font-size:108px;font-style:normal;transform:rotate(8deg); }
+.home-page .home-love-card > div:first-child > span:first-child,.home-page .home-love-card > div:first-child > span:last-child { background:linear-gradient(145deg,#edf2f8,#bdcce0)!important;color:#52698f!important;box-shadow:0 8px 22px -12px rgba(65,85,127,.42),inset 0 1px 0 rgba(255,255,255,.98);outline:1px solid rgba(255,255,255,.78);outline-offset:3px; }
+.home-page .home-love-card > div:first-child > svg { color:#8296b8;opacity:.82; }
+.home-page .home-love-card > p:nth-of-type(2) { color:#7186aa!important; }
+.home-page .home-love-card > p:nth-of-type(3) { color:var(--ink-faint)!important; }
+.home-page .home-date { border-color:rgba(133,151,181,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.86); }
+.home-wordmark { color:#52698f;text-shadow:0 8px 28px rgba(115,135,173,.18); }
+.home-page-create .home-glass-card,.home-page-tools .home-glass-card { border-radius:26px;box-shadow:0 14px 36px -27px rgba(62,82,123,.3),inset 0 1px 0 rgba(255,255,255,.9); }
+.home-page-create .home-glass-card:first-child { background:radial-gradient(ellipse at 100% 0%,rgba(174,190,217,.18),transparent 44%),color-mix(in srgb,var(--glass-bg-strong) 92%,var(--surface)); }
+.home-page-indicator { position:relative;z-index:2;min-height:30px; }
+.home-page-dot { width:7px;height:7px;padding:0;border:0;border-radius:999px;background:var(--line-strong);box-shadow:inset 0 1px 1px rgba(30,45,70,.08);transition:width .32s cubic-bezier(.2,.85,.25,1),background .25s ease,box-shadow .25s ease; }
+.home-page-dot.is-active { width:23px;background:linear-gradient(90deg,#9aacc8,#667fa8);box-shadow:0 2px 9px rgba(102,127,168,.28),inset 0 1px 0 rgba(255,255,255,.56); }
+.home-page-dot:focus-visible { outline:2px solid var(--accent);outline-offset:4px; }
+.home-page-count { margin-left:4px;color:var(--ink-faint);font:10px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em; }
+[data-theme="night"] .home-page .home-love-card { background:radial-gradient(ellipse at 50% -8%,rgba(225,235,250,.1),transparent 54%),radial-gradient(ellipse at 88% 100%,rgba(113,139,180,.2),transparent 48%),linear-gradient(150deg,rgba(47,62,84,.94),rgba(29,42,62,.94));border-color:rgba(219,230,248,.14); }
+[data-theme="night"] .home-page .home-love-card::after { color:rgba(193,209,234,.08); }
+[data-theme="night"] .home-page .home-love-card > div:first-child > span:first-child,[data-theme="night"] .home-page .home-love-card > div:first-child > span:last-child { background:linear-gradient(145deg,#647b9f,#405674)!important;color:#f0f4fb!important;outline-color:rgba(221,232,248,.2); }
+[data-theme="night"] .home-wordmark { color:#c7d5eb; }
+@media (prefers-reduced-motion:reduce) { .home-page-dot { transition:none!important; }.desk-track { scroll-behavior:auto!important; } }
