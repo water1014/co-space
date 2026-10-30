@@ -338,7 +338,7 @@ function Keepsake({
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="keepsake keepsake-sheet-enter reader-sheet flex max-h-[92vh]" w-full max-w-[600px] flex-col rounded-t-[24px] px-4 pb-5 pt-3.5"
+          className="keepsake keepsake-sheet-enter reader-sheet flex max-h-[92vh] w-full max-w-[600px] flex-col rounded-t-[24px] px-4 pb-5 pt-3.5"
         >
           {/* 元信息 */}
           <div className="flex items-center gap-2 px-0.5">
