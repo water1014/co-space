@@ -1737,3 +1737,184 @@ main.scroll-area > div > header:has(+ div) {
     to { opacity: 1; transform: translateY(0); }
   }
 }
+
+
+/* ================================================================
+   Tiny handmade details + quiet motion system
+   Vector-like ornaments are drawn in CSS/SVG: no stock stickers,
+   no external image dependency, and reduced-motion is respected.
+   ================================================================ */
+.editorial-page {
+  --editorial-ink: #202329;
+  --editorial-muted: #8c949d;
+  --editorial-line: rgba(32, 38, 46, .09);
+}
+.diary-heading::after {
+  content: "✳";
+  position: absolute;
+  right: 27px;
+  top: 31px;
+  color: #8997a7;
+  font-family: Georgia, serif;
+  font-size: 24px;
+  line-height: 1;
+  opacity: .7;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+.album-heading::after {
+  content: "";
+  position: absolute;
+  right: 25px;
+  top: 18px;
+  width: 31px;
+  height: 31px;
+  border: 1px solid rgba(89,107,131,.42);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 5px var(--bg), inset 0 0 0 6px rgba(89,107,131,.24);
+  pointer-events: none;
+}
+.album-heading::before {
+  content: "✧";
+  position: absolute;
+  right: 34px;
+  top: 22px;
+  z-index: 1;
+  color: #596b83;
+  font-size: 15px;
+  line-height: 1;
+  pointer-events: none;
+}
+.diary-page .diary-title,
+.album-page .album-title {
+  letter-spacing: -.045em;
+}
+.diary-page .diary-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.92);
+  border-radius: 19px;
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(246,247,248,.9));
+  box-shadow: 0 8px 26px -22px rgba(24,31,39,.28), inset 0 1px 0 #fff;
+  padding: 17px 17px 14px;
+  transition: transform .34s cubic-bezier(.2,.8,.2,1), box-shadow .34s ease, border-color .34s ease;
+}
+.diary-page .diary-card:active {
+  transform: scale(.985);
+  box-shadow: 0 3px 12px -9px rgba(24,31,39,.25);
+}
+.diary-page .plant-mark {
+  color: #8292a1;
+  opacity: .82;
+  transform-origin: 50% 70%;
+}
+.diary-page .diary-card:nth-child(3n) .plant-mark { color: #9a9b88; }
+.diary-page .diary-card:nth-child(3n + 1) .plant-mark { color: #8292a1; }
+.album-page .album-photo-card {
+  position: relative;
+  border-radius: 3px;
+}
+.album-page .album-photo-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255,255,255,.2);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.album-page .album-photo-card:active::after { opacity: 1; }
+.album-page .album-thumb {
+  border-radius: 3px;
+  background: #e9ecef;
+  box-shadow: 0 8px 22px -18px rgba(20,27,34,.42);
+  transform: translateZ(0);
+}
+.album-page .album-thumb img {
+  transition: transform .7s cubic-bezier(.2,.75,.25,1), filter .45s ease;
+  will-change: transform;
+}
+.album-page .album-thumb:active img {
+  transform: scale(1.035);
+  filter: saturate(.92);
+}
+.album-page .keepsake-body {
+  position: relative;
+}
+.album-page .keepsake-body::before {
+  content: "✳";
+  position: absolute;
+  left: -2px;
+  top: -7px;
+  color: #8b9aaa;
+  font-size: 10px;
+  opacity: .75;
+}
+.editorial-sheet {
+  border: 1px solid rgba(255,255,255,.68);
+  box-shadow: 0 -18px 58px -32px rgba(12,18,25,.38);
+}
+[data-theme="night"] .diary-page .diary-card {
+  background: linear-gradient(145deg, rgba(39,44,51,.96), rgba(30,34,40,.94));
+  border-color: rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+[data-theme="night"] .album-page .album-heading::after {
+  border-color: rgba(175,190,208,.42);
+  box-shadow: inset 0 0 0 5px var(--bg), inset 0 0 0 6px rgba(175,190,208,.22);
+}
+[data-theme="night"] .album-page .album-heading::before { color: #aebdce; }
+@media (prefers-reduced-motion: no-preference) {
+  .diary-page .diary-heading,
+  .album-page .album-heading {
+    animation: editorial-heading-in .48s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .diary-page .diary-card {
+    animation: editorial-card-in .48s cubic-bezier(.2,.8,.2,1) both;
+    animation-delay: calc(min(var(--card-index, 0), 8) * 42ms);
+  }
+  .diary-page .diary-card:nth-child(1) { animation-delay: 35ms; }
+  .diary-page .diary-card:nth-child(2) { animation-delay: 75ms; }
+  .diary-page .diary-card:nth-child(3) { animation-delay: 115ms; }
+  .diary-page .diary-card:nth-child(4) { animation-delay: 155ms; }
+  .diary-page .plant-mark { animation: botanical-breathe 5s ease-in-out infinite; }
+  .diary-page .diary-card:nth-child(even) .plant-mark { animation-delay: -2.5s; }
+  .album-page .album-photo-card {
+    animation: editorial-photo-in .55s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .album-page .album-photo-card:nth-child(2n) { animation-delay: 65ms; }
+  .album-page .album-photo-card:nth-child(3n) { animation-delay: 120ms; }
+  .album-page .album-photo-card:nth-child(4n) { animation-delay: 175ms; }
+  .album-page .album-heading::after { animation: orbit-mark 8s ease-in-out infinite; }
+  .editorial-sheet { animation: editorial-sheet-up .38s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes editorial-heading-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes editorial-card-in {
+    from { opacity: 0; transform: translateY(11px) scale(.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes editorial-photo-in {
+    from { opacity: 0; transform: translateY(8px) scale(.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes botanical-breathe {
+    0%, 100% { transform: rotate(-2deg) translateY(0); }
+    50% { transform: rotate(2deg) translateY(-2px); }
+  }
+  @keyframes orbit-mark {
+    0%, 100% { transform: rotate(0) scale(1); }
+    50% { transform: rotate(18deg) scale(1.05); }
+  }
+  @keyframes editorial-sheet-up {
+    from { opacity: .4; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .diary-page *, .album-page *, .editorial-sheet {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
+}
