@@ -593,7 +593,7 @@ function MessageRow({ id, divider }: { id: string; divider?: string }) {
 
 function UserRow({ meta }: { meta: ChatMessage }) {
   return (
-    <div className="rise mt-2 flex flex-col items-end first:mt-0">
+    <div className="chat-user-row rise mt-2 flex flex-col items-end first:mt-0">
       <div className="max-w-[80%]">
         <MessagePrimitive.Root className="bubble user-bubble">
           <MessagePrimitive.Parts>
@@ -601,7 +601,7 @@ function UserRow({ meta }: { meta: ChatMessage }) {
           </MessagePrimitive.Parts>
         </MessagePrimitive.Root>
       </div>
-      <span className="mt-[5px] pr-1.5 text-[10px] tracking-[0.02em] text-ink-faint">
+      <span className="chat-message-time mt-[5px] pr-1.5 text-[10px] tracking-[0.02em] text-ink-faint">
         {formatClock(meta.createdAt)}
       </span>
     </div>
@@ -614,10 +614,10 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
   const initiative = meta.origin === "initiative";
 
   return (
-    <div className="rise mt-3 flex items-start gap-2 first:mt-0">
+    <div className="chat-assistant-row rise mt-3 flex items-start gap-2 first:mt-0">
       <ChatAvatar initial={t.people.yan[0]} />
       <div className="flex min-w-0 max-w-[80%] flex-col items-start">
-        <span className="mb-[5px] pl-2 text-[10px] tracking-[0.02em] text-ink-faint">
+        <span className="chat-assistant-label mb-[5px] pl-2 text-[10px] tracking-[0.02em] text-ink-faint">
           {t.people.yan}
         </span>
         <MessagePrimitive.Root className="bubble assistant-bubble">
