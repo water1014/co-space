@@ -2065,3 +2065,132 @@ main.scroll-area > div > header:has(+ div) {
 @media (max-width: 360px) {
   .pocket-dock { width: min(96%, 420px); }
 }
+
+
+/* ================================================================
+   MIRROR FLOWER / MOONLIGHT — 镜花水月
+   Silvered glass, reflected moon, water rings and pressed-flower traces.
+   ================================================================ */
+:root, [data-theme="day"] {
+  --accent: #7387ad;
+  --accent-deep: #52698f;
+  --accent-soft: rgba(115,135,173,.14);
+}
+.app-bg {
+  background:
+    radial-gradient(ellipse 58% 30% at 50% 0%, rgba(255,255,255,.92), transparent 78%),
+    radial-gradient(ellipse 70% 36% at 100% 76%, rgba(151,174,203,.25), transparent 72%),
+    radial-gradient(ellipse 56% 34% at 0% 94%, rgba(183,169,202,.18), transparent 72%),
+    linear-gradient(160deg,#f3f5f8 0%,#e7edf3 48%,#edf0f4 100%);
+}
+.app-bg::before {
+  content: "";
+  position: absolute;
+  width: min(76vw, 420px);
+  aspect-ratio: 1;
+  right: -22%;
+  top: 12%;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.48);
+  box-shadow: 0 0 0 18px rgba(255,255,255,.045), 0 0 0 42px rgba(126,151,184,.035);
+  pointer-events: none;
+}
+.app-bg::after {
+  content: "";
+  position: absolute;
+  width: min(90vw, 520px);
+  height: 180px;
+  left: -18%;
+  bottom: 8%;
+  border-radius: 50%;
+  border-top: 1px solid rgba(255,255,255,.58);
+  transform: rotate(-12deg);
+  filter: blur(.2px);
+  pointer-events: none;
+}
+[data-theme="night"] .app-bg {
+  background:
+    radial-gradient(ellipse 46% 28% at 52% 8%, rgba(141,160,197,.2), transparent 78%),
+    radial-gradient(ellipse 60% 34% at 100% 76%, rgba(95,119,157,.18), transparent 72%),
+    linear-gradient(160deg,#171e2b 0%,#202a3a 52%,#171e2b 100%);
+}
+[data-theme="night"] .app-bg::before {
+  border-color: rgba(213,224,244,.12);
+  box-shadow: 0 0 0 18px rgba(213,224,244,.025), 0 0 0 42px rgba(126,151,184,.025);
+}
+.home-wordmark {
+  color: #52617b;
+  letter-spacing: .08em;
+  text-shadow: 0 8px 28px rgba(112,133,169,.18);
+}
+.home-love-card {
+  background:
+    radial-gradient(circle at 50% 12%, rgba(255,255,255,.98) 0 8%, rgba(255,255,255,.3) 8.5% 15%, transparent 31%),
+    radial-gradient(ellipse at 50% 100%, rgba(130,154,190,.22), transparent 54%),
+    linear-gradient(145deg,rgba(255,255,255,.92),rgba(224,232,242,.82) 58%,rgba(234,229,241,.84));
+  border-color: rgba(255,255,255,.9);
+  box-shadow: 0 22px 52px -30px rgba(76,98,139,.42), inset 0 1px 0 rgba(255,255,255,.98);
+}
+.home-love-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 210px;
+  height: 72px;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  border-top: 1px solid rgba(255,255,255,.9);
+  border-radius: 50%;
+  box-shadow: 0 -9px 0 -8px rgba(111,133,172,.22), 0 -20px 0 -19px rgba(255,255,255,.8);
+  pointer-events: none;
+}
+.home-love-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 94px;
+  height: 94px;
+  right: 24px;
+  top: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 32%,#fff 0 8%,rgba(255,255,255,.82) 9% 20%,rgba(186,201,222,.36) 48%,rgba(255,255,255,.05) 70%);
+  box-shadow: 0 0 38px rgba(255,255,255,.72), 0 0 76px rgba(123,147,186,.2);
+  pointer-events: none;
+}
+.soft-rose-card {
+  background: linear-gradient(145deg,rgba(255,255,255,.94),rgba(225,233,243,.9) 62%,rgba(232,228,241,.88));
+  border-color: rgba(255,255,255,.9);
+  box-shadow: 0 16px 34px -22px rgba(75,96,137,.32), inset 0 1px 0 rgba(255,255,255,.95);
+}
+.home-love-card .serif-display:first-of-type {
+  color: #637da6;
+}
+.home-love-card > p:nth-of-type(2) {
+  color: #7888a5 !important;
+}
+.home-page .app-icon .tile {
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.98),rgba(224,232,242,.92)),
+    linear-gradient(165deg,var(--tile-a),var(--tile-b));
+  border-color: rgba(255,255,255,.92);
+  box-shadow: 0 9px 22px -14px rgba(74,94,132,.38), inset 0 1px 0 #fff;
+}
+.pocket-dock {
+  border-color: rgba(255,255,255,.82);
+  box-shadow: 0 16px 42px -22px rgba(65,82,115,.3), inset 0 1px 0 rgba(255,255,255,.95);
+}
+[data-theme="night"] .home-love-card {
+  background:
+    radial-gradient(circle at 50% 12%,rgba(190,205,229,.2) 0 8%,rgba(190,205,229,.06) 15%,transparent 32%),
+    linear-gradient(145deg,rgba(54,67,89,.9),rgba(35,46,64,.94));
+  border-color: rgba(207,220,241,.16);
+}
+[data-theme="night"] .home-wordmark { color: #d1d9e8; }
+@media (prefers-reduced-motion: no-preference) {
+  .home-love-card::after { animation: moon-glimmer 8s ease-in-out infinite; }
+  @keyframes moon-glimmer {
+    0%,100% { transform: scale(.98); opacity: .78; }
+    50% { transform: scale(1.045); opacity: 1; }
+  }
+}
