@@ -104,7 +104,7 @@ export function Home() {
           </svg>
 
           {doors.map((door) => (
-            <Link key={door.title} to={door.to} className="moon-hotspot" style={{ left: door.x + "%", top: door.y + "%" }} onFocus={() => setActive(door.title)} onBlur={() => setActive(null)} onMouseEnter={() => setActive(door.title)} onMouseLeave={() => setActive(null)} onTouchStart={() => setActive(door.title)} aria-label={`进入${door.title}`}>
+            <Link key={door.title} to={door.to} className={`moon-hotspot ${active === door.title ? "is-active" : ""}`} style={{ left: door.x + "%", top: door.y + "%" }} onFocus={() => setActive(door.title)} onBlur={() => setActive(null)} onMouseEnter={() => setActive(door.title)} onMouseLeave={() => setActive(null)} onTouchStart={() => setActive(door.title)} aria-label={`进入${door.title}`}>
               <span className={`moon-hotspot-name ${active === door.title ? "is-lit" : ""}`}>{door.title}</span>
               <span className="moon-hotspot-note">{door.note}</span>
             </Link>
