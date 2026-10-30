@@ -15,7 +15,7 @@ export function ThoughtCard({
   part: Extract<MessagePart, { type: "thought" }>;
 }) {
   return (
-    <details className="group mb-2.5">
+    <details className="chat-thought-card group mb-2.5">
       <summary className="flex cursor-pointer list-none items-center gap-1.5 text-[10.5px] text-ink-ghost">
         <span className="h-[3px] w-[3px] flex-none rounded-full bg-[var(--accent)] opacity-60" />
         <span className="truncate">
@@ -30,7 +30,7 @@ export function ThoughtCard({
           className="ml-auto flex-none opacity-60 transition-transform duration-300 group-open:rotate-90"
         />
       </summary>
-      <div className="mt-2 space-y-1.5 border-l border-[var(--line)] pl-3">
+      <div className="chat-thought-steps mt-2 space-y-1.5 border-l border-[var(--line)] pl-3">
         {part.steps.map((step, i) => (
           <p key={i} className="text-[11.5px] leading-[1.9] text-ink-faint">
             {step}
@@ -91,12 +91,12 @@ export function VoiceBubble({
   };
 
   return (
-    <div className="glass-flat p-3">
+    <div className="chat-voice-card glass-flat p-3">
       <div className="flex items-center gap-3">
         <button
           onClick={play}
           aria-label={playing ? "停止播放" : "播放语音"}
-          className="press flex h-8 w-8 flex-none items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)]"
+          className="chat-voice-play press flex h-8 w-8 flex-none items-center justify-center rounded-full text-white"
         >
           {playing ? (
             <IconPause width={14} height={14} />
@@ -105,7 +105,7 @@ export function VoiceBubble({
           )}
         </button>
 
-        <div className="flex h-8 flex-1 items-center gap-[2.5px]">
+        <div className="chat-voice-wave flex h-8 flex-1 items-center gap-[2.5px]">
           {part.peaks.map((peak, i) => {
             const passed = i / part.peaks.length <= progress;
             return (
@@ -129,7 +129,7 @@ export function VoiceBubble({
         </span>
       </div>
       {part.transcript && (
-        <p className="mt-2 border-t border-[var(--line)] pt-2 text-[13.5px] leading-[1.8] text-ink-faint">
+        <p className="chat-voice-transcript mt-2 border-t border-[var(--line)] pt-2 text-[13.5px] leading-[1.8] text-ink-faint">
           {part.transcript}
         </p>
       )}
@@ -166,8 +166,8 @@ export function FileCard({
   };
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--glass-hi)] px-3 py-2.5">
-      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--glass-solid)] text-ink-soft">
+    <div className="chat-file-card flex items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--glass-hi)] px-3 py-2.5">
+      <span className="chat-file-icon flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[var(--glass-solid)] text-ink-soft">
         <IconFile width={17} height={17} />
       </span>
       <div className="min-w-0 flex-1">
@@ -182,13 +182,13 @@ export function FileCard({
             setHint(true);
             window.setTimeout(() => setHint(false), 2200);
           }}
-          className="press rounded-full bg-[var(--accent-deep)] px-3 py-1 text-[12.5px] text-white"
+          className="chat-file-open press rounded-full px-3 py-1 text-[12.5px] text-white"
         >
           {hint ? "未接入" : "打开"}
         </button>
         <button
           onClick={download}
-          className="press rounded-full border border-[var(--accent-deep)]/60 px-3 py-1 text-[12.5px] text-[var(--accent-deep)]"
+          className="chat-file-download press rounded-full border px-3 py-1 text-[12.5px]"
         >
           下载
         </button>
@@ -224,10 +224,10 @@ export function ImageBubble({
   return (
     <button
       onClick={onClick}
-      className="press group relative block w-full overflow-hidden rounded-2xl border border-[var(--line)]"
+      className="chat-imprint press group relative block w-full overflow-hidden rounded-2xl border border-[var(--line)]"
     >
       <div
-        className="grain-self relative w-full"
+        className="chat-imprint-art grain-self relative w-full"
         style={{ ...imprintStyle(part.seed), height: compact ? 150 : 210 }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
