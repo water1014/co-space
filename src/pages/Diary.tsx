@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Sheet } from "../components/ui/kit";
+import { BackButton } from "../components/ui/BackButton";
 import { IconCheck, IconClose, IconPlus } from "../components/ui/icons";
 import { Calendar, dayKey } from "../components/home/Calendar";
 import { Reader } from "../components/diary/Reader";
@@ -68,7 +69,7 @@ export function Diary() {
     <div className="relative flex h-full flex-col overflow-hidden">
       {/* 页头 */}
       <header className="flex items-center gap-2 px-5 pt-6">
-        <PenIcon />
+        <BackButton />
         <h1 className="page-head-title flex-1 text-[30px] leading-none text-ink">{t.pages.diary.title}</h1>
         <button
           onClick={() => setTimeline(true)}

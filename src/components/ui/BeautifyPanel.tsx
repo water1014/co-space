@@ -1,12 +1,14 @@
 import { useEffect } from "react";
-import { PRESETS, useBeautyStore } from "../../stores/beautyStore";
+import { PRESETS, WALLPAPERS, useBeautyStore } from "../../stores/beautyStore";
 import { useThemeStore } from "../../stores/themeStore";
-import { IconClose, IconSun, IconMoon } from "../ui/icons";
+import { IconClose, IconSun, IconMoon, IconCheck } from "../ui/icons";
 
-/** 美化面板：底部弹层，一键换肤 + 日夜切换，呼应「自己装修美化」。 */
+/** 美化面板：底部弹层，一键换肤 + 壁纸 + 日夜切换，呼应「自己装修美化」。 */
 export function BeautifyPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const presetId = useBeautyStore((s) => s.presetId);
   const setPreset = useBeautyStore((s) => s.setPreset);
+  const wallpaperId = useBeautyStore((s) => s.wallpaperId);
+  const setWallpaper = useBeautyStore((s) => s.setWallpaper);
   const theme = useThemeStore((s) => s.theme);
   const toggle = useThemeStore((s) => s.toggle);
 
@@ -65,6 +67,48 @@ export function BeautifyPanel({ open, onClose }: { open: boolean; onClose: () =>
           })}
         </div>
 
+        <p className="mt-5 mb-2.5 text-[11px] tracking-[0.16em] text-ink-faint">壁纸</p>
+        <div className="-mx-1 flex gap-2.5 overflow-x-auto px-1 pb-1">
+          {WALLPAPERS.map((w) => {
+            const active = w.id === wallpaperId;
+            return (
+              <button
+                key={w.id}
+                onClick={() => setWallpaper(w.id)}
+                className="tap flex flex-none flex-col items-center gap-1.5"
+              >
+                <span
+                  className={`relative flex h-16 w-12 items-center justify-center overflow-hidden rounded-2xl border transition-transform ${
+                    active
+                      ? "border-[var(--accent-deep)] ring-2 ring-[var(--accent-deep)] ring-offset-2 ring-offset-[var(--surface)]"
+                      : "border-[var(--line)]"
+                  }`}
+                  style={{
+                    background:
+                      w.css || "linear-gradient(165deg,#faf7f4 0%,#efe9e3 100%)",
+                  }}
+                >
+                  {active && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/85 text-[var(--accent-deep)]">
+                      <IconCheck width={12} height={12} strokeWidth={2.4} />
+                    </span>
+                  )}
+                  {!active && w.id === "none" && (
+                    <span className="text-[10px] text-ink-faint">默认</span>
+                  )}
+                </span>
+                <span
+                  className={`text-[10.5px] ${
+                    active ? "text-[var(--accent-deep)]" : "text-ink-faint"
+                  }`}
+                >
+                  {w.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
         <p className="mt-5 mb-2.5 text-[11px] tracking-[0.16em] text-ink-faint">外观</p>
         <div className="flex gap-2.5">
           {(["day", "night"] as const).map((m) => {
@@ -88,7 +132,7 @@ export function BeautifyPanel({ open, onClose }: { open: boolean; onClose: () =>
         </div>
 
         <p className="mt-4 text-center text-[11.5px] text-ink-ghost">
-          更多壁纸与小组件排版，正在路上 ✦
+          更多小组件排版，正在路上 ✦
         </p>
       </div>
     </div>

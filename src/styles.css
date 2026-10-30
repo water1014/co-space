@@ -192,6 +192,18 @@ body {
   transition: background 0.45s ease;
 }
 
+/* 壁纸层：叠在光斑之上，给「自己装修」用 */
+.app-bg .app-wall {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: background 0.4s ease, filter 0.4s ease;
+}
+[data-theme="night"] .app-bg .app-wall {
+  filter: brightness(0.5) saturate(0.85);
+}
+
 /* 一层极淡的顶部柔光，让白底不至于死板 */
 .app-bg .glow {
   position: absolute;
@@ -477,6 +489,36 @@ body {
 }
 .fadein {
   animation: fadein 0.6s ease both;
+}
+
+/* 页面转场：前进从右滑入、返回从左滑入，接近手机原生 */
+@keyframes page-push {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes page-pop {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.page-push {
+  animation: page-push 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+.page-pop {
+  animation: page-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
 }
 
 @keyframes breathe {

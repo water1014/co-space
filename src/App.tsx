@@ -16,6 +16,7 @@ import { Mit } from "./pages/Mit";
 import { Moments } from "./pages/Moments";
 import { Studio } from "./pages/Studio";
 import { Lounge } from "./pages/Lounge";
+import { Album } from "./pages/Album";
 import { Module } from "./pages/Module";
 import { useRelationEngine } from "./lib/relation/engine";
 import { useThemeStore, applyAppearanceVars } from "./stores/themeStore";
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/memory" element={<Memory />} />
+          <Route path="/album" element={<Album />} />
           <Route path="/together" element={<Together />} />
           <Route path="/diary" element={<Diary />} />
           <Route path="/mit" element={<Mit />} />

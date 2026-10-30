@@ -19,6 +19,23 @@ export const PRESETS: Preset[] = [
   { id: "amber", name: "暮金", accent: "#cf9a4e", accentDeep: "#b07e34", accentSoft: "rgba(207,154,78,0.14)", swatch: "#cf9a4e" },
 ];
 
+export type Wallpaper = {
+  id: string;
+  name: string;
+  /** 直接作为 .app-wall 的 background 使用；none 表示跟随默认光斑背景 */
+  css: string;
+};
+
+/** 壁纸：几套柔和渐变，配合磨砂卡片有照片墙的质感。 */
+export const WALLPAPERS: Wallpaper[] = [
+  { id: "none", name: "默认", css: "" },
+  { id: "blush", name: "柔粉", css: "linear-gradient(165deg,#fdf2ef 0%,#f9e0df 52%,#f2d2cd 100%)" },
+  { id: "mist", name: "雾蓝", css: "linear-gradient(165deg,#eef5f9 0%,#dfeaf2 52%,#d2e1ee 100%)" },
+  { id: "cream", name: "奶油", css: "linear-gradient(165deg,#faf6ef 0%,#f3e8d6 52%,#ecdcC2 100%)" },
+  { id: "matcha", name: "薄荷", css: "linear-gradient(165deg,#f1f6ee 0%,#e2ecdb 52%,#d5e4cf 100%)" },
+  { id: "dusk", name: "暮金", css: "linear-gradient(165deg,#f6efe9 0%,#ecdcd2 52%,#e0cdc2 100%)" },
+];
+
 function apply(p: Preset) {
   const root = document.documentElement;
   root.style.setProperty("--accent", p.accent);
@@ -29,6 +46,8 @@ function apply(p: Preset) {
 type Beauty = {
   presetId: string;
   setPreset: (id: string) => void;
+  wallpaperId: string;
+  setWallpaper: (id: string) => void;
 };
 
 export const useBeautyStore = create<Beauty>()(
@@ -40,6 +59,8 @@ export const useBeautyStore = create<Beauty>()(
         const p = PRESETS.find((x) => x.id === id);
         if (p) apply(p);
       },
+      wallpaperId: "none",
+      setWallpaper: (id) => set({ wallpaperId: id }),
     }),
     {
       name: "co-space::beauty",

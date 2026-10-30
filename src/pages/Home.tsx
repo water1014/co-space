@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   IconChat,
@@ -19,11 +19,14 @@ import {
   IconRefresh,
   IconPlay,
   IconPause,
+  IconPlus,
 } from "../components/ui/icons";
 import { useText } from "../lib/content/useText";
 import { useLifeStore } from "../stores/lifeStore";
+import { useAlbumStore } from "../stores/albumStore";
 import { daysTogether } from "../lib/life/derive";
 import { getTodayMessage } from "../lib/home/todayMessage";
+import { fileToDataUrl } from "../lib/img/resize";
 
 const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 
@@ -37,6 +40,9 @@ const TILES = {
 } as const;
 type TileKey = keyof typeof TILES;
 
+/** 记住首页停在第几屏，从子页返回时原位恢复（像手机一样不重置） */
+let lastHomeIndex = 0;
+
 /**
  * 首页（小手机桌面 · 三屏纯横滑 + 留白美 · 杂志风）：
  * 第 1 屏 社交互动 / 第 2 屏 记录创作 / 第 3 屏 生活工具。
@@ -49,9 +55,15 @@ export function Home() {
   const days = daysTogether(life.anniversary);
   const pending = life.todos.filter((x) => !x.done).length;
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(lastHomeIndex);
   const trackRef = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState("");
+
+  // 从子页返回时恢复到上次停留的那一屏
+  useLayoutEffect(() => {
+    const el = trackRef.current;
+    if (el && lastHomeIndex > 0) el.scrollLeft = el.clientWidth * lastHomeIndex;
+  }, []);
 
   const say = (s: string) => {
     setToast(s);
@@ -79,7 +91,10 @@ export function Home() {
 
   const onTrackScroll = () => {
     const el = trackRef.current;
-    if (el) setPage(Math.round(el.scrollLeft / el.clientWidth));
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.clientWidth);
+    setPage(idx);
+    lastHomeIndex = idx;
   };
 
   return (
@@ -124,28 +139,8 @@ export function Home() {
               </p>
             </div>
 
-            {/* 照片预览卡片（装饰模块） */}
-            <Link to="/memory" className="card press col-span-4 overflow-hidden rounded-3xl">
-              <div className="grid grid-cols-3 gap-2 p-3">
-                {[
-                  "from-[#f6e3dc] to-[#f0d2c8]",
-                  "from-[#e9eef2] to-[#dbe5ec]",
-                  "from-[#f4ecdd] to-[#eadcc2]",
-                ].map((g, i) => (
-                  <span
-                    key={i}
-                    className={`flex aspect-[4/3] items-center justify-center rounded-2xl bg-gradient-to-br ${g} text-[#b3a08f]`}
-                  >
-                    {i === 1 ? <IconHeart width={18} height={18} /> : <IconImages width={18} height={18} />}
-                  </span>
-                ))}
-              </div>
-              <div className="border-t border-[var(--line)] px-4 py-2.5 text-center">
-                <p className="serif-display text-[12px] italic tracking-[0.06em] text-ink-soft">
-                  our little world · 最近的瞬间
-                </p>
-              </div>
-            </Link>
+            {/* 照片墙：可以直接放照片（不跳去记忆） */}
+            <HomeAlbumCard />
 
             {/* 四个社交入口 */}
             <AppIcon label="聊天" tile="cream" icon={<IconChat width={18} height={18} />} to="/chat" />
@@ -192,7 +187,7 @@ export function Home() {
             </section>
 
             <AppIcon label="日记" tile="cream" icon={<IconEdit width={18} height={18} />} to="/diary" />
-            <AppIcon label="相册" tile="blue" icon={<IconImages width={18} height={18} />} to="/memory" />
+            <AppIcon label="相册" tile="blue" icon={<IconImages width={18} height={18} />} to="/album" />
             <AppIcon label="生图室" tile="blush" icon={<IconStudio width={18} height={18} />} to="/studio" />
             <AppIcon label="共读听影" tile="mint" icon={<IconLounge width={18} height={18} />} to="/lounge" />
             <AppIcon label="记忆" tile="sand" icon={<IconMemory width={18} height={18} />} to="/memory" />
@@ -324,6 +319,73 @@ function SectionHead({ zh, en }: { zh: string; en: string }) {
     <div className="mb-7 flex items-baseline gap-3">
       <h2 className="text-[22px] font-semibold text-ink">{zh}</h2>
       <span className="text-[11px] tracking-[0.24em] text-ink-faint">{en}</span>
+    </div>
+  );
+}
+
+/** 首页照片墙：直接放照片（上传到本地相册），不跳去记忆 */
+function HomeAlbumCard() {
+  const photos = useAlbumStore((s) => s.photos);
+  const add = useAlbumStore((s) => s.add);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const slots = photos.slice(0, 3);
+
+  const pick = async (files: FileList | null) => {
+    if (!files) return;
+    for (const f of Array.from(files).slice(0, 3)) {
+      if (!f.type.startsWith("image/")) continue;
+      try {
+        add({ dataUrl: await fileToDataUrl(f), caption: "" });
+      } catch {
+        /* 忽略单张失败 */
+      }
+    }
+  };
+
+  return (
+    <div className="card col-span-4 overflow-hidden rounded-3xl">
+      <div className="grid grid-cols-3 gap-2 p-3">
+        {[0, 1, 2].map((i) => {
+          const p = slots[i];
+          return p ? (
+            <Link
+              key={p.id}
+              to="/album"
+              className="relative block aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--surface-2)]"
+            >
+              <img src={p.dataUrl} alt="" className="h-full w-full object-cover" />
+            </Link>
+          ) : (
+            <button
+              key={i}
+              onClick={() => inputRef.current?.click()}
+              className="flex aspect-[4/3] flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-[var(--line-strong)] text-ink-faint transition-colors hover:border-[var(--accent)] hover:text-[var(--accent-deep)]"
+            >
+              <IconPlus width={17} height={17} />
+              {i === 0 && <span className="text-[10px]">添加照片</span>}
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex items-center justify-between border-t border-[var(--line)] px-4 py-2.5">
+        <p className="serif-display text-[12px] italic tracking-[0.06em] text-ink-soft">
+          our little world · 最近的瞬间
+        </p>
+        <Link to="/album" className="text-[11.5px] text-ink-faint">
+          全部 ›
+        </Link>
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          void pick(e.target.files);
+          e.target.value = "";
+        }}
+      />
     </div>
   );
 }

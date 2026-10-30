@@ -36,6 +36,7 @@ import {
   IconSpark,
 } from "../components/ui/icons";
 import { useThemeStore } from "../stores/themeStore";
+import { useBack } from "../lib/nav/useBack";
 import { formatClock } from "../lib/utils/id";
 import { EMPTY_STATES } from "../content";
 import { useText } from "../lib/content/useText";
@@ -201,6 +202,7 @@ function ChatHeader() {
   const phase = moonPhase();
   const activeProject = projects.find((p) => p.id === activeId);
   const t = useText();
+  const back = useBack();
 
   // 会话历史：把用户消息按天分组，当作「之前的对话」入口
   const historyDays = (() => {
@@ -229,8 +231,8 @@ function ChatHeader() {
   return (
     <header className="flex items-center justify-between gap-2 px-4 pt-4 pb-2">
       <button
-        onClick={() => setDrawer("history")}
-        aria-label="我们说过的话"
+        onClick={back}
+        aria-label="返回"
         className="press flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[var(--line)] bg-white/60 text-ink-soft backdrop-blur hover:text-ink"
       >
         <IconChevron width={17} height={17} className="rotate-180" />

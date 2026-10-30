@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { imprintStyle } from "../components/chat/parts";
 import { Sheet } from "../components/ui/kit";
+import { BackButton } from "../components/ui/BackButton";
 import { IconCheck, IconClose, IconSearch } from "../components/ui/icons";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useProjectsStore } from "../stores/projectsStore";
@@ -29,11 +30,7 @@ export function Memory() {
       {/* 页头：‹ Memory / Things I remember. + 绿点 */}
       <header className="px-5 pt-6">
         <div className="flex items-start gap-2">
-          <span className="mt-2 text-ink-faint">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </span>
+          <BackButton className="mt-1.5" />
           <div className="flex-1">
             <h1 className="page-head-title text-[30px] leading-none text-ink">{t.pages.memory.title}</h1>
             <p className="page-head-sub mt-1 text-[12.5px]">{t.pages.memory.sub}</p>

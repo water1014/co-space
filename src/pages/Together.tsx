@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { BackButton } from "../components/ui/BackButton";
 import {
   IconCheck,
   IconChevron,
@@ -67,9 +67,7 @@ export function Together() {
     <div className="flex flex-col px-4 pb-12 pt-6">
       {/* 头部：‹ Together / life, kept */}
       <div className="flex items-start gap-2 px-1">
-        <Link to="/" className="press mt-2 text-ink-faint hover:text-ink-soft" aria-label="返回">
-          <IconChevron width={16} height={16} className="rotate-180" />
-        </Link>
+        <BackButton className="mt-1.5" />
         <div>
           <h1 className="page-head-title text-[30px] leading-none text-ink">{t.pages.together.title}</h1>
           <p className="page-head-sub mt-1 text-[12.5px]">{t.pages.together.sub}</p>

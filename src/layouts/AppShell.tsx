@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import type { ReactNode, SVGProps } from "react";
 import { BackgroundLayer } from "./BackgroundLayer";
@@ -6,9 +6,8 @@ import { IconGear, IconSpark } from "../components/ui/icons";
 import { BeautifyPanel } from "../components/ui/BeautifyPanel";
 
 /**
- * 底部 dock：设置 / 美化。
- * 设置进入全局设置页；美化为底部弹层，一键换肤 + 日夜切换。
- * 其余页面（聊天 / 日记 / 记忆 / 共处）从首页桌面的 app 图标进入，子页自带返回。
+ * 底部 dock：设置 / 美化。只在首页出现；进入子页即隐藏。
+ * 页面切换做「推入 / 弹出」转场，并记住每页滚动位置，接近手机原生。
  */
 type TabDef =
   | { kind: "route"; to: string; label: string; icon: TabIcon }
@@ -19,11 +18,34 @@ const TAB_DEFS: TabDef[] = [
   { kind: "action", action: "beauty", label: "美化", icon: IconSpark },
 ];
 
+const depthOf = (p: string) => p.split("/").filter(Boolean).length;
+
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [beauty, setBeauty] = useState(false);
-  // 底栏只属于首页；进入任何子页（聊天 / 日记 / 记忆 …）立即隐藏。
   const isHome = location.pathname === "/";
+
+  const mainRef = useRef<HTMLElement>(null);
+  const scrollMem = useRef<Record<string, number>>({});
+  const prevPath = useRef(location.pathname);
+
+  // 更深 = 前进（右滑入），否则 = 返回（左滑入）
+  const dir = depthOf(location.pathname) > depthOf(prevPath.current) ? "page-push" : "page-pop";
+
+  // 切页后恢复该页上次的滚动位置
+  useLayoutEffect(() => {
+    const el = mainRef.current;
+    if (el) el.scrollTop = scrollMem.current[location.pathname] ?? 0;
+  }, [location.pathname]);
+
+  useEffect(() => {
+    prevPath.current = location.pathname;
+  }, [location.pathname]);
+
+  const onScroll = () => {
+    const el = mainRef.current;
+    if (el) scrollMem.current[location.pathname] = el.scrollTop;
+  };
 
   return (
     <div className="relative h-full w-full overflow-hidden">
@@ -33,7 +55,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="relative flex h-full w-full max-w-[600px] flex-col">
           <main
             key={location.pathname}
-            className={`scroll-area fadein min-h-0 flex-1 ${isHome ? "pb-24" : "pb-0"}`}
+            ref={mainRef}
+            onScroll={onScroll}
+            className={`scroll-area min-h-0 flex-1 ${isHome ? "pb-24" : "pb-0"} ${dir}`}
           >
             {children}
           </main>
