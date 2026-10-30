@@ -46,12 +46,13 @@ function dateNo(d = new Date()) {
 
 const rise = (ms: number) => ({ animationDelay: `${ms}ms` } as const);
 
-/** 杂志式栏目眉题：编号 + 大写英文 + 右侧细线 */
-function Kicker({ no, en }: { no: string; en: string }) {
+/** 杂志式栏目眉题：编号 + 大写英文 + 中文副标 + 右侧细线 */
+function Kicker({ no, en, zh }: { no: string; en: string; zh?: string }) {
   return (
     <div className="mag-kicker">
       <span className="no">{no}</span>
       <span>{en}</span>
+      {zh && <span className="zh">{zh}</span>}
       <span className="rule" />
     </div>
   );
@@ -106,7 +107,7 @@ export function Home() {
 
   return (
     <div className="relative flex flex-col px-5 pb-6 pt-9">
-      {/* 刊头 masthead */}
+      {/* 刊头 masthead：双层杂志刊头 */}
       <header className="rise" style={rise(0)}>
         <div className="flex items-center justify-between">
           <button
@@ -122,51 +123,62 @@ export function Home() {
           </div>
         </div>
 
-        <div className="mt-6 flex items-end justify-between">
+        <div className="mt-7 flex items-end justify-between">
           <div>
-            <p className="serif-display text-[13px] tracking-[0.04em] text-ink-faint">
-              co·space
+            <p className="serif-display text-[12px] tracking-[0.24em] text-ink-faint">
+              CO·SPACE
             </p>
-            <h1 className="serif-display mt-0.5 text-[36px] leading-[0.95] text-ink">
+            <h1 className="serif-display mt-1 text-[40px] leading-[0.92] text-ink">
               Fall in love
             </h1>
-            <p className="mt-2 text-[13px] text-ink-soft">主页 · 我们的第 {days} 天</p>
+            <p className="mt-2 text-[13px] text-ink-soft">我们的第 {days} 天 · 月刊</p>
           </div>
-          <p className="serif-display text-right text-[12px] leading-[1.1] text-ink-faint">
-            Nº
-            <br />
-            {String(days).padStart(3, "0")}
-          </p>
+          <div className="text-right">
+            <p className="serif-display text-[11px] tracking-[0.2em] text-ink-faint">Nº</p>
+            <p className="serif-display text-[34px] leading-none text-[var(--accent)]">
+              {String(days).padStart(3, "0")}
+            </p>
+          </div>
         </div>
-        <div className="mt-4 h-px w-full bg-[var(--line)]" />
+        <div className="mag-rule-dot mt-5">
+          <span />
+        </div>
       </header>
 
-      {/* 封面：玻璃拟态大卡，超大 Playfair 天数 */}
+      {/* 封面：玻璃拟态大卡，超大 Playfair 天数 + 编辑式元信息 */}
       <section
-        className="glass-cover rise mt-5 px-6 py-8 text-center"
+        className="glass-cover rise mt-5 px-6 py-7 text-center"
         style={rise(80)}
       >
-        <div className="flex items-center justify-center gap-4">
+        <div className="cover-meta">
+          <span>ISSUE Nº {String(days).padStart(3, "0")}</span>
+          <span>MONTHLY</span>
+        </div>
+        <div className="mt-5 flex items-center justify-center gap-4">
           <AvatarBlock initial={t.people.wan[0]} name={t.people.wan} />
           <IconHeart width={17} height={17} strokeWidth={1.6} className="text-[var(--accent)]" />
           <AvatarBlock initial={t.people.yan[0]} name={t.people.yan} accent />
         </div>
         <p className="mt-6 flex items-baseline justify-center gap-2">
-          <span className="serif-display text-[74px] font-medium leading-none text-[var(--accent)]">
+          <span className="serif-display text-[78px] font-medium leading-none text-[var(--accent)]">
             {days}
           </span>
-          <span className="text-[13px] font-semibold tracking-[0.24em] text-ink-soft">
-            DAYS
+          <span className="text-[13px] font-semibold tracking-[0.2em] text-ink-soft">
+            DAYS 天
           </span>
         </p>
         <p className="mt-3 text-[12px] tracking-[0.34em] text-ink-faint">在 一 起</p>
+        <div className="mag-rule-dot mt-5">
+          <span />
+        </div>
         <p className="num mt-3 text-[12px] tracking-[0.1em] text-ink-faint">{dateNo()}</p>
       </section>
 
-      {/* 卷首语 pull quote（衬线大字 + 首字下沉） */}
+      {/* 卷首语 pull quote（大引号装饰 + 衬线引言） */}
       <section className="rise mt-8" style={rise(160)}>
-        <Kicker no="01" en="Manifesto" />
-        <p className="mag-quote dropcap">{t.home.quote}</p>
+        <Kicker no="01" en="Manifesto" zh="卷首" />
+        <p className="lead-mark text-center">“</p>
+        <p className="mag-quote mt-1 text-center">{t.home.quote}</p>
         <p className="mt-2 text-right text-[12px] text-ink-faint">
           — {t.home.quoteAuthor}
         </p>
@@ -174,7 +186,7 @@ export function Home() {
 
       {/* 写给你的话（模型生成，信件式玻璃卡） */}
       <section className="rise mt-8" style={rise(220)}>
-        <Kicker no="02" en="A Note" />
+        <Kicker no="02" en="A Note" zh="信" />
         <div className="glass rounded-3xl p-5">
           <div className="flex items-center gap-2">
             <IconHeart width={14} height={14} strokeWidth={1.6} className="text-[var(--accent)]" />
@@ -208,7 +220,7 @@ export function Home() {
       {/* 今日打卡 / 待办清单 */}
       <div className="rise mt-8 grid grid-cols-2 gap-3" style={rise(280)}>
         <section>
-          <Kicker no="03" en="Daily" />
+          <Kicker no="03" en="Daily" zh="今日" />
           <Link to="/together" className="glass press block rounded-3xl p-[18px] text-left">
             <h3 className="text-[15px] font-semibold text-ink">今日打卡</h3>
             <p className="num mt-2.5 text-[26px] font-semibold leading-none text-ink">
@@ -222,7 +234,7 @@ export function Home() {
         </section>
 
         <section>
-          <Kicker no="04" en="To-do" />
+          <Kicker no="04" en="To-do" zh="待办" />
           <div className="glass rounded-3xl p-[18px]">
             <div className="flex items-center justify-between">
               <h3 className="text-[15px] font-semibold text-ink">待办清单</h3>
@@ -254,19 +266,19 @@ export function Home() {
 
       {/* 天气 */}
       <section className="rise mt-8" style={rise(340)}>
-        <Kicker no="05" en="Weather" />
+        <Kicker no="05" en="Weather" zh="天气" />
         <WeatherCard />
       </section>
 
       {/* 音乐 */}
       <section className="rise mt-8" style={rise(400)}>
-        <Kicker no="06" en="Playlist" />
+        <Kicker no="06" en="Playlist" zh="歌单" />
         <MusicCard />
       </section>
 
       {/* 相册 */}
       <section className="rise mt-8" style={rise(460)}>
-        <Kicker no="07" en="Gallery" />
+        <Kicker no="07" en="Gallery" zh="影像" />
         <AlbumCard />
       </section>
 
@@ -417,26 +429,31 @@ function MusicCard() {
   );
 }
 
-/** 相册模块：三张占位 + 杂志式图说 */
+/** 相册模块：feature 布局（左一大图 + 右两小图）+ 杂志式图说 */
 function AlbumCard() {
-  const caps = ["我们的日常", "未命名 · 秋", "某年某月"];
   return (
     <section className="glass rounded-3xl p-5">
-      <div className="mt-1 grid grid-cols-3 gap-2.5">
-        {[
-          "from-[#f6e3dc] to-[#f0d2c8]",
-          "from-[#e9eef2] to-[#dbe5ec]",
-          "from-[#f4ecdd] to-[#eadcc2]",
-        ].map((g, i) => (
-          <figure key={i} className="flex flex-col gap-1.5">
-            <div
-              className={`flex aspect-square items-center justify-center rounded-2xl bg-gradient-to-br ${g} text-[#b3a08f]`}
-            >
-              <IconImages width={24} height={24} />
+      <div className="mt-1 album-grid">
+        <figure className="album-fig feature">
+          <div className="thumb bg-gradient-to-br from-[#f6e3dc] to-[#f0d2c8] text-[#b3a08f]">
+            <IconImages width={30} height={30} />
+          </div>
+          <figcaption className="caption">我们的日常</figcaption>
+        </figure>
+        <div className="album-col">
+          <figure className="album-fig flex-1">
+            <div className="thumb square bg-gradient-to-br from-[#e9eef2] to-[#dbe5ec] text-[#9aa7b1]">
+              <IconImages width={22} height={22} />
             </div>
-            <figcaption className="caption truncate">{caps[i]}</figcaption>
+            <figcaption className="caption">未命名 · 秋</figcaption>
           </figure>
-        ))}
+          <figure className="album-fig flex-1">
+            <div className="thumb square bg-gradient-to-br from-[#f4ecdd] to-[#eadcc2] text-[#b3a08f]">
+              <IconImages width={22} height={22} />
+            </div>
+            <figcaption className="caption">某年某月</figcaption>
+          </figure>
+        </div>
       </div>
       <Link
         to="/memory"

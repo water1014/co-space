@@ -843,22 +843,22 @@ textarea:focus {
   background: var(--line);
 }
 
-/* 卷首语：衬线大字 + 首字下沉（杂志经典手法） */
+/* 卷首语：衬线大字引言（中文回退到楷体） */
 .mag-quote {
-  font-family: "Playfair Display", "Kaiti SC", "STKaiti", "KaiTi",
-    "Noto Serif SC", "Songti SC", serif;
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", "Songti SC",
+    serif;
   font-size: 19px;
   line-height: 1.95;
   color: var(--ink);
 }
-.mag-quote.dropcap::first-letter {
-  float: left;
-  font-family: var(--f-display), "Playfair Display", "Songti SC", serif;
-  font-size: 3.1em;
-  line-height: 0.78;
-  padding: 0.05em 0.12em 0 0;
-  font-weight: 600;
+
+/* 卷首语大引号装饰：Playfair 的对开引号，半透明做底纹 */
+.lead-mark {
+  font-family: "Playfair Display", "Songti SC", serif;
+  font-size: 52px;
+  line-height: 0.6;
   color: var(--accent);
+  opacity: 0.22;
 }
 
 /* 图说 */
@@ -866,4 +866,74 @@ textarea:focus {
   font-size: 10.5px;
   letter-spacing: 0.02em;
   color: var(--ink-ghost);
+}
+
+/* 栏目中文副标：放在英文后、细线前 */
+.mag-kicker .zh {
+  color: var(--ink-soft);
+  letter-spacing: 0.06em;
+}
+
+/* 装饰分隔线：两端发丝线，中间一颗品牌色小圆点——刊头/封面收尾用 */
+.mag-rule-dot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mag-rule-dot::before,
+.mag-rule-dot::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.mag-rule-dot > span {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+/* 封面元信息行（ISSUE / MONTHLY 一类编辑式标注） */
+.cover-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* 相册 feature 布局：左一张大图 + 右两张竖图，杂志内页感 */
+.album-grid {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 10px;
+}
+.album-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.album-fig {
+  margin: 0;
+}
+.album-fig .thumb {
+  width: 100%;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.album-fig.feature .thumb {
+  aspect-ratio: 5 / 4;
+}
+.album-fig .thumb.square {
+  aspect-ratio: 1 / 1;
+}
+.album-fig .caption {
+  margin-top: 6px;
 }
