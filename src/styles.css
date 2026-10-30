@@ -1557,3 +1557,36 @@ textarea:focus {
     to { opacity: 1; transform: translateY(0); }
   }
 }
+
+
+/* Apply the shared glass header to the first navigation row on app screens */
+main.scroll-area > div > header:first-child,
+main.scroll-area > div > div > header:first-child {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  isolation: isolate;
+  padding-bottom: 10px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg) 78%, transparent),
+    color-mix(in srgb, var(--bg) 48%, transparent));
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+main.scroll-area > div > header:first-child::after,
+main.scroll-area > div > div > header:first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-bottom: 1px solid var(--line);
+  pointer-events: none;
+}
+main.scroll-area > div > header:first-child button,
+main.scroll-area > div > div > header:first-child button {
+  transition: transform .22s cubic-bezier(.22,1,.36,1), background-color .22s ease;
+}
+main.scroll-area > div > header:first-child button:active,
+main.scroll-area > div > div > header:first-child button:active {
+  transform: scale(.94);
+}
