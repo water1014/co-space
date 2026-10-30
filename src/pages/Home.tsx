@@ -47,6 +47,7 @@ export function Home() {
   const life = useLifeStore();
 
   const days = daysTogether(life.anniversary);
+  const since = life.anniversary?.slice(5).replace("-", ".") ?? "";
   const pending = life.todos.filter((x) => !x.done).length;
 
   const [page, setPage] = useState(0);
@@ -102,26 +103,19 @@ export function Home() {
           </header>
 
           <div className="grid grid-cols-4 gap-x-4 gap-y-6">
-            {/* 双人头像卡片 */}
-            <div className="card col-span-2 flex flex-col justify-center rounded-3xl px-5 py-5">
-              <div className="flex items-center justify-center gap-3">
+            {/* 双人头像 + 在一起时间：长方形主卡 */}
+            <div className="card col-span-4 rounded-[28px] px-6 py-7 text-center">
+              <div className="flex items-center justify-center gap-6">
                 <MiniAvatar initial={t.people.wan[0]} name={t.people.wan} />
-                <IconHeart width={16} height={16} className="text-[var(--accent)]" />
+                <IconHeart width={18} height={18} className="text-[var(--accent)]" />
                 <MiniAvatar initial={t.people.yan[0]} name={t.people.yan} accent />
               </div>
-              <p className="num mt-3 text-center text-[13px] text-ink-faint">
-                在一起 <span className="text-[15px] font-semibold text-[var(--accent)]">{days}</span> 天
+              <p className="mt-6 text-[12px] tracking-[0.34em] text-ink-faint">
+                我 们 在 一 起 的 时 间
               </p>
-            </div>
-
-            {/* 情侣简介卡片 */}
-            <div className="card col-span-2 flex flex-col justify-center rounded-3xl px-5 py-5">
-              <p className="text-[10.5px] tracking-[0.2em] text-ink-faint">COUPLE</p>
-              <p className="serif-display mt-1 text-[19px] leading-tight text-ink">
-                {t.people.wan} &amp; {t.people.yan}
-              </p>
-              <p className="mt-1 text-[12.5px] leading-[1.55] text-ink-soft">
-                一对人机恋人，把日常过成诗
+              <p className="num mt-2 text-[58px] leading-none text-[var(--accent)]">{days}</p>
+              <p className="mt-1.5 text-[11px] tracking-[0.22em] text-ink-faint">
+                DAYS · SINCE {since}
               </p>
             </div>
 
@@ -163,7 +157,7 @@ export function Home() {
 
         {/* ───────── 第 2 屏：记录 & 创作 ───────── */}
         <section className="desk-page px-6 pb-8 pt-12">
-          <SectionHead no="02" zh="记录" en="CREATE" />
+          <SectionHead zh="记录" en="CREATE" />
           <div className="grid grid-cols-4 gap-x-4 gap-y-6">
             {/* 摘抄 / 短句卡片 */}
             <section className="card col-span-4 rounded-3xl p-5">
@@ -202,7 +196,7 @@ export function Home() {
 
         {/* ───────── 第 3 屏：生活工具 ───────── */}
         <section className="desk-page px-6 pb-8 pt-12">
-          <SectionHead no="03" zh="工具" en="TOOLS" />
+          <SectionHead zh="工具" en="TOOLS" />
           <div className="grid grid-cols-4 gap-x-4 gap-y-6">
             {/* 日程概览卡片 */}
             <div className="card col-span-4 flex items-center justify-between rounded-3xl px-5 py-5">
@@ -316,11 +310,10 @@ function MiniAvatar({ initial, name, accent }: { initial: string; name: string; 
   );
 }
 
-/** 分屏小标题（第 2/3 屏） */
-function SectionHead({ no, zh, en }: { no: string; zh: string; en: string }) {
+/** 分屏小标题（第 2/3 屏，无编号，保持留白美） */
+function SectionHead({ zh, en }: { zh: string; en: string }) {
   return (
     <div className="mb-7 flex items-baseline gap-3">
-      <span className="num text-[13px] font-semibold text-[var(--accent)]">{no}</span>
       <h2 className="text-[22px] font-semibold text-ink">{zh}</h2>
       <span className="text-[11px] tracking-[0.24em] text-ink-faint">{en}</span>
     </div>
