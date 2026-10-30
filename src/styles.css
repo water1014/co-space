@@ -785,3 +785,85 @@ textarea:focus {
 .btn-soft:active {
   transform: scale(0.975);
 }
+
+/* ---------------- 杂志风（editorial）+ 玻璃拟态 ---------------- */
+
+/* 展示衬线：Playfair Display 作主字体，中文回退到宋体/楷体 */
+.serif-display {
+  font-family: "Playfair Display", "Songti SC", "STSong", "Noto Serif SC",
+    "SimSun", "Times New Roman", serif;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+/* 封面大卡：更强的玻璃拟态——透彩更实、顶部高光更亮、悬浮投影更深 */
+.glass-cover {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.55) 0%, transparent 36%) no-repeat,
+    linear-gradient(180deg, rgba(226, 96, 95, 0.08), rgba(235, 205, 190, 0.05)),
+    var(--glass-bg);
+  -webkit-backdrop-filter: blur(26px) saturate(165%);
+  backdrop-filter: blur(26px) saturate(165%);
+  border: 1px solid var(--glass-border);
+  border-radius: 26px;
+  box-shadow:
+    0 22px 52px -26px rgba(40, 30, 28, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="night"] .glass-cover {
+  background:
+    linear-gradient(160deg, rgba(255, 240, 232, 0.06) 0%, transparent 36%) no-repeat,
+    linear-gradient(180deg, rgba(226, 96, 95, 0.12), rgba(86, 66, 62, 0.05)),
+    var(--glass-bg);
+  box-shadow:
+    0 22px 54px -24px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 240, 232, 0.08);
+}
+
+/* 栏目眉题：编号 + 大写英文 + 右侧细线，编辑式分栏标记 */
+.mag-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.mag-kicker .no {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.mag-kicker .rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* 卷首语：衬线大字 + 首字下沉（杂志经典手法） */
+.mag-quote {
+  font-family: "Playfair Display", "Kaiti SC", "STKaiti", "KaiTi",
+    "Noto Serif SC", "Songti SC", serif;
+  font-size: 19px;
+  line-height: 1.95;
+  color: var(--ink);
+}
+.mag-quote.dropcap::first-letter {
+  float: left;
+  font-family: var(--f-display), "Playfair Display", "Songti SC", serif;
+  font-size: 3.1em;
+  line-height: 0.78;
+  padding: 0.05em 0.12em 0 0;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* 图说 */
+.caption {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink-ghost);
+}
