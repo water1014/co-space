@@ -106,19 +106,19 @@ export function Home() {
         className="desk-track rise mt-1 min-h-0 flex-1"
       >
         {/* ───────── 第 1 屏：社交互动 ───────── */}
-        <section className="desk-page px-6 pb-8 pt-12">
+        <section className="desk-page home-page px-5 pb-8 pt-9">
           <header className="mb-7">
-            <p className="text-[12px] tracking-[0.08em] text-ink-faint">
+            <p className="home-date text-[11px] tracking-[0.16em] text-ink-faint">
               {`${new Date().getMonth() + 1}月${new Date().getDate()}日 ${WEEK[new Date().getDay()]}`}
             </p>
-            <h1 className="serif-display mt-1 text-[34px] italic leading-[1.05] text-ink">
+            <h1 className="serif-display home-wordmark mt-1 text-[38px] italic leading-[1.02] text-ink">
               Fall in love
             </h1>
           </header>
 
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 双人头像 + days together：柔粉玻璃主卡（参考 Rifugio） */}
-            <div className="soft-rose-card col-span-4 rounded-[26px] px-6 py-8 text-center">
+            <div className="soft-rose-card home-love-card col-span-4 rounded-[30px] px-6 py-8 text-center">
               <div className="flex items-center justify-center gap-5">
                 <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[19px] font-semibold text-[#9c6b52] shadow-md ring-4 ring-white/70">
                   {t.people.wan[0]}
@@ -160,7 +160,7 @@ export function Home() {
           <SectionHead zh="记录" en="CREATE" />
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 摘抄 / 短句卡片 */}
-            <section className="card col-span-4 rounded-3xl p-5">
+            <section className="card home-glass-card col-span-4 rounded-[26px] p-5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] tracking-[0.2em] text-ink-faint">摘句 · FRAGMENT</span>
                 <button
@@ -199,7 +199,7 @@ export function Home() {
           <SectionHead zh="工具" en="TOOLS" />
           <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
             {/* 日程概览卡片 */}
-            <div className="card col-span-4 flex items-center justify-between rounded-3xl px-5 py-5">
+            <div className="card home-glass-card col-span-4 flex items-center justify-between rounded-[26px] px-5 py-5">
               <div className="flex items-end gap-3">
                 <span className="serif-display text-[40px] leading-none text-ink">
                   {new Date().getDate()}
@@ -343,7 +343,7 @@ function HomeAlbumCard() {
   };
 
   return (
-    <div className="card col-span-4 overflow-hidden rounded-3xl">
+    <div className="card home-glass-card col-span-4 overflow-hidden rounded-[26px]">
       <div className="grid grid-cols-3 gap-2 p-3">
         {[0, 1, 2].map((i) => {
           const p = slots[i];
@@ -401,7 +401,7 @@ function MusicCard() {
   }, [playing]);
 
   return (
-    <section className="card col-span-4 flex items-center gap-4 overflow-hidden rounded-3xl p-5">
+    <section className="card home-glass-card col-span-4 flex items-center gap-4 overflow-hidden rounded-[26px] p-5">
       <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white shadow-md shadow-[var(--accent-soft)]">
         <IconPlay width={19} height={19} />
       </span>
