@@ -333,12 +333,12 @@ function Keepsake({
   return (
     <Portal>
       <div
-        className="fixed inset-0 z-[60] flex items-end justify-center bg-black/45 backdrop-blur-[2px]"
+        className="keepsake-backdrop fixed inset-0 z-[60] flex items-end justify-center bg-black/45 backdrop-blur-[2px]"
         onClick={close}
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="keepsake reader-sheet flex max-h-[92vh] w-full max-w-[600px] flex-col rounded-t-[24px] px-4 pb-5 pt-3.5"
+          className="keepsake keepsake-sheet-enter reader-sheet flex max-h-[92vh]" w-full max-w-[600px] flex-col rounded-t-[24px] px-4 pb-5 pt-3.5"
         >
           {/* 元信息 */}
           <div className="flex items-center gap-2 px-0.5">
@@ -400,7 +400,7 @@ function Keepsake({
       {/* 放大看：黑底、整张、不再裁 */}
       {zoom && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/92 p-2"
+          className="keepsake-zoom fixed inset-0 z-[70] flex items-center justify-center bg-black/92 p-2"
           onClick={() => setZoom(false)}
         >
           <img
