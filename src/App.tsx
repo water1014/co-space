@@ -13,6 +13,10 @@ const Diary = lazy(() =>
   import("./pages/Diary").then((m) => ({ default: m.Diary })),
 );
 import { Mit } from "./pages/Mit";
+import { Moments } from "./pages/Moments";
+import { Studio } from "./pages/Studio";
+import { Lounge } from "./pages/Lounge";
+import { Module } from "./pages/Module";
 import { useRelationEngine } from "./lib/relation/engine";
 import { useThemeStore, applyAppearanceVars } from "./stores/themeStore";
 import { useMemoryStore } from "./stores/memoryStore";
@@ -51,6 +55,15 @@ export default function App() {
           <Route path="/together" element={<Together />} />
           <Route path="/diary" element={<Diary />} />
           <Route path="/mit" element={<Mit />} />
+          <Route path="/moments" element={<Moments />} />
+          <Route path="/studio" element={<Studio />} />
+          <Route path="/lounge" element={<Lounge />} />
+          <Route path="/calendar" element={<Module kind="calendar" />} />
+          <Route path="/travel" element={<Module kind="travel" />} />
+          <Route path="/music" element={<Module kind="music" />} />
+          <Route path="/health" element={<Module kind="health" />} />
+          <Route path="/ledger" element={<Module kind="ledger" />} />
+          <Route path="/budget" element={<Module kind="budget" />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

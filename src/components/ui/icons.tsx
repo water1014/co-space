@@ -230,3 +230,90 @@ export const IconRefresh = (p: SVGProps<SVGSVGElement>) => (
     <path d="M20 4v3.4h-3.4" />
   </svg>
 );
+
+/** 日历（共享日历 / 纪念日 / 约会计划） */
+export const IconCalendar = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="4" y="5" width="16" height="15" rx="2.6" />
+    <path d="M4 9.5h16" />
+    <path d="M8.5 3v4M15.5 3v4" />
+    <path d="M8 14h3" />
+  </svg>
+);
+
+/** 音乐（共享歌单 / 同步听歌） */
+export const IconMusic = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M9 17.5V6l10-2v11.5" />
+    <circle cx="6.8" cy="17.5" r="2.4" />
+    <circle cx="16.8" cy="15.5" r="2.4" />
+    <path d="M16.8 15.5V8.5" />
+  </svg>
+);
+
+/** 旅游（出行打卡 / 旅行轨迹） */
+export const IconTravel = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="8.4" />
+    <path d="M15.6 8.4 12.8 12.8 8.4 14.1 11.2 9.7z" />
+  </svg>
+);
+
+/** 健康（作息 / 健康打卡） */
+export const IconHealth = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M3 12h4l2-5 3.2 9 2-6 1.4 2.2H21" />
+  </svg>
+);
+
+/** 额度（共同预算管理） */
+export const IconWallet = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="3" y="6.5" width="18" height="12" rx="2.6" />
+    <path d="M3 10.5h18" />
+    <circle cx="16.5" cy="14" r="1.3" />
+  </svg>
+);
+
+/** 朋友圈（情侣动态广场） */
+export const IconMoments = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <circle cx="9" cy="9" r="3.2" />
+    <path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" />
+    <circle cx="16.6" cy="10" r="2.6" />
+    <path d="M14.8 15.4a5 5 0 0 1 5.6 3.6" />
+  </svg>
+);
+
+/** 生图室（AI 插画生成） */
+export const IconStudio = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="4" y="5" width="16" height="14" rx="2.6" />
+    <circle cx="9" cy="10" r="1.6" />
+    <path d="M6 17l4-4 3 2.4 2-1.6 3 3" />
+    <path d="M17 3.2l.9 2.3 2.3.9-2.3.9L17 9.6l-.9-2.3-2.3-.9 2.3-.9z" />
+  </svg>
+);
+
+/** 共读听影（同步读书 / 观影 / 听音频） */
+export const IconLounge = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M4.5 14v-1.6a7.5 7.5 0 0 1 15 0V14" />
+    <path d="M4.5 14a2 2 0 0 1 2 2v2a2 2 0 0 1-4 0v-2a2 2 0 0 1 2-2z" />
+    <path d="M19.5 14a2 2 0 0 1 2 2v2a2 2 0 0 1-4 0v-2a2 2 0 0 1 2-2z" />
+  </svg>
+);
+
+/** 记忆（珍贵瞬间存档合集） */
+export const IconMemory = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M7 5.5h10a1 1 0 0 1 1 1V20l-6-3.6L6 20V6.5a1 1 0 0 1 1-1z" />
+  </svg>
+);
+
+/** 一对一联系（快捷呼叫 / 消息直达） */
+export const IconPhone = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M6.5 4h3l1.5 4-2 1.6a11 11 0 0 0 5 5l1.6-2 4 1.5v3a2 2 0 0 1-2.2 2A15 15 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4z" />
+  </svg>
+);
