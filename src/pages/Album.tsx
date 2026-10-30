@@ -94,17 +94,17 @@ export function Album() {
   };
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden">
+    <div className="album-page editorial-page relative flex h-full flex-col overflow-hidden">
       <header className="px-5 pt-5">
         <BackButton />
       </header>
 
       {/* 标题：September | 2026 · KEEPSAKES */}
-      <div className="px-5 pt-4">
+      <div className="album-heading relative px-5 pt-4">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-start gap-2.5">
-              <h1 className="serif-display text-[29px] leading-none text-ink">
+              <h1 className="album-title serif-display text-[29px] leading-none text-ink">
                 {MON_FULL[month]}
               </h1>
               <span className="mt-1 h-[22px] w-px flex-none bg-[var(--line-strong)]" />
@@ -225,7 +225,7 @@ export function Album() {
         ) : view === "grid" ? (
           <div className="columns-2 gap-2.5">
             {visible.map((p) => (
-              <figure key={p.id} className="mb-2.5 break-inside-avoid">
+              <figure key={p.id} className="album-photo-card mb-2.5 break-inside-avoid">
                 <button
                   onClick={() => setOpenId(p.id)}
                   className="album-thumb press block w-full overflow-hidden"
