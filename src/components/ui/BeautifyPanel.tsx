@@ -37,7 +37,7 @@ export function BeautifyPanel({ open, onClose }: { open: boolean; onClose: () =>
             <IconClose width={15} height={15} />
           </button>
         </div>
-        <p className="mt-0.5 text-[12.5px] text-ink-faint">挑一套喜欢的配色，全站即时生效</p>
+        <p className="mt-0.5 text-[12.5px] text-ink-faint">镜花、水月与月相，挑一层喜欢的光，全站即时生效</p>
 
         <p className="mt-5 mb-2.5 text-[11px] tracking-[0.16em] text-ink-faint">主题色</p>
         <div className="grid grid-cols-5 gap-3">
@@ -132,7 +132,7 @@ export function BeautifyPanel({ open, onClose }: { open: boolean; onClose: () =>
         </div>
 
         <p className="mt-4 text-center text-[11.5px] text-ink-ghost">
-          更多小组件排版，正在路上 ✦
+          镜中有花，水中有月 · 让这里成为两个人的倒影 ✦
         </p>
       </div>
     </div>
