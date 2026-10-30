@@ -21,6 +21,7 @@ import {
   VoiceBubble,
 } from "../components/chat/parts";
 import { Sheet } from "../components/ui/kit";
+import { Portal } from "../components/ui/Portal";
 import {
   IconChevron,
   IconCheck,
@@ -286,7 +287,7 @@ function ChatHeader() {
       )}
 
       {confirming && (
-        <>
+        <Portal>
           <div className="fixed inset-0 z-40" onClick={() => setConfirming(false)} />
           <div
             className="glass fixed bottom-24 left-1/2 z-50 w-[86%] max-w-sm -translate-x-1/2 rounded-3xl p-4"
@@ -311,12 +312,12 @@ function ChatHeader() {
               </button>
             </div>
           </div>
-        </>
+        </Portal>
       )}
 
       {/* 会话历史抽屉：从右侧滑出，参考图「我们说过的话」 */}
       {drawer === "history" && (
-        <>
+        <Portal>
           <div className="fixed inset-0 z-40 bg-black/10" onClick={() => setDrawer(null)} />
           <div
             className="glass-solid fixed inset-y-0 right-0 z-50 flex w-[88%] max-w-sm flex-col border-l border-[var(--line)] bg-[var(--glass-solid)] px-4 pb-6 pt-6 backdrop-blur-2xl"
@@ -396,43 +397,52 @@ function ChatHeader() {
               )}
             </div>
           </div>
-        </>
+        </Portal>
       )}
 
-      {/* 模型胶囊抽屉 */}
+      {/* 模型面板：底部居中弹出（原来 fixed 被页面转场困住，会飘到屏幕右上） */}
       {drawer === "model" && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setDrawer(null)} />
+        <Portal>
           <div
-            className="glass fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 rounded-3xl p-4"
+            className="fixed inset-0 z-40 bg-black/15"
+            onClick={() => setDrawer(null)}
+          />
+          <div
+            className="sheet-panel fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[520px] rounded-t-[26px] px-5 pb-8 pt-3"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="eyebrow">模型 · 本版走本地回应层</p>
-            <div className="mt-2.5 space-y-1">
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[var(--line-strong)]" />
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-[16px] font-semibold text-ink">模型</h2>
+              <span className="text-[11px] text-ink-faint">本版走本地回应层</span>
+            </div>
+            <div className="mt-3 space-y-1">
               {["Opus 4.6", "Sonnet 4.6", "本地回应层"].map((m, i) => (
                 <div
                   key={m}
-                  className="flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5"
+                  className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 ${
+                    i === 0 ? "bg-[var(--accent-soft)]" : ""
+                  }`}
                 >
                   <span className="flex-1 text-[14px] text-ink">{m}</span>
                   {i === 0 && (
                     <span className="text-[var(--accent)]">
-                      <IconCheck width={14} height={14} strokeWidth={2.2} />
+                      <IconCheck width={15} height={15} strokeWidth={2.2} />
                     </span>
                   )}
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-[11px] text-ink-faint">
+            <p className="mt-3 px-1 text-[11.5px] leading-[1.8] text-ink-faint">
               接真实模型：设置页填接口地址与 Key。
             </p>
           </div>
-        </>
+        </Portal>
       )}
 
       {/* 项目抽屉：切换「家」 */}
       {drawer === "projects" && (
-        <>
+        <Portal>
           <div className="fixed inset-0 z-40 bg-black/10" onClick={() => setDrawer(null)} />
           <div
             className="glass-solid fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-[600px] rounded-t-3xl border-t border-[var(--line)] bg-[var(--glass-solid)] px-5 pb-8 pt-4 backdrop-blur-2xl"
@@ -517,7 +527,7 @@ function ChatHeader() {
               + 新建 project
             </button>
           </div>
-        </>
+        </Portal>
       )}
     </header>
   );
