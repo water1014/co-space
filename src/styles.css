@@ -50,12 +50,12 @@
   --shadow-bar: 0 -1px 0 rgba(40, 30, 28, 0.06);
   --shadow-glass: 0 12px 32px -16px rgba(40, 30, 28, 0.28);
 
-  /* 磨砂玻璃容器：半透明 + 背景模糊 + 顶部内高光 */
-  --glass-bg: rgba(255, 255, 255, 0.52);
-  --glass-bg-strong: rgba(255, 255, 255, 0.68);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-sheen: rgba(255, 255, 255, 0.75);
-  --glass-blur: 18px;
+  /* 磨砂玻璃容器：更实一点，透出的杂色更少，材质更干净 */
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-bg-strong: rgba(255, 255, 255, 0.76);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-sheen: rgba(255, 255, 255, 0.5);
+  --glass-blur: 20px;
 
   --f-display: "Noto Sans SC", -apple-system, BlinkMacSystemFont,
     "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
@@ -101,12 +101,12 @@
   --shadow-bar: 0 -1px 0 rgba(255, 240, 232, 0.07);
   --shadow-glass: 0 16px 36px -16px rgba(0, 0, 0, 0.6);
 
-  /* 磨砂玻璃容器（夜间：深色半透明，彩斑透出更明显） */
-  --glass-bg: rgba(38, 32, 28, 0.5);
-  --glass-bg-strong: rgba(40, 34, 30, 0.66);
+  /* 磨砂玻璃容器（夜间：深色半透明，柔光透出更克制） */
+  --glass-bg: rgba(38, 32, 28, 0.56);
+  --glass-bg-strong: rgba(40, 34, 30, 0.72);
   --glass-border: rgba(255, 240, 232, 0.12);
-  --glass-sheen: rgba(255, 240, 232, 0.09);
-  --glass-blur: 18px;
+  --glass-sheen: rgba(255, 240, 232, 0.07);
+  --glass-blur: 20px;
 
   color-scheme: dark;
 }
@@ -179,14 +179,14 @@ body {
 
 /* ---------------- 背景：暖白底 + 柔彩光斑，供磨砂玻璃透出 ---------------- */
 
+/* 背景：干净的暖白底 + 右上角极淡桃色光晕 + 左上角极淡绯红。
+   只保留同色调柔光，不堆彩色光斑——高级感来自克制。 */
 .app-bg {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(42% 36% at 14% 12%, rgba(226, 96, 95, 0.2) 0%, transparent 70%),
-    radial-gradient(44% 38% at 86% 8%, rgba(122, 180, 208, 0.17) 0%, transparent 72%),
-    radial-gradient(46% 40% at 80% 84%, rgba(230, 186, 118, 0.18) 0%, transparent 72%),
-    radial-gradient(48% 42% at 16% 90%, rgba(158, 200, 168, 0.15) 0%, transparent 74%),
+    radial-gradient(58% 42% at 84% -8%, rgba(235, 205, 190, 0.5) 0%, transparent 60%),
+    radial-gradient(48% 40% at 4% 1%, rgba(226, 96, 95, 0.06) 0%, transparent 58%),
     var(--bg);
   overflow: hidden;
   transition: background 0.45s ease;
@@ -215,13 +215,11 @@ body {
   opacity: 1;
 }
 
-/* 夜间：光斑更饱和、底色更沉，磨砂玻璃的透彩感更强 */
+/* 夜间：沉底 + 单色柔光，磨砂玻璃的透彩感克制 */
 [data-theme="night"] .app-bg {
   background:
-    radial-gradient(44% 38% at 14% 12%, rgba(226, 96, 95, 0.24) 0%, transparent 70%),
-    radial-gradient(46% 40% at 86% 8%, rgba(96, 150, 196, 0.2) 0%, transparent 72%),
-    radial-gradient(48% 42% at 80% 84%, rgba(212, 168, 104, 0.18) 0%, transparent 72%),
-    radial-gradient(50% 44% at 16% 90%, rgba(122, 172, 142, 0.16) 0%, transparent 74%),
+    radial-gradient(60% 44% at 86% -8%, rgba(86, 66, 62, 0.6) 0%, transparent 60%),
+    radial-gradient(50% 42% at 6% 1%, rgba(226, 96, 95, 0.1) 0%, transparent 58%),
     var(--bg);
 }
 
@@ -243,13 +241,13 @@ body {
 .glass {
   position: relative;
   background:
-    linear-gradient(150deg, var(--glass-sheen) 0%, transparent 42%) no-repeat,
+    linear-gradient(150deg, var(--glass-sheen) 0%, transparent 28%) no-repeat,
     var(--glass-bg);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(155%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(155%);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  box-shadow: var(--shadow-glass), inset 0 1px 0 var(--glass-sheen);
+  border-radius: 22px;
+  box-shadow: var(--shadow-glass), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transition:
     background-color 0.35s ease,
     border-color 0.35s ease;

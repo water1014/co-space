@@ -38,18 +38,15 @@ function nowTime() {
 function todayLabel(d = new Date()) {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${WEEK[d.getDay()]}`;
 }
-function isoDate(d = new Date()) {
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
-    d.getDate(),
-  ).padStart(2, "0")}`;
-}
+
+/** 入场动画的错峰延迟，让页面像依次浮现 */
+const rise = (ms: number) => ({ animationDelay: `${ms}ms` } as const);
 
 /**
- * 首页（排布参考「河床 / Cotton」，模块取自淼淼定稿草图）：
- * 左上大标题 + 右上时间/汉堡侧边栏；
- * Hero 磨砂卡（双头像 + 红线 + 在一起 N 天大数字 + 日期）；
- * 「写给你的话」卡（模型生成）；两列：今日打卡 / 待办清单；
- * 天气通栏卡；音乐卡；相册卡；底部悬浮胶囊三栏导航。
+ * 首页 v2（审美重构）：
+ * 干净的暖白底 + 单色柔光；Hero 以「在一起 N 天」为视觉主角；
+ * 统一的圆角与间距节奏；克制的入场动画；
+ * 保留写给你的话 / 今日打卡 / 待办 / 天气 / 音乐 / 相册 / 侧边栏。
  */
 export function Home() {
   const t = useText();
@@ -94,48 +91,53 @@ export function Home() {
   const pendingTodos = life.todos.filter((x) => !x.done).slice(0, 3);
 
   return (
-    <div className="relative flex flex-col px-5 pb-4 pt-9">
-      {/* 顶栏：左汉堡侧边栏，右上时间 */}
+    <div className="relative flex flex-col px-5 pb-6 pt-9">
+      {/* 顶栏：左汉堡、右时间 */}
       <header className="flex items-center justify-between">
         <button
           onClick={() => setSidebar(true)}
-          className="tap -ml-1 flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
+          className="tap -ml-1 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] text-ink-soft transition-colors hover:bg-[var(--surface-2)]"
           aria-label="菜单"
         >
-          <IconMenu width={22} height={22} />
+          <IconMenu width={20} height={20} />
         </button>
-        <p className="num text-[14px] font-semibold tracking-[0.05em] text-ink">{time}</p>
+        <div className="text-right">
+          <p className="num text-[15px] font-semibold leading-none text-ink">{time}</p>
+          <p className="mt-0.5 text-[11px] tracking-[0.12em] text-ink-faint">{todayLabel()}</p>
+        </div>
       </header>
 
-      {/* 左上大标题（参考「Home / Fall in love」） */}
-      <div className="mt-1">
-        <p className="page-title">主页</p>
-        <p className="mt-0.5 text-[12px] tracking-[0.06em] text-ink-faint">Fall in love</p>
+      {/* 标题区：英文眉题 + 大标题 */}
+      <div className="rise mt-6" style={rise(40)}>
+        <p className="text-[11px] font-semibold tracking-[0.34em] text-[var(--accent)]">
+          FALL IN LOVE
+        </p>
+        <h1 className="page-title mt-1.5">主页</h1>
       </div>
 
-      {/* Hero 磨砂卡：双头像 + 红线 + 在一起 N 天 + 日期 */}
-      <section className="glass mt-4 rounded-3xl px-5 py-6 text-center">
-        <div className="flex items-center justify-center gap-7">
+      {/* Hero：双头像 + 爱心 + 在一起 N 天（视觉主角） */}
+      <section className="glass rise mt-5 rounded-3xl px-6 py-7 text-center" style={rise(100)}>
+        <div className="flex items-center justify-center gap-4">
           <AvatarBlock initial={t.people.wan[0]} name={t.people.wan} />
-          <RedThread />
+          <IconHeart width={17} height={17} strokeWidth={1.6} className="text-[var(--accent)]" />
           <AvatarBlock initial={t.people.yan[0]} name={t.people.yan} accent />
         </div>
-        <p className="mt-4">
-          <span className="num text-[56px] font-semibold leading-none text-[var(--accent)]">
+        <p className="mt-6 flex items-baseline justify-center gap-1.5">
+          <span className="num text-[62px] font-semibold leading-none text-[var(--accent)]">
             {days}
           </span>
-          <span className="ml-2 text-[15px] text-ink-soft">天</span>
+          <span className="text-[18px] font-medium text-ink-soft">天</span>
         </p>
-        <p className="num mt-1.5 text-[12.5px] tracking-[0.1em] text-ink-faint">{isoDate()}</p>
+        <p className="mt-2.5 text-[12px] tracking-[0.34em] text-ink-faint">在 一 起</p>
       </section>
 
-      {/* 他今天写的话（模型生成） */}
-      <section className="glass relative mt-4 rounded-3xl p-5">
-        <span className="absolute -top-3 right-5 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-3 py-1 text-[11px] text-[var(--accent-deep)] backdrop-blur-xl">
-          写给你的话…
-        </span>
-        <p className="text-[12px] text-ink-faint">他今天写的话</p>
-        <p className="kai mt-2 min-h-[72px] text-[17px] leading-[2] text-ink">
+      {/* 他今天写的话（模型生成，信件式排版） */}
+      <section className="glass rise relative mt-4 rounded-3xl p-5" style={rise(160)}>
+        <div className="flex items-center gap-2">
+          <IconHeart width={14} height={14} strokeWidth={1.6} className="text-[var(--accent)]" />
+          <span className="text-[13.5px] font-semibold text-ink">写给你的话</span>
+        </div>
+        <p className="kai mt-3 min-h-[76px] text-[18px] leading-[1.95] text-ink">
           {loading ? "正在想今天要对你说的话…" : msg?.text}
         </p>
         <div className="mt-3 flex items-center justify-between border-t border-[var(--line)] pt-3">
@@ -152,7 +154,7 @@ export function Home() {
               <IconRefresh width={13} height={13} className={loading ? "animate-spin" : ""} />
               换一句
             </button>
-            <Link to="/chat" className="text-[13px] text-[var(--accent)]">
+            <Link to="/chat" className="text-[13px] font-medium text-[var(--accent)]">
               去聊聊 ›
             </Link>
           </div>
@@ -160,34 +162,38 @@ export function Home() {
       </section>
 
       {/* 两列：今日打卡 / 待办清单 */}
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <Link to="/together" className="glass press rounded-3xl p-4 text-left">
+      <div className="rise mt-4 grid grid-cols-2 gap-3" style={rise(220)}>
+        <Link to="/together" className="glass press rounded-3xl p-[18px] text-left">
           <h3 className="text-[15px] font-semibold text-ink">今日打卡</h3>
-          <p className="mt-2 text-[13px] text-ink">已记 {checkinCount} 件小事</p>
-          <p className="mt-1 text-[11.5px] leading-[1.6] text-ink-faint">
-            连续记录有小惊喜哦~
+          <p className="num mt-2.5 text-[26px] font-semibold leading-none text-ink">
+            {checkinCount}
           </p>
-          <span className="mt-2 inline-block text-[12px] text-[var(--accent)]">去记录 ›</span>
+          <p className="mt-1.5 text-[12px] leading-[1.5] text-ink-faint">
+            件小事已记录
+          </p>
+          <span className="mt-3 inline-block text-[12px] font-medium text-[var(--accent)]">
+            去记录 ›
+          </span>
         </Link>
 
-        <section className="glass rounded-3xl p-4">
+        <section className="glass rounded-3xl p-[18px]">
           <div className="flex items-center justify-between">
             <h3 className="text-[15px] font-semibold text-ink">待办清单</h3>
             <Link
               to="/together"
               aria-label="添加待办"
-              className="tap text-ink-faint hover:text-[var(--accent)]"
+              className="tap flex h-6 w-6 items-center justify-center rounded-full text-ink-faint transition-colors hover:bg-[var(--accent-soft)] hover:text-[var(--accent)]"
             >
-              <IconPlus width={16} height={16} />
+              <IconPlus width={15} height={15} />
             </Link>
           </div>
-          <ul className="mt-2 space-y-1.5">
+          <ul className="mt-3 space-y-2">
             {pendingTodos.length === 0 ? (
               <li className="text-[12px] text-ink-faint">都清空啦，真棒</li>
             ) : (
               pendingTodos.map((td) => (
                 <li key={td.id} className="flex items-center gap-2">
-                  <span className="h-[14px] w-[14px] flex-none rounded-full border border-[var(--line-strong)]" />
+                  <span className="h-[13px] w-[13px] flex-none rounded-full border border-[var(--line-strong)]" />
                   <span className="min-w-0 flex-1 truncate text-[12.5px] text-ink">
                     {td.text}
                   </span>
@@ -199,16 +205,24 @@ export function Home() {
       </div>
 
       {/* 天气通栏卡 */}
-      <WeatherCard />
+      <div className="rise mt-4" style={rise(280)}>
+        <WeatherCard />
+      </div>
 
       {/* 音乐卡 */}
-      <MusicCard />
+      <div className="rise mt-4" style={rise(340)}>
+        <MusicCard />
+      </div>
 
       {/* 相册模块 */}
-      <AlbumCard />
+      <div className="rise mt-4" style={rise(400)}>
+        <AlbumCard />
+      </div>
 
       <footer className="mt-8">
-        <p className="text-center text-[12px] text-ink-faint">{t.home.footer}</p>
+        <p className="text-center text-[11.5px] tracking-[0.04em] text-ink-faint">
+          {t.home.footer}
+        </p>
       </footer>
 
       <Sidebar open={sidebar} onClose={() => setSidebar(false)} footer={t.home.footer} />
@@ -216,7 +230,7 @@ export function Home() {
   );
 }
 
-/** 头像 + 名字（左侧暖沙渐变 / 右侧品牌绯红渐变） */
+/** 头像 + 名字（左侧暖沙渐变 / 右侧品牌绯红渐变，加细描边） */
 function AvatarBlock({
   initial,
   name,
@@ -229,39 +243,23 @@ function AvatarBlock({
   return (
     <div className="flex flex-col items-center gap-2">
       <Avatar
-        size={62}
+        size={56}
         className={
           accent
-            ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] shadow-lg shadow-[var(--accent-soft)]"
-            : "bg-gradient-to-br from-[#f6e7dc] to-[#ecd0c0] shadow-md"
+            ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] shadow-lg shadow-[var(--accent-soft)] ring-2 ring-white/70"
+            : "bg-gradient-to-br from-[#f6e7dc] to-[#e9cdbd] shadow-md ring-2 ring-white/70"
         }
       >
         <span
-          className={`text-[19px] font-semibold ${
+          className={`text-[18px] font-semibold ${
             accent ? "text-white" : "text-[#9c6b52]"
           }`}
         >
           {initial}
         </span>
       </Avatar>
-      <span className="text-[12.5px] font-medium text-ink-soft">{name}</span>
+      <span className="text-[12px] font-medium text-ink-soft">{name}</span>
     </div>
-  );
-}
-
-/** 你 ↔ 角色 之间的一根红线（命运感） */
-function RedThread() {
-  return (
-    <svg width="44" height="22" viewBox="0 0 44 22" fill="none" aria-hidden>
-      <path
-        d="M3 11 C 13 3, 17 19, 22 11 S 35 3, 41 11"
-        stroke="var(--accent)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeDasharray="1 4"
-      />
-      <circle cx="22" cy="11" r="2.4" fill="var(--accent)" />
-    </svg>
   );
 }
 
@@ -311,21 +309,21 @@ function WeatherCard() {
   }, []);
 
   return (
-    <section className="glass mt-3 flex items-center gap-4 rounded-3xl p-4">
-      <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
-        <IconSun width={20} height={20} />
+    <section className="glass flex items-center gap-4 rounded-3xl p-5">
+      <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-[var(--accent-soft)] text-[var(--accent-deep)]">
+        <IconSun width={22} height={22} />
       </span>
       <div className="min-w-0 flex-1">
         {w.state === "ok" ? (
-          <p className="num text-[24px] leading-none text-ink">
-            {w.temp}°<span className="ml-1.5 text-[13px] text-ink-faint">{w.label}</span>
+          <p className="num text-[26px] leading-none text-ink">
+            {w.temp}°<span className="ml-2 text-[13px] text-ink-faint">{w.label}</span>
           </p>
         ) : (
-          <p className="num text-[18px] leading-none text-ink-faint">
-            {w.state === "loading" ? "定位中…" : "--"}
+          <p className="num text-[19px] leading-none text-ink-faint">
+            {w.state === "loading" ? "定位中…" : "未连接定位"}
           </p>
         )}
-        <p className="mt-1.5 text-[12px] text-ink-faint">{todayLabel()}</p>
+        <p className="mt-1.5 text-[12px] text-ink-faint">今天天气</p>
       </div>
     </section>
   );
@@ -343,24 +341,24 @@ function MusicCard() {
   }, [playing]);
 
   return (
-    <section className="glass mt-3 overflow-hidden rounded-3xl p-4">
-      <div className="flex items-center gap-3">
-        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white">
+    <section className="glass overflow-hidden rounded-3xl p-5">
+      <div className="flex items-center gap-4">
+        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white shadow-md shadow-[var(--accent-soft)]">
           <IconPlay width={22} height={22} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[14px] font-medium text-ink">晚安，淼淼</p>
+          <p className="truncate text-[14.5px] font-medium text-ink">晚安，淼淼</p>
           <p className="truncate text-[12px] text-ink-faint">宋祁 · 私房歌单</p>
         </div>
         <button
           onClick={() => setPlaying((v) => !v)}
-          className="tap flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink"
+          className="tap flex h-10 w-10 items-center justify-center rounded-full bg-[var(--surface-2)] text-ink transition-colors hover:bg-[var(--accent-soft)]"
           aria-label={playing ? "暂停" : "播放"}
         >
           {playing ? <IconPause width={18} height={18} /> : <IconPlay width={18} height={18} />}
         </button>
       </div>
-      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
+      <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
         <div
           className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-1000"
           style={{ width: `${p}%` }}
@@ -373,14 +371,14 @@ function MusicCard() {
 /** 相册模块：横向 3 个图片占位框 */
 function AlbumCard() {
   return (
-    <section className="glass mt-3 rounded-3xl p-4">
+    <section className="glass rounded-3xl p-5">
       <div className="flex items-center justify-between">
         <h2 className="card-title text-ink">相册</h2>
         <Link to="/memory" className="text-[12px] text-ink-faint">
           全部 ›
         </Link>
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <div className="mt-3.5 grid grid-cols-3 gap-2.5">
         {[
           "from-[#f6e3dc] to-[#f0d2c8]",
           "from-[#e9eef2] to-[#dbe5ec]",
@@ -447,7 +445,7 @@ function Sidebar({
               key={to}
               to={to}
               onClick={onClose}
-              className="flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] text-ink hover:bg-[var(--accent-soft)]"
+              className="flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] text-ink transition-colors hover:bg-[var(--accent-soft)]"
             >
               <Icon width={19} height={19} className="text-ink-soft" />
               {label}
