@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="relative h-full w-full overflow-hidden">
       <BackgroundLayer />
 
-      <div className="relative flex h-full w-full justify-center">
+      <div className="pocket-shell relative flex h-full w-full justify-center">
         <div className="relative flex h-full w-full max-w-[600px] flex-col">
           <main
             key={location.pathname}
@@ -80,7 +80,7 @@ function TabBar({ onBeauty }: { onBeauty: () => void }) {
       className="fixed inset-x-0 bottom-0 z-40"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
     >
-      <div className="mx-auto flex w-[min(64%,300px)] items-center rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-3 py-1.5 shadow-[var(--shadow-float)] backdrop-blur-2xl">
+      <div className="pocket-dock mx-auto flex w-[min(68%,320px)] items-center rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-3 py-1.5 shadow-[var(--shadow-float)] backdrop-blur-2xl">
         {TAB_DEFS.map((item, i) =>
           item.kind === "route" ? (
             <NavLink
