@@ -3175,3 +3175,324 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:
 @media (prefers-reduced-motion: reduce) {
   .partner-page *, .partner-page *::before, .partner-page *::after { scroll-behavior:auto !important; }
 }
+
+
+/* ===== 镜花水月 · 月庭横向全景 v2 ===== */
+.moon-home {
+  --moon-ink:#425d70;
+  --moon-muted:#8298a7;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  width:100vw;
+  height:100%;
+  min-height:100%;
+  margin-left:calc(50% - 50vw);
+  overflow:hidden;
+  color:var(--moon-ink);
+  background:
+    radial-gradient(ellipse at 50% -10%,rgba(218,232,240,.88),transparent 58%),
+    linear-gradient(180deg,#f3f6f6 0%,#e8eef1 100%);
+}
+[data-theme="night"] .moon-home {
+  --moon-ink:#e5edf3;
+  --moon-muted:#aabccc;
+  background:
+    radial-gradient(ellipse at 50% -10%,rgba(76,99,122,.42),transparent 58%),
+    linear-gradient(180deg,#1b2937 0%,#111d2a 100%);
+}
+.moon-home-head {
+  position:relative;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex:none;
+  padding:max(13px,env(safe-area-inset-top)) clamp(18px,4vw,48px) 12px;
+}
+.moon-kicker {
+  margin:0 0 2px;
+  color:#91a9b8;
+  font:500 9px/1.4 Inter,sans-serif;
+  letter-spacing:.24em;
+}
+.moon-home-head h1 {
+  margin:0;
+  color:var(--moon-ink);
+  font:500 clamp(23px,3vw,32px)/1.2 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.16em;
+}
+.moon-motto {
+  margin:5px 0 0;
+  color:var(--moon-muted);
+  font:11px/1.5 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.08em;
+}
+.moon-days {
+  display:flex;
+  align-items:baseline;
+  gap:4px;
+  flex:none;
+  color:var(--moon-muted);
+  font-size:10px;
+  letter-spacing:.1em;
+}
+.moon-days strong {
+  color:var(--moon-ink);
+  font:italic 29px/1 Georgia,serif;
+}
+.moon-panorama-wrap {
+  position:relative;
+  display:flex;
+  flex:1 1 auto;
+  flex-direction:column;
+  min-height:0;
+}
+.moon-scene-viewport {
+  position:relative;
+  flex:1 1 auto;
+  width:100%;
+  min-height:360px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  touch-action:pan-x pan-y;
+  scroll-behavior:smooth;
+  outline:none;
+}
+.moon-scene-viewport::-webkit-scrollbar {display:none}
+.moon-scene {
+  position:relative;
+  flex:none;
+  width:1180px;
+  height:664px;
+  overflow:hidden;
+  isolation:isolate;
+  background:#263b4b;
+}
+.moon-artwork {
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  background:#263b4b;
+}
+.moon-artwork-image {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  user-select:none;
+  pointer-events:none;
+  animation:moon-artwork-arrive .9s ease both;
+}
+@keyframes moon-artwork-arrive {
+  from {opacity:.72;filter:brightness(.96)}
+  to {opacity:1;filter:brightness(1)}
+}
+.moon-scene-brand {
+  position:absolute;
+  z-index:2;
+  top:4.2%;
+  left:3.5%;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:rgba(250,249,244,.96);
+  text-shadow:0 2px 15px rgba(15,32,49,.52);
+  pointer-events:none;
+}
+.moon-brand-title {
+  font:400 29px/1.2 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.18em;
+}
+.moon-brand-divider {font-size:17px;opacity:.82}
+.moon-brand-motto {
+  max-width:190px;
+  font:10px/1.8 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.1em;
+  opacity:.9;
+}
+.moon-scene-meta {
+  position:absolute;
+  z-index:2;
+  top:4.5%;
+  right:3.5%;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:rgba(250,249,244,.92);
+  font:10px/1.5 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.12em;
+  text-shadow:0 2px 12px rgba(15,32,49,.55);
+  pointer-events:none;
+}
+.moon-scene-meta span:first-child {font-size:18px}
+.moon-scene-meta i {width:1px;height:23px;background:rgba(255,255,255,.48)}
+.moon-hotspot {
+  position:absolute;
+  z-index:4;
+  display:flex;
+  min-width:126px;
+  min-height:70px;
+  padding:8px 12px;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:4px;
+  color:#fff;
+  text-align:left;
+  text-decoration:none;
+  transform:translate(-50%,-50%);
+  border:1px solid transparent;
+  border-radius:3px;
+  background:transparent;
+  cursor:pointer;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .36s cubic-bezier(.2,.8,.2,1),filter .36s ease;
+}
+.moon-hotspot::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  border:1px solid rgba(255,255,255,.34);
+  border-radius:3px;
+  background:linear-gradient(110deg,rgba(27,45,62,.34),rgba(27,45,62,.08));
+  opacity:0;
+  -webkit-backdrop-filter:blur(9px);
+  backdrop-filter:blur(9px);
+  box-shadow:0 8px 28px rgba(16,30,43,.14),inset 0 1px 0 rgba(255,255,255,.2);
+  transition:opacity .32s ease;
+}
+.moon-hotspot::after {
+  content:"";
+  position:absolute;
+  top:2px;
+  left:0;
+  width:36px;
+  height:1px;
+  background:rgba(248,241,224,.86);
+  opacity:.8;
+}
+.moon-hotspot-name {
+  color:rgba(255,253,248,.97);
+  font:500 22px/1.35 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.16em;
+  text-shadow:0 2px 13px rgba(12,27,42,.76);
+}
+.moon-hotspot-note {
+  color:rgba(250,248,242,.88);
+  font:10px/1.5 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.07em;
+  text-shadow:0 1px 9px rgba(12,27,42,.8);
+  opacity:.86;
+  transition:opacity .3s ease,transform .3s ease;
+}
+.moon-hotspot-mark {
+  position:absolute;
+  right:7px;
+  top:5px;
+  color:rgba(255,247,224,.85);
+  font-size:11px;
+  opacity:0;
+  transform:scale(.7) rotate(-20deg);
+  transition:opacity .3s ease,transform .3s ease;
+}
+.moon-hotspot:hover,.moon-hotspot:focus-visible,.moon-hotspot.is-active {
+  transform:translate(-50%,-50%) scale(1.045);
+  filter:drop-shadow(0 0 14px rgba(245,239,220,.38));
+  outline:none;
+}
+.moon-hotspot:hover::before,.moon-hotspot:focus-visible::before,.moon-hotspot.is-active::before {opacity:1}
+.moon-hotspot:hover .moon-hotspot-mark,.moon-hotspot:focus-visible .moon-hotspot-mark,.moon-hotspot.is-active .moon-hotspot-mark {
+  opacity:1;
+  transform:scale(1) rotate(0);
+}
+.moon-hotspot:focus-visible {outline:2px solid rgba(246,239,220,.92);outline-offset:3px}
+.moon-panorama-progress {
+  width:min(220px,38vw);
+  height:2px;
+  flex:none;
+  margin:7px auto 0;
+  overflow:hidden;
+  border-radius:99px;
+  background:rgba(143,170,189,.25);
+}
+.moon-panorama-progress span {
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,rgba(143,170,189,.62),rgba(198,173,131,.95));
+  box-shadow:0 0 9px rgba(198,173,131,.28);
+  transition:width .18s ease-out;
+}
+.moon-explore-hint {
+  display:flex;
+  flex:none;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:8px 12px 4px;
+  color:#8298a7;
+  font-size:10px;
+  letter-spacing:.1em;
+  user-select:none;
+}
+.moon-explore-hint span {color:#a9bac5;font-size:16px}
+.moon-home-foot {
+  display:flex;
+  flex:none;
+  align-items:center;
+  justify-content:space-between;
+  padding:3px 22px max(10px,env(safe-area-inset-bottom));
+  color:#91a4af;
+  font:10px/1.5 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.08em;
+}
+.moon-home-foot span:last-child {color:#b9a987}
+[data-theme="night"] .moon-kicker {color:#9db3c6}
+[data-theme="night"] .moon-motto,[data-theme="night"] .moon-home-foot {color:#9fb2c2}
+[data-theme="night"] .moon-days {color:#aebfcd}
+[data-theme="night"] .moon-days strong {color:#dbe6ee}
+@media (min-width:900px) {
+  .moon-home-head {padding-right:clamp(32px,5vw,72px);padding-left:clamp(32px,5vw,72px)}
+  .moon-scene-viewport {display:flex;justify-content:center;overflow-x:hidden}
+  .moon-scene {width:min(2048px,calc(100vw - 40px));height:auto;aspect-ratio:16/9}
+  .moon-hotspot {min-width:clamp(126px,10vw,180px);min-height:clamp(70px,6vw,92px);padding:12px 16px}
+  .moon-hotspot-name {font-size:clamp(20px,1.55vw,28px)}
+  .moon-hotspot-note {font-size:clamp(10px,.75vw,13px)}
+  .moon-brand-title {font-size:clamp(29px,2.1vw,42px)}
+  .moon-brand-motto {font-size:clamp(10px,.72vw,14px)}
+  .moon-scene-meta {font-size:clamp(10px,.7vw,13px)}
+}
+@media (max-width:640px) {
+  .moon-home-head {padding-right:17px;padding-left:17px}
+  .moon-home-head h1 {font-size:24px}
+  .moon-motto {font-size:10px}
+  .moon-days strong {font-size:26px}
+  .moon-scene-viewport {min-height:0;height:calc(100svh - 235px);flex:1 1 auto}
+  .moon-scene {width:1180px;height:664px}
+  .moon-hotspot {min-width:122px;min-height:66px;padding:7px 9px}
+  .moon-hotspot-name {font-size:19px}
+  .moon-hotspot-note {font-size:9px}
+  .moon-scene-brand {top:4%;left:3%;gap:8px}
+  .moon-brand-title {font-size:24px}
+  .moon-brand-divider {font-size:13px}
+  .moon-brand-motto {max-width:130px;font-size:8px}
+  .moon-scene-meta {top:4%;right:3%;gap:7px;font-size:8px}
+  .moon-scene-meta span:first-child {font-size:15px}
+  .moon-explore-hint {font-size:9px}
+}
+@media (max-height:650px) and (max-width:640px) {
+  .moon-scene-viewport {height:calc(100svh - 190px)}
+}
+@media (prefers-reduced-motion:reduce) {
+  .moon-artwork-image {animation:none}
+  .moon-hotspot,.moon-hotspot-note,.moon-hotspot-mark,.moon-panorama-progress span {transition:none}
+  .moon-scene-viewport {scroll-behavior:auto}
+}
