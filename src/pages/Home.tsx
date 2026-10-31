@@ -122,7 +122,7 @@ export function Home() {
           {doors.map((door, index) => (
             <Link key={door.id} to={door.to}
               className={`moon-hotspot moon-door-${door.id} ${door.align === "right" ? "align-right" : ""} ${active === door.id ? "is-active" : ""}`}
-              style={{ left: `${door.x}%`, top: `${door.y}%`, ["--door-order" as string]: index }}
+              style={{ left: `${door.x}%`, top: `${door.y}%` }}
               onClick={(event) => {
                 if (suppressClick.current) { event.preventDefault(); event.stopPropagation(); }
                 suppressClick.current = false;
