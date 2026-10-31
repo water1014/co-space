@@ -86,3 +86,20 @@
 @media(max-width:380px){.ma-original-tree-frame{height:700px;min-height:700px}}
 
 .ma-nav .ma-tree-link{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:11px 5px;border:1px solid transparent;border-radius:13px;color:var(--ink-faint);font-size:12px;white-space:nowrap;text-decoration:none}.ma-nav .ma-tree-link b{color:var(--ink-ghost);font:9px Georgia,serif}.ma-nav .ma-tree-link:active{background:rgba(174,207,222,.18)}
+
+
+/* Date navigation: small controls, clear touch targets */
+.ma-calendar-foot{align-items:center;flex-wrap:wrap;gap:10px}
+.ma-day-jump{display:flex;align-items:center;gap:5px}
+.ma-day-jump button{min-width:30px;height:30px;padding:0 9px;border:1px solid var(--line-strong);border-radius:16px;background:var(--glass-bg);color:var(--ink-soft);font:12px var(--f-sans,sans-serif)}
+.ma-day-jump button:active{background:rgba(150,190,207,.24);transform:scale(.96)}
+.ma-day-jump span{margin-left:4px;color:var(--ink-faint);font-size:10px;font-variant-numeric:tabular-nums}
+.ma-record-heading h2{letter-spacing:.12em}
+.ma-entry{transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.ma-entry:active{transform:translateY(1px)}
+.ma-compose{position:relative;overflow:hidden}
+.ma-compose:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.16) 48%,transparent 70%);transform:translateX(-120%);transition:transform .65s ease}
+.ma-compose:active:before{transform:translateX(120%)}
+[data-theme="night"] .ma-day-jump button{background:rgba(35,54,65,.55);border-color:rgba(153,190,207,.24);color:#d9e8ee}
+@media(max-width:420px){.ma-calendar-foot{align-items:flex-start;flex-direction:column}.ma-day-jump{width:100%;justify-content:flex-end}.ma-day-jump span{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.ma-entry,.ma-compose:before{transition:none}}
