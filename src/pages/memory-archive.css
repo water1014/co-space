@@ -174,3 +174,5 @@
 
 .ma-collection-note{margin:20px 2px 4px;padding:13px 15px;border-left:1px solid rgba(132,177,195,.55);color:var(--ink-faint);font:11px/1.9 var(--f-serif,serif);letter-spacing:.04em;background:linear-gradient(90deg,rgba(158,197,213,.1),transparent)}
 [data-theme="night"] .ma-collection-note{border-left-color:rgba(153,190,207,.5);background:linear-gradient(90deg,rgba(105,153,174,.12),transparent)}
+
+.ma-search-clear{flex:0 0 auto;padding:4px 7px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.24);color:var(--ink-faint);font-size:10px}.ma-detail-actions button:disabled{opacity:.42;cursor:not-allowed}.ma-detail textarea{width:100%;max-width:100%;box-sizing:border-box;resize:vertical;line-height:1.9}
