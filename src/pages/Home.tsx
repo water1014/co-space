@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useLifeStore } from "../stores/lifeStore";
 import { daysTogether } from "../lib/life/derive";
 import { useThemeStore } from "../stores/themeStore";
+import "./home-scene.css";
 
 const dayArtwork = `${import.meta.env.BASE_URL}日.jpg`;
 const nightArtwork = `${import.meta.env.BASE_URL}夜.jpg`;
