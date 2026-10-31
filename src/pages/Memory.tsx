@@ -12,7 +12,7 @@ const dayKey = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)
 const entryDay = (entry: MemoryEntry) => dayKey(new Date(entry.createdAt));
 
 export function Memory() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const memories = useMemoryStore((s) => s.memories);
   const loading = useMemoryStore((s) => s.loading);
   const initialDay = searchParams.get("day");
@@ -44,7 +44,9 @@ export function Memory() {
       .sort((a, b) => b.createdAt - a.createdAt);
   }, [memories, query, selectedDay, view]);
   const moveMonth = (delta: number) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
-  const selectDay = (key: string) => { setSelectedDay(key); const [y, m] = key.split("-").map(Number); setMonth(new Date(y, m - 1, 1)); };
+  const selectDay = (key: string) => { setSelectedDay(key); setSearchParams({ day: key }, { replace: true }); const [y, m] = key.split("-").map(Number); setMonth(new Date(y, m - 1, 1)); };
+  const moveDay = (delta: number) => { const [y,m,d] = selectedDay.split("-").map(Number); const next = new Date(y,m-1,d+delta); selectDay(dayKey(next)); };
+  const jumpToday = () => selectDay(dayKey(new Date()));
   const openEntry = (entry: MemoryEntry) => { setOpened(entry); setDraft(entry.text); };
 
   return <main className="memory-archive-page">
@@ -61,7 +63,7 @@ export function Memory() {
         {Array.from({ length: firstWeekday }, (_, i) => <span className="ma-day-empty" key={`blank-${i}`} />)}
         {Array.from({ length: daysInMonth }, (_, i) => { const day = i + 1; const key = dayKey(new Date(month.getFullYear(), month.getMonth(), day)); const count = counts.get(key) ?? 0; return <button key={key} className={`ma-day ${selectedDay === key ? "selected" : ""} ${count ? "has-memory" : ""}`} onClick={() => selectDay(key)}><span>{day}</span>{count > 0 && <i aria-label={`${count} 条记忆`} />}</button>; })}
       </div>
-      <div className="ma-calendar-foot"><span><i /> 有记忆的日子</span><span>已选 {selectedDay} · {counts.get(selectedDay) ?? 0} 条记忆</span></div>
+      <div className="ma-calendar-foot"><span><i /> 有记忆的日子</span><div className="ma-day-jump"><button onClick={() => moveDay(-1)} aria-label="前一天">‹</button><button onClick={jumpToday}>今天</button><button onClick={() => moveDay(1)} aria-label="后一天">›</button><span>{selectedDay} · {counts.get(selectedDay) ?? 0} 条</span></div></div>
     </section>
     <section className="ma-records">
       <div className="ma-record-heading"><div><span className="ma-eyebrow">{view === "saved" ? "KEPT CLOSE, KEPT SAFE" : "A DAY IN YOUR STORY"}</span><h2>{view === "saved" ? "珍藏的片段" : "日常记忆"}</h2></div><span className="ma-record-count">{visible.length.toString().padStart(2, "0")} <small>ENTRIES</small></span></div>
