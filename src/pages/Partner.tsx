@@ -157,7 +157,7 @@ export function Partner() {
   if (loading) return <div className="px-5 py-16 text-center text-sm text-ink-faint">正在打开月下人档案……</div>;
 
   return (
-    <div className="partner-page relative min-h-full overflow-hidden px-5 pb-28 pt-6">
+    <div className="partner-page partner-editorial relative min-h-full overflow-hidden px-5 pb-28 pt-6">
       <div aria-hidden="true" className="partner-orbit pointer-events-none absolute -right-24 top-20 h-64 w-64 rounded-full" />
       <header className="relative flex items-start gap-3">
         <BackButton className="mt-1.5" />
@@ -168,9 +168,15 @@ export function Partner() {
         </div>
       </header>
 
+      <div className="partner-editorial-intro relative mt-7 mb-2">
+        <span>PERSONAL ARCHIVE · NO. 01</span>
+        <p>把关于 TA 的细节，慢慢收进<br/><em>属于你们的时间里。</em></p>
+        <i aria-hidden="true">✳</i>
+      </div>
+
       {(error || notice) && <div role="status" className={`relative mt-4 rounded-2xl border px-4 py-3 text-sm ${error ? "border-red-300 text-red-700" : "border-[var(--line-strong)] text-ink-soft"}`}>{error || notice}</div>}
 
-      <section className="partner-profile relative mt-7 overflow-hidden rounded-[30px] border p-5">
+      <section className="partner-profile partner-sheet partner-sheet--identity relative mt-7 overflow-hidden rounded-[30px] border p-5">
         <div aria-hidden="true" className="partner-profile-glow absolute -right-12 -top-14 h-48 w-48 rounded-full" />
         <div className="relative flex items-center gap-4">
           <label className="partner-moon flex h-[76px] w-[76px] flex-none cursor-pointer items-center justify-center overflow-hidden rounded-full" title="更换伴侣头像">
@@ -191,7 +197,7 @@ export function Partner() {
         <button type="button" disabled={saving} onClick={() => void saveProfile()} className="relative mt-5 w-full rounded-full border border-[var(--line-strong)] px-5 py-3 text-sm text-ink disabled:opacity-50">{saving ? "保存中…" : "保存基础资料"}</button>
       </section>
 
-      <section className="partner-date-card relative mt-4 overflow-hidden rounded-[30px] border p-5">
+      <section className="partner-date-card partner-sheet partner-sheet--timeline relative mt-4 overflow-hidden rounded-[30px] border p-5">
         <p className="text-[10px] tracking-[.2em] text-ink-faint">OUR TIMELINE</p>
         <p className="mt-2 text-sm text-ink-soft">一起走过的日子</p>
         <p className="serif-display mt-1 text-[42px] leading-none text-ink">{startDate ? days : "—"}<span className="ml-2 text-sm tracking-wider">DAYS</span></p>
@@ -202,7 +208,7 @@ export function Partner() {
         <button type="button" disabled={saving} onClick={() => void saveProfile()} className="mt-4 w-full rounded-full border border-[var(--line-strong)] px-5 py-3 text-sm text-ink disabled:opacity-50">保存关系日期</button>
       </section>
 
-      <section className="partner-profile relative mt-4 rounded-[30px] border p-5">
+      <section className="partner-profile partner-sheet partner-sheet--persona relative mt-4 rounded-[30px] border p-5">
         <div className="flex items-center justify-between gap-3">
           <div><p className="text-[10px] tracking-[.2em] text-ink-faint">PERSONA · VERSION {persona?.version ?? 1}</p><h2 className="mt-1 text-lg text-ink">性情录</h2></div>
           <span className="text-xs text-ink-faint">每次保存都会留档</span>
@@ -219,7 +225,7 @@ export function Partner() {
         <p className="mt-3 text-[11px] leading-relaxed text-ink-faint">旧人格版本不会被覆盖。这里记录的是角色设定，实际对话效果仍取决于已连接的模型及发送给模型的上下文。</p>
       </section>
 
-      <section className="partner-date-card relative mt-4 rounded-[30px] border p-5">
+      <section className="partner-date-card partner-sheet partner-sheet--milestones relative mt-4 rounded-[30px] border p-5">
         <p className="text-[10px] tracking-[.2em] text-ink-faint">MILESTONES</p>
         <h2 className="mt-1 text-lg text-ink">相伴纪</h2>
         <div className="mt-4 space-y-3">
