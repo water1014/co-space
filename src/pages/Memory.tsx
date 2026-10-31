@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BackButton } from "../components/ui/BackButton";
 import { Sheet } from "../components/ui/kit";
 import { useMemoryStore } from "../stores/memoryStore";
@@ -12,6 +12,9 @@ const entryDay = (entry: MemoryEntry) => dayKey(new Date(entry.createdAt));
 
 export function Memory() {
   const memories = useMemoryStore((s) => s.memories);
+  const treeFrame = useRef<HTMLIFrameElement>(null);
+  const treeRecords = useMemo(() => { const grouped = new Map<string, MemoryEntry[]>(); memories.forEach((m) => { const key = entryDay(m); grouped.set(key, [...(grouped.get(key) ?? []), m]); }); return [...grouped.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([day, entries]) => ({ day, count: entries.length, text: entries.map((m) => m.text).join(" · "), createdAt: entries[0]?.createdAt ?? Date.now() })); }, [memories]);
+  useEffect(() => { const send = () => treeFrame.current?.contentWindow?.postMessage({ type: "mirror-memory-data", records: treeRecords }, window.location.origin); const onMessage = (event: MessageEvent) => { if (event.origin !== window.location.origin) return; if (event.data?.type === "mirror-memory-ready") send(); if (event.data?.type === "mirror-memory-open" && typeof event.data.day === "string") setSelectedDay(event.data.day); }; window.addEventListener("message", onMessage); send(); return () => window.removeEventListener("message", onMessage); }, [treeRecords]);
   const loading = useMemoryStore((s) => s.loading);
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selectedDay, setSelectedDay] = useState(dayKey(new Date()));
@@ -53,32 +56,7 @@ export function Memory() {
     </nav>
     {view === "tree" && <section className="ma-calendar-section">
       <div className="ma-section-head"><div><span className="ma-eyebrow">THE MEMORY TREE</span><h2>时日树</h2></div><div className="ma-month-control"><button aria-label="上个月" onClick={() => moveMonth(-1)}>‹</button><strong>{monthLabel}</strong><button aria-label="下个月" onClick={() => moveMonth(1)}>›</button></div></div>
-      <div className="ma-tree-stage">
-        <div className="ma-tree-caption"><span>THE TREE OF DAYS</span><i>✧</i><span>{counts.size} 个被记住的日子</span></div>
-        <div className="ma-tree-art">
-          <div className="ma-tree-halo" />
-          <svg className="ma-tree-svg" viewBox="0 0 360 300" role="img" aria-label="一棵承载记忆的月下之树">
-            <defs>
-              <linearGradient id="ma-bark" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#b8cbd1"/><stop offset=".48" stopColor="#789eac"/><stop offset="1" stopColor="#d4e1e4"/></linearGradient>
-              <linearGradient id="ma-leaf" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#f8fcfd"/><stop offset=".55" stopColor="#c5dce3"/><stop offset="1" stopColor="#8fb6c5"/></linearGradient>
-              <radialGradient id="ma-moon"><stop stopColor="#fff"/><stop offset="1" stopColor="#d9edf3" stopOpacity=".12"/></radialGradient>
-              <filter id="ma-soft"><feGaussianBlur stdDeviation="7"/></filter>
-            </defs>
-            <circle cx="180" cy="134" r="105" fill="url(#ma-moon)" opacity=".55"/>
-            <ellipse cx="180" cy="272" rx="94" ry="12" fill="#8eafbc" opacity=".15" filter="url(#ma-soft)"/>
-            <path d="M177 267 C166 230 190 204 177 169 C166 140 144 119 115 99 M180 206 C205 182 216 155 220 124 C224 97 244 82 265 68 M174 179 C148 164 119 159 91 145 M188 186 C215 173 246 171 275 151 M174 142 C163 116 163 91 173 63 M209 151 C191 126 190 99 199 77" fill="none" stroke="url(#ma-bark)" strokeWidth="9" strokeLinecap="round"/>
-            <path d="M177 265 C174 232 183 209 178 179" fill="none" stroke="#eef6f8" strokeWidth="2" opacity=".8"/>
-            {Array.from({length:24},(_,i)=>{const a=i*2.399;const r=35+(i%5)*17;const x=180+Math.cos(a)*r*1.55;const y=133+Math.sin(a)*r*.82;return <g key={i} transform={`translate(${x} ${y}) rotate(${i*31})`}><ellipse rx={7+(i%3)} ry={13+(i%4)} fill="url(#ma-leaf)" opacity={.72+(i%3)*.08}/><path d="M0 -10 Q1 0 0 10" stroke="#fff" strokeWidth=".8" opacity=".7"/></g>;})}
-            <path d="M100 270 Q180 251 260 270" fill="none" stroke="#9bb9c5" strokeWidth="1.4" opacity=".7"/>
-            <circle cx="180" cy="268" r="5" fill="#d9e9ee" stroke="#8eafbc"/>
-          </svg>
-          <div className="ma-tree-orbit ma-orbit-one">✧</div><div className="ma-tree-orbit ma-orbit-two">·</div><div className="ma-tree-orbit ma-orbit-three">✦</div>
-          <div className="ma-tree-note ma-note-left"><small>ROOTED IN TIME</small><b>每一日</b><span>都值得被收藏</span></div>
-          <div className="ma-tree-note ma-note-right"><small>MEMORY BLOOMS</small><b>{memories.length.toString().padStart(2,"0")}</b><span>段记忆枝叶</span></div>
-          {memories.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,5).map((entry,i)=><button key={entry.id} className={`ma-tree-charm ma-charm-${i} ${selectedDay===entryDay(entry)?"is-active":""}`} onClick={()=>setSelectedDay(entryDay(entry))} aria-label={`查看${entryDay(entry)}的记忆`}><span>{["✧","❀","◈","✦","❋"][i]}</span><small>{new Date(entry.createdAt).getDate()}</small></button>)}
-        </div>
-        <p className="ma-tree-motto">“时间没有带走一切，它让珍贵的事物长成了树。”</p>
-      </div>
+      <div className="ma-tree-stage ma-original-tree-stage"><iframe title="老师原版封存记忆树" src="/co-space/vendor/sealed-days/index.html" ref={treeFrame} className="ma-original-tree-frame" loading="eager" /></div>
       <div className="ma-calendar">{["日","一","二","三","四","五","六"].map((d) => <span className="ma-weekday" key={d}>{d}</span>)}
         {Array.from({ length: firstWeekday }, (_, i) => <span className="ma-day-empty" key={`blank-${i}`} />)}
         {Array.from({ length: daysInMonth }, (_, i) => { const day = i + 1; const key = dayKey(new Date(month.getFullYear(), month.getMonth(), day)); const count = counts.get(key) ?? 0; return <button key={key} className={`ma-day ${selectedDay === key ? "selected" : ""} ${count ? "has-memory" : ""}`} onClick={() => setSelectedDay(key)}><span>{day}</span>{count > 0 && <i aria-label={`${count} 条记忆`} />}</button>; })}
