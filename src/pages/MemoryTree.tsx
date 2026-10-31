@@ -30,7 +30,7 @@ export function MemoryTree() {
       if(e.origin!==window.location.origin || e.source!==frame.current?.contentWindow)return;
       if(e.data?.type==="mirror-memory-ready")send();
       if(e.data?.type==="mirror-memory-height" && typeof e.data.height==="number" && Number.isFinite(e.data.height)){frame.current.style.height=`${Math.max(720,Math.min(2400,Math.ceil(e.data.height)))}px`;}
-      if(e.data?.type==="mirror-memory-open" && typeof e.data.day==="string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(e.data.day) && dayKey(new Date(e.data.day+"T12:00:00"))===e.data.day)navigate(`/memory?day=${e.data.day}`);
+      if(e.data?.type==="mirror-memory-open" && typeof e.data.day==="string" && /^\d{4}-\d{2}-\d{2}$/.test(e.data.day) && dayKey(new Date(e.data.day+"T12:00:00"))===e.data.day)navigate(`/memory?day=${e.data.day}`);
     };
     window.addEventListener("message",onMessage); send(); return ()=>window.removeEventListener("message",onMessage);
   }, [records,navigate]);
