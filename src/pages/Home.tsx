@@ -35,7 +35,7 @@ const places: Place[] = [
   { id: "budget", title: "共同预算", to: "/budget", x: 91, y: 17, level: "minor", side: "right" },
 ];
 
-let savedScrollLeft = 0;
+const PANORAMA_PROGRESS_KEY = "jinghua-home-panorama-progress";
 
 function EntranceMark() {
   return <svg className="moon-entry-mark" viewBox="0 0 28 12" aria-hidden="true"><path d="M1 6h8m10 0h8M14 1l4 5-4 5-4-5 4-5Z" /></svg>;
@@ -64,14 +64,6 @@ export function Home() {
     return () => window.removeEventListener("resize", fitArtwork);
   }, []);
 
-  useEffect(() => {
-    const el = track.current;
-    if (!el) return;
-    const max = Math.max(0, el.scrollWidth - el.clientWidth);
-    if (window.matchMedia("(max-width: 899px)").matches) {
-      el.scrollLeft = savedScrollLeft > 0 ? Math.min(savedScrollLeft, max) : max * 0.36;
-    }
-  }, []);
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     pointerStart.current = { x: event.clientX, y: event.clientY };
@@ -110,7 +102,7 @@ export function Home() {
         role="region"
         tabIndex={0}
         aria-label="镜花水月地图，左右滑动探索地点"
-        onScroll={(event) => { savedScrollLeft = event.currentTarget.scrollLeft; }}
+        onScroll={(event) => { const el = event.currentTarget; const max = Math.max(0, el.scrollWidth - el.clientWidth); sessionStorage.setItem(PANORAMA_PROGRESS_KEY, String(max > 0 ? el.scrollLeft / max : 0)); }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -126,7 +118,19 @@ export function Home() {
         }}
       >
         <div className="moon-scene" ref={scene}>
-          <img ref={artwork} onLoad={() => { const image = artwork.current; const viewport = track.current; const sceneElement = scene.current; if (image && viewport && sceneElement) sceneElement.style.width = `${Math.max(viewport.clientWidth, image.naturalWidth / image.naturalHeight * viewport.clientHeight)}px`; }} className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="镜花水月的日夜全景地图" draggable={false} />
+          <img ref={artwork} onLoad={() => {
+            const image = artwork.current;
+            const viewport = track.current;
+            const sceneElement = scene.current;
+            if (!image || !viewport || !sceneElement) return;
+            sceneElement.style.width = `${Math.max(viewport.clientWidth, image.naturalWidth / image.naturalHeight * viewport.clientHeight)}px`;
+            requestAnimationFrame(() => {
+              const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+              const stored = Number(sessionStorage.getItem(PANORAMA_PROGRESS_KEY));
+              const progress = Number.isFinite(stored) && stored >= 0 ? Math.min(stored, 1) : 0.36;
+              viewport.scrollLeft = max * progress;
+            });
+          }} className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="镜花水月的日夜全景地图" draggable={false} />
           <div className="moon-map-entries">
             {places.map((place) => (
               <Link
