@@ -157,92 +157,104 @@ export function Partner() {
   if (loading) return <div className="px-5 py-16 text-center text-sm text-ink-faint">正在打开月下人档案……</div>;
 
   return (
-    <div className="partner-page partner-editorial relative min-h-full overflow-hidden px-5 pb-28 pt-6">
-      <div aria-hidden="true" className="partner-orbit pointer-events-none absolute -right-24 top-20 h-64 w-64 rounded-full" />
-      <header className="relative flex items-start gap-3">
-        <BackButton className="mt-1.5" />
-        <div className="min-w-0">
-          <p className="page-head-sub tracking-[.22em]">THE ONE YOU CHOOSE</p>
-          <h1 className="page-head-title mt-1 text-[30px] leading-tight text-ink">月下人</h1>
-          <p className="page-head-sub mt-1">一个固定的 TA，一份持续生长的档案。</p>
-        </div>
+    <main className="partner-page partner-archive relative min-h-full overflow-hidden pb-28">
+      <div className="archive-atmosphere" aria-hidden="true" />
+      <header className="archive-topbar relative mx-auto flex max-w-5xl items-center justify-between px-5 pt-5">
+        <BackButton />
+        <span className="archive-wordmark">JING HUA SHUI YUE <i>／</i> PERSONAL ARCHIVE</span>
+        <span className="archive-index">01 — 05</span>
       </header>
 
-      <div className="partner-editorial-intro relative mt-7 mb-2">
-        <span>PERSONAL ARCHIVE · NO. 01</span>
-        <p>把关于 TA 的细节，慢慢收进<br/><em>属于你们的时间里。</em></p>
-        <i aria-hidden="true">✳</i>
-      </div>
-
-      {(error || notice) && <div role="status" className={`relative mt-4 rounded-2xl border px-4 py-3 text-sm ${error ? "border-red-300 text-red-700" : "border-[var(--line-strong)] text-ink-soft"}`}>{error || notice}</div>}
-
-      <section className="partner-profile partner-sheet partner-sheet--identity relative mt-7 overflow-hidden rounded-[30px] border p-5">
-        <div aria-hidden="true" className="partner-profile-glow absolute -right-12 -top-14 h-48 w-48 rounded-full" />
-        <div className="relative flex items-center gap-4">
-          <label className="partner-moon flex h-[76px] w-[76px] flex-none cursor-pointer items-center justify-center overflow-hidden rounded-full" title="更换伴侣头像">
-            {avatarUrl ? <img src={avatarUrl} alt="伴侣头像" className="h-full w-full object-cover" /> : <span className="text-3xl text-ink-faint">月</span>}
-            <input aria-label="上传伴侣头像" type="file" accept="image/*" className="sr-only" onChange={(e) => void chooseAvatar(e.target.files?.[0])} />
-          </label>
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] tracking-[.2em] text-ink-faint">ONE COMPANION · PRIMARY IDENTITY</p>
-            <h2 className="mt-1 truncate text-[22px] text-ink">{name.trim() || "尚未命名"}</h2>
-            <p className="mt-1 text-xs text-ink-faint">点击圆形区域更换头像 · 仅保存在当前设备</p>
+      <div className="archive-wrap relative mx-auto max-w-5xl px-5">
+        <section className="archive-heading">
+          <div>
+            <p className="archive-kicker">THE ONE WHO LIVES IN YOUR MOON GARDEN</p>
+            <h1>月下人<span>。</span></h1>
+            <p className="archive-lede">为一个独一无二的存在，留一份会随时间生长的档案。</p>
           </div>
-        </div>
-        <div className="partner-rule relative my-5 h-px" />
-        <label className="relative block text-xs tracking-wide text-ink-faint" htmlFor="companion-name">TA 的名字</label>
-        <input id="companion-name" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} placeholder="给 TA 一个名字" className="ghost-input relative mt-2 w-full border-b border-[var(--line-strong)] bg-transparent py-2.5 text-base text-ink placeholder:text-ink-ghost" />
-        <label className="relative mt-4 block text-xs tracking-wide text-ink-faint" htmlFor="owner-name">TA 平时怎么称呼你</label>
-        <input id="owner-name" value={selfName} maxLength={24} onChange={(e) => setSelfName(e.target.value)} placeholder="例如：宝宝、阿淼" className="ghost-input relative mt-2 w-full border-b border-[var(--line-strong)] bg-transparent py-2.5 text-base text-ink placeholder:text-ink-ghost" />
-        <button type="button" disabled={saving} onClick={() => void saveProfile()} className="relative mt-5 w-full rounded-full border border-[var(--line-strong)] px-5 py-3 text-sm text-ink disabled:opacity-50">{saving ? "保存中…" : "保存基础资料"}</button>
-      </section>
+          <div className="archive-seal" aria-hidden="true"><span>月</span><i>✳</i></div>
+        </section>
 
-      <section className="partner-date-card partner-sheet partner-sheet--timeline relative mt-4 overflow-hidden rounded-[30px] border p-5">
-        <p className="text-[10px] tracking-[.2em] text-ink-faint">OUR TIMELINE</p>
-        <p className="mt-2 text-sm text-ink-soft">一起走过的日子</p>
-        <p className="serif-display mt-1 text-[42px] leading-none text-ink">{startDate ? days : "—"}<span className="ml-2 text-sm tracking-wider">DAYS</span></p>
-        <div className="partner-rule my-5 h-px" />
-        <label className="block text-xs tracking-wide text-ink-faint" htmlFor="relationship-date">关系开始日期</label>
-        <input id="relationship-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="ghost-input mt-2 w-full border-b border-[var(--line-strong)] bg-transparent py-2.5 text-sm text-ink" />
-        <p className="mt-2 text-[11px] leading-relaxed text-ink-faint">旧页面的默认日期可能是示例数据；请在这里确认并保存真实日期。</p>
-        <button type="button" disabled={saving} onClick={() => void saveProfile()} className="mt-4 w-full rounded-full border border-[var(--line-strong)] px-5 py-3 text-sm text-ink disabled:opacity-50">保存关系日期</button>
-      </section>
+        {(error || notice) && <div role="status" className={`archive-feedback ${error ? "is-error" : ""}`}>{error || notice}</div>}
 
-      <section className="partner-profile partner-sheet partner-sheet--persona relative mt-4 rounded-[30px] border p-5">
-        <div className="flex items-center justify-between gap-3">
-          <div><p className="text-[10px] tracking-[.2em] text-ink-faint">PERSONA · VERSION {persona?.version ?? 1}</p><h2 className="mt-1 text-lg text-ink">性情录</h2></div>
-          <span className="text-xs text-ink-faint">每次保存都会留档</span>
-        </div>
-        <label className="mt-5 block text-xs text-ink-faint" htmlFor="personality">性格与个性</label>
-        <textarea id="personality" rows={3} value={personality} onChange={(e) => setPersonality(e.target.value)} placeholder="TA 是怎样的人？例如温柔、理性、偶尔有点俏皮……" className="ghost-input mt-2 w-full resize-y rounded-xl border border-[var(--line-strong)] bg-transparent p-3 text-sm text-ink" />
-        <label className="mt-4 block text-xs text-ink-faint" htmlFor="speaking-style">说话方式</label>
-        <textarea id="speaking-style" rows={3} value={speakingStyle} onChange={(e) => setSpeakingStyle(e.target.value)} placeholder="TA 喜欢怎样表达、怎样回应你？" className="ghost-input mt-2 w-full resize-y rounded-xl border border-[var(--line-strong)] bg-transparent p-3 text-sm text-ink" />
-        <label className="mt-4 block text-xs text-ink-faint" htmlFor="values">价值观（每行一项）</label>
-        <textarea id="values" rows={3} value={values} onChange={(e) => setValues(e.target.value)} placeholder={"尊重彼此\n坦诚沟通\n珍惜日常"} className="ghost-input mt-2 w-full resize-y rounded-xl border border-[var(--line-strong)] bg-transparent p-3 text-sm text-ink" />
-        <label className="mt-4 block text-xs text-ink-faint" htmlFor="boundaries">相处边界（每行一项）</label>
-        <textarea id="boundaries" rows={3} value={boundaries} onChange={(e) => setBoundaries(e.target.value)} placeholder={"不编造现实经历\n尊重我的拒绝\n不替我做重要决定"} className="ghost-input mt-2 w-full resize-y rounded-xl border border-[var(--line-strong)] bg-transparent p-3 text-sm text-ink" />
-        <button type="button" disabled={saving} onClick={() => void savePersona()} className="mt-5 w-full rounded-full border border-[var(--line-strong)] px-5 py-3 text-sm text-ink disabled:opacity-50">{saving ? "保存中…" : "保存为新的人格版本"}</button>
-        <p className="mt-3 text-[11px] leading-relaxed text-ink-faint">旧人格版本不会被覆盖。这里记录的是角色设定，实际对话效果仍取决于已连接的模型及发送给模型的上下文。</p>
-      </section>
+        <section className="archive-identity">
+          <div className="archive-identity-art">
+            <div className="archive-portrait">
+              {avatarUrl ? <img src={avatarUrl} alt="伴侣头像" /> : <span>月</span>}
+              <label className="archive-upload" title="更换头像">
+                <span>＋</span><input aria-label="上传伴侣头像" type="file" accept="image/*" onChange={(e) => void chooseAvatar(e.target.files?.[0])} />
+              </label>
+            </div>
+            <span className="archive-art-caption">A PERSON, A UNIVERSE</span>
+          </div>
+          <div className="archive-identity-content">
+            <div className="archive-section-meta"><span>01 / IDENTITY</span><span>PRIMARY COMPANION</span></div>
+            <p className="archive-eyebrow">THE NAME YOU KEEP CLOSE</p>
+            <h2>{name.trim() || "尚未命名"}<small>你的专属伴侣</small></h2>
+            <div className="archive-fields">
+              <label htmlFor="companion-name">TA 的名字<input id="companion-name" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} placeholder="给 TA 一个名字" /></label>
+              <label htmlFor="owner-name">TA 如何称呼你<input id="owner-name" value={selfName} maxLength={24} onChange={(e) => setSelfName(e.target.value)} placeholder="例如：宝宝" /></label>
+            </div>
+            <button type="button" disabled={saving} onClick={() => void saveProfile()} className="archive-button">{saving ? "保存中…" : "保存这份身份 · →"}</button>
+          </div>
+        </section>
 
-      <section className="partner-date-card partner-sheet partner-sheet--milestones relative mt-4 rounded-[30px] border p-5">
-        <p className="text-[10px] tracking-[.2em] text-ink-faint">MILESTONES</p>
-        <h2 className="mt-1 text-lg text-ink">相伴纪</h2>
-        <div className="mt-4 space-y-3">
-          {milestones.length ? milestones.map((item) => <article key={item.id} className="flex items-start gap-3 border-b border-[var(--line-strong)] pb-3">
-            <div className="min-w-0 flex-1"><p className="text-sm text-ink">{item.title}</p><p className="mt-1 text-xs text-ink-faint">{timestampToDate(item.happenedAt)}{item.description ? ` · ${item.description}` : ""}</p></div>
-            <button type="button" onClick={() => void removeMilestone(item.id)} className="text-xs text-ink-faint">删除</button>
-          </article>) : <p className="text-xs text-ink-faint">还没有记录。把值得纪念的日子留在这里吧。</p>}
-        </div>
-        <div className="partner-rule my-5 h-px" />
-        <label className="block text-xs text-ink-faint" htmlFor="milestone-title">纪念事件</label>
-        <input id="milestone-title" value={milestoneTitle} onChange={(e) => setMilestoneTitle(e.target.value)} placeholder="例如：第一次相遇" className="ghost-input mt-2 w-full border-b border-[var(--line-strong)] bg-transparent py-2.5 text-sm text-ink" />
-        <label className="mt-4 block text-xs text-ink-faint" htmlFor="milestone-date">发生日期</label>
-        <input id="milestone-date" type="date" value={milestoneDate} onChange={(e) => setMilestoneDate(e.target.value)} className="ghost-input mt-2 w-full border-b border-[var(--line-strong)] bg-transparent py-2.5 text-sm text-ink" />
-        <textarea rows={2} value={milestoneDescription} onChange={(e) => setMilestoneDescription(e.target.value)} placeholder="补充一点当时的故事（可选）" className="ghost-input mt-4 w-full resize-y rounded-xl border border-[var(--line-strong)] bg-transparent p-3 text-sm text-ink" />
-        <button type="button" onClick={() => void addMilestone()} disabled={!milestoneTitle.trim()} className="mt-4 w-full rounded-full border border-[var(--line-strong)] px-5 py-3 text-sm text-ink disabled:opacity-40">添加到相伴纪</button>
-      </section>
-      <p className="mx-3 mt-5 text-center text-[11px] leading-[1.9] text-ink-faint">档案保存在当前浏览器的 IndexedDB 中。头像和人格版本不会自动上传云端；请定期使用归藏备份。</p>
-    </div>
+        <section className="archive-time">
+          <div className="archive-time-copy">
+            <div className="archive-section-meta"><span>02 / OUR TIME</span><span>THE DAYS WE SHARE</span></div>
+            <p className="archive-eyebrow">EVERY DAY, A LITTLE MORE</p>
+            <h2>相伴的时间</h2>
+            <p className="archive-time-note">时间会向前，而这里替你记得每一个开始。</p>
+          </div>
+          <div className="archive-counter"><strong>{startDate ? days : "—"}</strong><span>DAYS<br/>TOGETHER</span></div>
+          <div className="archive-date-control">
+            <label htmlFor="relationship-date">关系开始日期</label>
+            <input id="relationship-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            <button type="button" disabled={saving} onClick={() => void saveProfile()} className="archive-text-button">{saving ? "保存中…" : "确认日期 →"}</button>
+            <p>旧页面可能包含示例日期，请确认后再保存。</p>
+          </div>
+        </section>
+
+        <section className="archive-persona">
+          <div className="archive-persona-heading">
+            <div className="archive-section-meta"><span>03 / INNER WORLD</span><span>PERSONA · V{persona?.version ?? 1}</span></div>
+            <h2>性情录<span>。</span></h2>
+            <p>不是给 TA 贴上标签，而是慢慢描摹出 TA 的灵魂轮廓。</p>
+          </div>
+          <div className="archive-persona-fields">
+            <label htmlFor="personality"><span>01</span> 性格与个性<textarea id="personality" rows={3} value={personality} onChange={(e) => setPersonality(e.target.value)} placeholder="TA 是怎样的人？温柔、理性，或偶尔有点俏皮……" /></label>
+            <label htmlFor="speaking-style"><span>02</span> 说话方式<textarea id="speaking-style" rows={3} value={speakingStyle} onChange={(e) => setSpeakingStyle(e.target.value)} placeholder="TA 喜欢怎样表达、怎样回应你？" /></label>
+            <label htmlFor="values"><span>03</span> 珍视的价值<textarea id="values" rows={3} value={values} onChange={(e) => setValues(e.target.value)} placeholder={"尊重彼此\n坦诚沟通\n珍惜日常"} /></label>
+            <label htmlFor="boundaries"><span>04</span> 相处的边界<textarea id="boundaries" rows={3} value={boundaries} onChange={(e) => setBoundaries(e.target.value)} placeholder={"不编造现实经历\n尊重我的拒绝\n不替我做重要决定"} /></label>
+          </div>
+          <div className="archive-persona-foot"><p>每次保存都会生成新版本，旧的人格设定会被完整保留。</p><button type="button" disabled={saving} onClick={() => void savePersona()} className="archive-button">{saving ? "保存中…" : "保存为新的人格版本 · →"}</button></div>
+        </section>
+
+        <section className="archive-milestones">
+          <div className="archive-milestone-intro">
+            <div className="archive-section-meta"><span>04 / LITTLE FOREVERS</span><span>{String(milestones.length).padStart(2,"0")} MEMORIES</span></div>
+            <h2>相伴纪</h2>
+            <p>那些值得被郑重记下的日子。</p>
+            <div className="archive-milestone-form">
+              <label htmlFor="milestone-title">给这一天一个名字</label>
+              <input id="milestone-title" value={milestoneTitle} onChange={(e) => setMilestoneTitle(e.target.value)} placeholder="例如：第一次相遇" />
+              <label htmlFor="milestone-date">发生日期</label>
+              <input id="milestone-date" type="date" value={milestoneDate} onChange={(e) => setMilestoneDate(e.target.value)} />
+              <textarea rows={2} value={milestoneDescription} onChange={(e) => setMilestoneDescription(e.target.value)} placeholder="写下一点当时的故事（可选）" />
+              <button type="button" disabled={!milestoneTitle.trim()} onClick={() => void addMilestone()} className="archive-text-button">收进相伴纪　＋</button>
+            </div>
+          </div>
+          <div className="archive-milestone-list">
+            {milestones.length ? milestones.map((item, index) => <article key={item.id}>
+              <span className="archive-milestone-no">{String(index + 1).padStart(2,"0")}</span>
+              <div><time>{timestampToDate(item.happenedAt)}</time><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}</div>
+              <button type="button" aria-label={`删除${item.title}`} onClick={() => void removeMilestone(item.id)}>×</button>
+            </article>) : <div className="archive-empty"><span>✧</span><p>故事尚未写下</p><small>从一个小小的纪念日开始</small></div>}
+          </div>
+        </section>
+
+        <footer className="archive-footer"><span>JING HUA SHUI YUE</span><i>✧</i><span>所有故事，都只属于此间。</span><p>档案保存在当前浏览器的 IndexedDB 中。头像和人格版本不会自动上传云端；请定期使用归藏备份。</p></footer>
+      </div>
+    </main>
   );
 }
