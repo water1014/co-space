@@ -225,3 +225,13 @@
 [data-theme="night"] .ma-tag-filters button.active{background:rgba(91,139,159,.25);border-color:rgba(157,194,210,.42);color:#d8eaf0}
 [data-theme="night"] .ma-export{background:rgba(91,139,159,.16);border-color:rgba(157,194,210,.28);color:#d8eaf0}
 @media(max-width:380px){.ma-tools-row{gap:6px}.ma-export{padding:0 8px;font-size:9px}.ma-tag-filters{gap:5px}}
+
+
+.ma-discard-confirm{margin:0 0 15px;padding:14px;border:1px solid rgba(139,180,198,.34);border-left:2px solid rgba(139,180,198,.72);border-radius:3px 11px 11px 3px;background:rgba(194,220,230,.17)}
+.ma-discard-confirm strong{display:block;color:var(--ink-soft);font:500 14px/1.7 var(--f-serif,serif)}
+.ma-discard-confirm p{margin:5px 0 12px;color:var(--ink-faint);font-size:11px;line-height:1.8}
+.ma-discard-confirm>div{display:flex;justify-content:flex-end;gap:8px}
+.ma-discard-confirm button{min-height:35px;padding:0 12px;border:1px solid var(--line-strong);border-radius:18px;background:rgba(255,255,255,.28);color:var(--ink-soft);font-size:11px}
+.ma-discard-confirm button.danger{border-color:rgba(174,126,111,.38);background:rgba(174,126,111,.1);color:#986d60}
+[data-theme="night"] .ma-discard-confirm{background:rgba(63,94,110,.22);border-color:rgba(157,194,210,.25);border-left-color:rgba(157,194,210,.65)}
+[data-theme="night"] .ma-discard-confirm button.danger{color:#e0b8a9}
