@@ -8,6 +8,9 @@ import { useThemeStore } from "../stores/themeStore";
 const dayArtwork = `${import.meta.env.BASE_URL}日.jpg`;
 const nightArtwork = `${import.meta.env.BASE_URL}夜.jpg`;
 
+// Keep the panorama position when leaving a room and returning to Moon Garden.
+let savedMoonSceneScrollLeft = 0;
+
 type Door = { title: string; note: string; to: string; x: number; y: number };
 
 const dayDoors: Door[] = [
@@ -41,10 +44,17 @@ export function Home() {
   useEffect(() => {
     const el = track.current;
     if (!el) return;
-    if (el.scrollLeft === 0 && window.matchMedia("(max-width: 640px)").matches) {
-      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) * 0.5);
+    if (window.matchMedia("(max-width: 640px)").matches) {
+      const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+      el.scrollLeft = savedMoonSceneScrollLeft > 0
+        ? Math.min(savedMoonSceneScrollLeft, maxScroll)
+        : maxScroll * 0.5;
     }
   }, []);
+
+  const rememberScenePosition = () => {
+    if (track.current) savedMoonSceneScrollLeft = track.current.scrollLeft;
+  };
 
   return (
     <div className="moon-home">
@@ -57,7 +67,7 @@ export function Home() {
         <div className="moon-days"><span>相伴</span><strong>{days}</strong><span>天</span></div>
       </header>
 
-      <div className="moon-scene-viewport" ref={track} role="region" tabIndex={0} aria-label="月庭全景，可左右滑动探索" aria-roledescription="横向全景">
+      <div className="moon-scene-viewport" ref={track} role="region" tabIndex={0} aria-label="月庭全景，可左右滑动探索" aria-roledescription="横向全景" onScroll={rememberScenePosition}>
         <div className="moon-scene">
           <div className="moon-artwork" aria-hidden="true">
             <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
