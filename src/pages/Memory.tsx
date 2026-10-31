@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { BackButton } from "../components/ui/BackButton";
 import { Sheet } from "../components/ui/kit";
@@ -12,6 +13,22 @@ const dayKey = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)
 const entryDay = (entry: MemoryEntry) => dayKey(new Date(entry.createdAt));
 const parseTags = (value: string) => [...new Set(value.split(/[，,、]/).map((tag) => tag.trim().replace(/^#/, "")).filter(Boolean))].slice(0, 8).map((tag) => tag.slice(0, 20));
 
+const isBackupMemory = (value: unknown): value is MemoryEntry => {
+  if (!value || typeof value !== "object") return false;
+  const entry = value as Partial<MemoryEntry>;
+  return typeof entry.id === "string" && entry.id.length > 0 && entry.id.length <= 160
+    && typeof entry.text === "string" && entry.text.trim().length > 0 && entry.text.length <= 5000
+    && (entry.kind === "fact" || entry.kind === "feel" || entry.kind === "todo")
+    && Array.isArray(entry.tags) && entry.tags.length <= 8
+    && entry.tags.every((tag) => typeof tag === "string" && tag.length <= 20)
+    && (entry.source === "conversation" || entry.source === "manual" || entry.source === "reflection")
+    && (entry.sourceRef === undefined || (typeof entry.sourceRef === "string" && entry.sourceRef.length <= 500))
+    && Number.isFinite(entry.createdAt) && Number.isFinite(entry.updatedAt)
+    && Number.isFinite(entry.weight) && Number(entry.weight) >= 0 && Number(entry.weight) <= 1
+    && typeof entry.pinned === "boolean" && typeof entry.resolved === "boolean"
+    && (entry.decay === undefined || entry.decay === "natural" || entry.decay === "slow");
+};
+
 export function Memory() {
   const [searchParams, setSearchParams] = useSearchParams();
   const memories = useMemoryStore((s) => s.memories);
@@ -23,6 +40,8 @@ export function Memory() {
   const [view, setView] = useState<"saved" | "index">("index");
   const [query, setQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
+  const [backupMessage, setBackupMessage] = useState("");
+  const [pendingImport, setPendingImport] = useState<{ entries: MemoryEntry[]; fileName: string; addedCount: number; duplicateCount: number } | null>(null);
   const [opened, setOpened] = useState<MemoryEntry | null>(null);
   const [editingOpened, setEditingOpened] = useState(false);
   const [draft, setDraft] = useState("");
@@ -44,6 +63,7 @@ export function Memory() {
   const patchMemory = useMemoryStore((s) => s.patchMemory);
   const removeMemory = useMemoryStore((s) => s.removeMemory);
   const togglePin = useMemoryStore((s) => s.togglePin);
+  const restoreMemories = useMemoryStore((s) => s.restoreMemories);
   const monthLabel = `${month.getFullYear()}年 · ${MONTHS[month.getMonth()]}`;
   const firstWeekday = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
@@ -93,6 +113,45 @@ export function Memory() {
     if (confirmDiscard === "new") { setShowComposer(false); setNewText(""); setNewTags(""); }
     setConfirmDiscard(null);
   };
+  const importMemories = async (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) return;
+    setBackupMessage("");
+    try {
+      if (file.size > 10 * 1024 * 1024) throw new Error("备份文件不能超过 10 MB。");
+      const payload: unknown = JSON.parse(await file.text());
+      if (!payload || typeof payload !== "object" || (payload as { format?: unknown }).format !== "jinghua-memory-backup-v1") {
+        throw new Error("这不是镜花水月支持的记忆备份文件。");
+      }
+      const raw = (payload as { memories?: unknown }).memories;
+      if (!Array.isArray(raw) || raw.length > 5000 || !raw.every(isBackupMemory)) {
+        throw new Error("备份内容不完整或格式不正确，未导入任何记录。");
+      }
+      const existingIds = new Set(memories.map((memory) => memory.id));
+      const addedCount = raw.filter((entry) => !existingIds.has(entry.id)).length;
+      setPendingImport({ entries: raw, fileName: file.name, addedCount, duplicateCount: raw.length - addedCount });
+    } catch (error) {
+      console.error("[memory] backup import failed", error);
+      setBackupMessage(error instanceof Error ? error.message : "读取备份失败，请确认文件完整。");
+    } finally {
+      input.value = "";
+    }
+  };
+
+  const confirmImport = async () => {
+    if (!pendingImport) return;
+    try {
+      const count = await restoreMemories(pendingImport.entries);
+      setBackupMessage(count ? "已恢复 " + count + " 条新记忆；重复记录已自动跳过。" : "备份中的记忆已经全部存在，没有重复导入。");
+      setPendingImport(null);
+    } catch (error) {
+      console.error("[memory] backup restore failed", error);
+      setBackupMessage(error instanceof Error ? error.message : "恢复失败，请稍后重试。");
+      setPendingImport(null);
+    }
+  };
+
   const exportMemories = () => {
     const payload = { exportedAt: new Date().toISOString(), format: "jinghua-memory-backup-v1", memories };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
@@ -127,13 +186,14 @@ export function Memory() {
       {view === "saved" && <div className="ma-collection-intro"><div className="ma-collection-kicker"><span>THE PRIVATE EDITION</span><i>✧</i><span>VOL. 01</span></div><div className="ma-collection-title"><div><span className="ma-eyebrow">A FEW THINGS WORTH KEEPING</span><h2>珍藏<span>。</span></h2><p>那些不想让时间带走的片刻。</p></div><div className="ma-collection-index"><strong>{memories.filter((m) => m.pinned).length.toString().padStart(2,"0")}</strong><small>KEPT MOMENTS</small></div></div><div className="ma-collection-rule"><span>SELECTED MEMORIES</span><i /></div></div>}
       <div className="ma-record-heading"><div><span className="ma-eyebrow">{view === "saved" ? "KEPT CLOSE, KEPT SAFE" : "A DAY IN YOUR STORY"}</span><h2>{view === "saved" ? "精选目录" : "日常记忆"}</h2></div><span className="ma-record-count">{visible.length.toString().padStart(2, "0")} <small>ENTRIES</small></span></div>
       <label className="ma-search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索文字、标签与片段…" />{query && <button className="ma-search-clear" type="button" onClick={() => setQuery("")}>清除</button>}<kbd>SEARCH</kbd></label>
-      <div className="ma-tools-row"><div className="ma-tag-filters" aria-label="按标签筛选"><button type="button" className={!selectedTag ? "active" : ""} aria-pressed={!selectedTag} onClick={() => setSelectedTag("")}>全部标签</button>{tagOptions.map((tag) => <button type="button" key={tag} className={selectedTag === tag ? "active" : ""} aria-pressed={selectedTag === tag} onClick={() => setSelectedTag(selectedTag === tag ? "" : tag)}>#{tag}</button>)}</div><button type="button" className="ma-export" onClick={exportMemories} disabled={!memories.length}>↓ 导出备份</button></div>
+      <div className="ma-tools-row"><div className="ma-tag-filters" aria-label="按标签筛选"><button type="button" className={!selectedTag ? "active" : ""} aria-pressed={!selectedTag} onClick={() => setSelectedTag("")}>全部标签</button>{tagOptions.map((tag) => <button type="button" key={tag} className={selectedTag === tag ? "active" : ""} aria-pressed={selectedTag === tag} onClick={() => setSelectedTag(selectedTag === tag ? "" : tag)}>#{tag}</button>)}</div><div className="ma-backup-actions"><label className="ma-import">↑ 导入备份<input type="file" accept=".json,application/json" onChange={importMemories} /></label><button type="button" className="ma-export" onClick={exportMemories} disabled={!memories.length}>↓ 导出备份</button></div></div>{backupMessage && <p className="ma-backup-message" role="status">{backupMessage}</p>}
       <div className="ma-entry-list">{visible.map((entry, index) => <article className={`ma-entry ${view === "saved" ? "ma-entry-saved" : ""} ${view === "saved" && index === 0 ? "ma-entry-featured" : ""}`} key={entry.id}><div className="ma-entry-rail"><span>{String(index + 1).padStart(2, "0")}</span><i /></div><button className="ma-entry-body" onClick={() => openEntry(entry)}>{view === "saved" && (!visible[index - 1] || entryDay(visible[index - 1]) !== entryDay(entry)) && <span className="ma-entry-date-divider"><i />{new Date(entry.createdAt).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}<small>DAY NOTE</small></span>}<div className="ma-entry-meta"><span>{new Date(entry.createdAt).toLocaleString("zh-CN", { month:"numeric", day:"numeric", hour:"2-digit", minute:"2-digit" })}</span><span>{entry.pinned ? "✦ 已珍藏" : entry.kind === "todo" ? "待完成" : entry.kind === "feel" ? "心绪" : "记忆"}</span></div><p>{entry.text}</p>{entry.tags.length > 0 && <div className="ma-tags">{entry.tags.slice(0, 4).map((tag) => <span key={tag}>#{tag}</span>)}</div>}</button><button className={`ma-pin ${entry.pinned ? "is-pinned" : ""}`} aria-label={entry.pinned ? "取消珍藏" : "加入珍藏"} onClick={() => void runMemoryAction(`pin:${entry.id}`, () => togglePin(entry.id))} disabled={busyAction === `pin:${entry.id}`}>✧</button></article>)}
         {!visible.length && <div className="ma-empty"><span>◌</span><strong>{loading ? "正在整理记忆…" : view === "saved" ? "还没有珍藏的片段" : "这一天暂时空白"}</strong><p>{view === "saved" ? "试试其他关键词，或把值得留下的片段标记为珍藏。" : "留白也是时间的一部分。你可以在这里写下一段记忆。"}</p></div>}
       </div>
       {view === "index" ? <button className="ma-compose" onClick={() => setShowComposer(true)}><span>＋</span> 写下一段记忆</button> : <p className="ma-collection-note">在时日笺中，点亮记录旁的 ✧，便能把它收进这本私人选集。</p>}
     </section>
     <footer className="ma-footer"><span>EVERY DAY LEAVES A TRACE</span><span>镜花水月 · 私人记忆档案</span></footer>
+    <Sheet open={Boolean(pendingImport)} onClose={() => setPendingImport(null)} title="恢复记忆备份" panelClassName="memory-mirror-sheet"><div className="ma-detail ma-import-preview"><p className="ma-eyebrow">BACKUP RESTORE PREVIEW</p><h3>确认把记忆带回来吗？</h3><p className="ma-import-file">{pendingImport?.fileName}</p><div className="ma-import-stats"><div><strong>{pendingImport?.addedCount ?? 0}</strong><span>即将新增</span></div><div><strong>{pendingImport?.duplicateCount ?? 0}</strong><span>重复跳过</span></div><div><strong>{pendingImport?.entries.length ?? 0}</strong><span>备份总数</span></div></div><p className="ma-import-note">现有记忆不会被覆盖。确认后只会补入尚不存在的记录，恢复过程在当前设备本地完成。</p><div className="ma-detail-actions"><button type="button" disabled={!pendingImport?.addedCount} onClick={() => void confirmImport()}>确认恢复 {pendingImport?.addedCount ? pendingImport.addedCount + " 条" : ""}</button><button type="button" onClick={() => setPendingImport(null)}>暂不恢复</button></div></div></Sheet>
     <Sheet open={Boolean(opened)} onClose={requestCloseOpened} title="时日笺" panelClassName="memory-mirror-sheet">{opened && <div className="ma-detail">{actionError && <p className="ma-action-error" role="alert">{actionError}</p>}{confirmDiscard === "edit" && <div className="ma-discard-confirm" role="alertdialog" aria-label="放弃未保存的修改"><strong>还有修改没有保存</strong><p>现在离开，这些编辑内容将不会保留。</p><div><button type="button" onClick={() => setConfirmDiscard(null)}>继续编辑</button><button type="button" className="danger" onClick={discardPendingChanges}>放弃修改</button></div></div>}<p className="ma-eyebrow">{new Date(opened.createdAt).toLocaleString("zh-CN", { dateStyle: "long", timeStyle: "short" })}</p>{editingOpened ? <><textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={7} maxLength={5000} /><label className="ma-tag-editor"><span>记忆标签</span><input value={draftTags} onChange={(e) => setDraftTags(e.target.value)} maxLength={180} placeholder="用逗号分隔，例如：旅行，日常" /></label></> : <div className="ma-reading-text"><p>{opened.text}</p>{opened.tags.length > 0 && <div className="ma-tags">{opened.tags.map((tag) => <span key={tag}>#{tag}</span>)}</div>}</div>}<div className="ma-detail-actions">{editingOpened ? <><button disabled={!draft.trim() || busyAction !== null} onClick={() => void saveOpenedMemory()}>{busyAction === "edit" ? "正在保存…" : "保存修改"}</button><button disabled={busyAction !== null} onClick={() => { setDraft(opened.text); setDraftTags(opened.tags.join("，")); setEditingOpened(false); }}>取消编辑</button></> : <button disabled={busyAction !== null} onClick={() => setEditingOpened(true)}>编辑内容</button>}<button disabled={busyAction !== null} onClick={() => void runMemoryAction("detail-pin", () => togglePin(opened.id), () => setOpened(null))}>{opened.pinned ? "取消珍藏" : "珍藏这段"}</button><button className="danger" disabled={busyAction !== null} onClick={() => setConfirmDelete((value) => !value)}>删除</button><button disabled={busyAction !== null} onClick={() => { selectDay(dayKey(new Date(opened.createdAt))); setView("index"); setOpened(null); setEditingOpened(false); }}>查看这一天</button></div>{confirmDelete && <div className="ma-delete-confirm" role="alertdialog" aria-labelledby="ma-delete-title"><strong id="ma-delete-title">确定要删除这段记忆吗？</strong><p>删除后，这段记录将从藏忆阁中移除。</p><div><button type="button" disabled={busyAction !== null} onClick={() => setConfirmDelete(false)}>再想一想</button><button type="button" className="danger" disabled={busyAction !== null} onClick={() => void deleteOpenedMemory()}>{busyAction === "delete" ? "正在删除…" : "确认删除"}</button></div></div>}</div>}</Sheet>
     <Sheet open={showComposer} onClose={requestCloseComposer} title="写下一段记忆" panelClassName="memory-mirror-sheet"><div className="ma-detail">{actionError && <p className="ma-action-error" role="alert">{actionError}</p>}{confirmDiscard === "new" && <div className="ma-discard-confirm" role="alertdialog" aria-label="放弃尚未收入的记忆"><strong>这段记忆还没有收入</strong><p>离开后，当前填写的内容将被清空。</p><div><button type="button" onClick={() => setConfirmDiscard(null)}>继续写</button><button type="button" className="danger" onClick={discardPendingChanges}>放弃内容</button></div></div>}<p className="ma-eyebrow">A SMALL NOTE TO KEEP</p><div className="ma-compose-date"><span>写入日期</span><strong>{selectedDay}</strong><button onClick={jumpToday}>改为今天</button></div><textarea value={newText} onChange={(e) => setNewText(e.target.value)} rows={6} maxLength={5000} placeholder="今天有什么想留下？" /><label className="ma-tag-editor"><span>添加标签 <small>选填 · 最多 8 个</small></span><input value={newTags} onChange={(e) => setNewTags(e.target.value)} maxLength={180} placeholder="例如：生活，灵感，旅行" /></label><div className="ma-detail-actions"><button disabled={!newText.trim() || busyAction !== null} onClick={() => void saveNewMemory()}>{busyAction === "create" ? "正在收入…" : "收入记忆"}</button></div></div></Sheet>
   </main>;
