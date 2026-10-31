@@ -4,6 +4,7 @@ import { AppShell } from "./layouts/AppShell";
 import { Home } from "./pages/Home";
 import { Chat } from "./pages/Chat";
 import { Memory } from "./pages/Memory";
+import { MemoryTree } from "./pages/MemoryTree";
 // 图表只在共处页用，懒加载，首屏不背这个包。
 const Together = lazy(() =>
   import("./pages/Together").then((m) => ({ default: m.Together })),
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/memory" element={<Memory />} />
+          <Route path="/memory/tree" element={<MemoryTree />} />
           <Route path="/album" element={<Album />} />
           <Route path="/together" element={<Together />} />
           <Route path="/diary" element={<Diary />} />

@@ -216,8 +216,8 @@ body{background:#e6e6e6;color:#3f3f3f;-webkit-font-smoothing:antialiased}
 (function(){
   var stage = document.querySelector(".stage");
   if(!stage || !stage.getBoundingClientRect) return;
-  var cards = document.querySelectorAll(".tag .card");
   function fit(){
+    var cards = stage.querySelectorAll(".tag .card");
     var sr = stage.getBoundingClientRect();
     stage.style.setProperty("--k", (sr.width / 1138).toFixed(4));  // 牌/绳/字随树台缩放
     var iw = 631, ih = 900;             // ditu3-block.jpg 真实宽高比（竖幅）
@@ -233,6 +233,7 @@ body{background:#e6e6e6;color:#3f3f3f;-webkit-font-smoothing:antialiased}
   fit();
   window.addEventListener("load", fit);
   window.addEventListener("resize", fit);
+  window.__mirrorMemoryFit = fit;
 })();
 /* 点击挂牌过渡（快版）：点牌 → 日期+挂绳淡出 0.2s → 纸色白框放大铺满全屏 0.2s
    → 0.35s 跳那一天，单日页 ≈0.95s 依次浮现，全程 ≈1.3s < 1.5s。
@@ -374,7 +375,8 @@ if (sealEntry) sealEntry.onclick = function(){ location.href = "seal.html"; };
 /* Mirror Memory bridge: records arrive from the parent React app. */
 (function(){
   var stage=document.querySelector('.stage'); if(!stage) return;
-  var style=document.createElement('style'); style.textContent='.tag .txt b{font-weight:500}.tag .txt em{font-style:normal}.tag{cursor:pointer}'; document.head.appendChild(style);
+  var style=document.createElement('style'); style.textContent='.tag .txt b{font-weight:500}.tag .txt em{font-style:normal}.tag{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.tag:focus-visible .card{outline:2px solid #719db1;outline-offset:4px}'; document.head.appendChild(style);
+  function reportHeight(){var h=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight);parent.postMessage({type:'mirror-memory-height',height:h},location.origin);}
   function render(records){
     stage.querySelectorAll('.tag').forEach(function(n){n.remove()});
     var list=(records||[]).slice(0,31), w=[4.5,17,30,44,58,72,85,11,25,39,53,67,80,7,21,35,49,63,77,91,15,29,43,57,71,84,10,24,38,52,66];
@@ -394,11 +396,14 @@ if (sealEntry) sealEntry.onclick = function(){ location.href = "seal.html"; };
       el.addEventListener('click',function(e){e.preventDefault();parent.postMessage({type:'mirror-memory-open',day:item.day},location.origin)});
       stage.appendChild(el);
     });
+    if(window.__mirrorMemoryFit) window.__mirrorMemoryFit();
     var title=document.querySelector('.titlewrap h1'); if(title) title.textContent='Dear Memory.';
     var owner=document.querySelector('[data-sd-owner]'); if(owner) owner.textContent='镜花水月';
     var stats=document.querySelector('.monthline'); if(stats) stats.innerHTML='<span>镜花水月</span><span class="sep">·</span><b>'+list.length+'</b> days<span class="sep">·</span><b>'+list.reduce(function(n,x){return n+(x.text||'').length},0)+'</b> words';
+    requestAnimationFrame(reportHeight);
   }
   window.addEventListener('message',function(e){if(e.origin!==location.origin||!e.data||e.data.type!=='mirror-memory-data')return;render(e.data.records)});
+  window.addEventListener('load',reportHeight);window.addEventListener('resize',reportHeight);
   window.parent.postMessage({type:'mirror-memory-ready'},location.origin);
 })();
 </script>

@@ -21,6 +21,7 @@ type MemoryState = {
       source?: MemoryEntry["source"];
       tags?: string[];
       sourceRef?: string;
+      createdAt?: number;
     },
   ) => Promise<void>;
   patchMemory: (id: string, patch: Partial<MemoryEntry>) => Promise<void>;
@@ -67,6 +68,7 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
   createMemory: async (text, input = {}) => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    const createdAt = input.createdAt ?? Date.now();
     const now = Date.now();
     const entry: MemoryEntry = {
       id: uid("m"),
@@ -75,7 +77,7 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
       tags: input.tags ?? [],
       source: input.source ?? "manual",
       sourceRef: input.sourceRef,
-      createdAt: now,
+      createdAt,
       updatedAt: now,
       weight: 1,
       pinned: false,
