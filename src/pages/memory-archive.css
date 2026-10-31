@@ -79,3 +79,12 @@
 [data-theme="night"] .ma-tree-charm small{color:#e0edf2}
 @media(max-width:380px){.ma-tree-stage{margin-left:-3px;margin-right:-3px;padding-left:5px;padding-right:5px}.ma-tree-art{height:250px}.ma-tree-note b{font-size:11px}.ma-tree-note span{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.ma-tree-orbit{animation:none}.ma-tree-charm{transition:none}}
+
+/* Each real entry becomes its own botanical keepsake */
+.ma-tree-charm{width:35px;height:43px;padding:2px;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.ma-tree-charm-feel{border-radius:52% 48% 58% 42%;background:linear-gradient(145deg,#fff,rgba(203,229,237,.9));color:#719eae}
+.ma-tree-charm-todo{width:30px;height:36px;border-radius:7px 7px 12px 12px;background:linear-gradient(145deg,#f8fcfd,rgba(190,219,230,.92));color:#6c91a3}
+.ma-tree-charm:not(.ma-tree-charm-feel):not(.ma-tree-charm-todo){border-radius:50% 50% 45% 45%}
+.ma-tree-charm.is-active{z-index:5}
+.ma-tree-charm:focus-visible{outline:2px solid #78a9bd;outline-offset:3px}
+[data-theme="night"] .ma-tree-charm-feel,[data-theme="night"] .ma-tree-charm-todo{background:linear-gradient(145deg,rgba(112,155,174,.94),rgba(52,85,103,.96));color:#edf7fa}
