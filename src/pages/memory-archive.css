@@ -211,3 +211,17 @@
 .ma-tag-editor input:focus-visible{border-color:rgba(104,157,181,.72);box-shadow:0 0 0 3px rgba(104,157,181,.12)}
 .ma-tag-editor input::placeholder{color:var(--ink-ghost)}
 [data-theme="night"] .ma-tag-editor input{background:rgba(35,54,65,.52);border-color:rgba(157,194,210,.22);color:#e0edf2}
+
+
+/* Tag filtering and private local backup tools */
+.ma-tools-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:10px 0 18px}
+.ma-tag-filters{display:flex;flex:1;min-width:0;gap:7px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ma-tag-filters::-webkit-scrollbar{display:none}
+.ma-tag-filters button{flex:none;min-height:29px;padding:0 11px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.24);color:var(--ink-faint);font:10px var(--f-sans,sans-serif);white-space:nowrap}
+.ma-tag-filters button.active{border-color:rgba(112,163,184,.58);background:rgba(167,205,219,.2);color:var(--accent-deep)}
+.ma-export{flex:none;min-height:31px;padding:0 10px;border:1px solid rgba(122,169,188,.35);border-radius:18px;background:rgba(193,222,232,.18);color:var(--ink-soft);font:10px var(--f-sans,sans-serif);white-space:nowrap}
+.ma-export:disabled{opacity:.4;cursor:not-allowed}
+[data-theme="night"] .ma-tag-filters button{background:rgba(35,54,65,.35);border-color:rgba(157,194,210,.18);color:#aec4ce}
+[data-theme="night"] .ma-tag-filters button.active{background:rgba(91,139,159,.25);border-color:rgba(157,194,210,.42);color:#d8eaf0}
+[data-theme="night"] .ma-export{background:rgba(91,139,159,.16);border-color:rgba(157,194,210,.28);color:#d8eaf0}
+@media(max-width:380px){.ma-tools-row{gap:6px}.ma-export{padding:0 8px;font-size:9px}.ma-tag-filters{gap:5px}}
