@@ -58,6 +58,7 @@ export function Home() {
       <div className="moon-scene-viewport" ref={track} aria-label="月庭全景，可左右滑动探索">
         <div className="moon-scene">
           <div className="moon-artwork" aria-hidden="true">
+            <img className="moon-artwork-backdrop" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
             <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
           </div>
 
