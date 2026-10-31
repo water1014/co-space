@@ -1,432 +1,119 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+// 月庭首页：移动端优先的横向沉浸式场景入口。
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  IconChat,
-  IconHeart,
-  IconMoments,
-  IconPhone,
-  IconEdit,
-  IconImages,
-  IconStudio,
-  IconLounge,
-  IconMemory,
-  IconCalendar,
-  IconTravel,
-  IconMusic,
-  IconHealth,
-  IconWallet,
-  IconCoin,
-  IconRefresh,
-  IconPlay,
-  IconPause,
-  IconPlus,
-} from "../components/ui/icons";
-import { useText } from "../lib/content/useText";
 import { useLifeStore } from "../stores/lifeStore";
-import { useAlbumStore } from "../stores/albumStore";
 import { daysTogether } from "../lib/life/derive";
-import { getTodayMessage } from "../lib/home/todayMessage";
-import { fileToDataUrl } from "../lib/img/resize";
 
-const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+type Door = { title: string; note: string; to: string; x: number; y: number; kind: "window" | "desk" | "garden" | "record" | "portrait" | "clock" };
 
-/* 图标底色的几组奶油渐变 */
-const TILES = {
-  cream: { "--tile-a": "#f7f8fb", "--tile-b": "#dfe7f2" },
-  blue: { "--tile-a": "#f2f6fb", "--tile-b": "#d4e2f4" },
-  sand: { "--tile-a": "#f7f5fb", "--tile-b": "#e8e0f5" },
-  blush: { "--tile-a": "#f8f3f7", "--tile-b": "#ead8e7" },
-  mint: { "--tile-a": "#f1f7f5", "--tile-b": "#d8ebe5" },
-} as const;
-type TileKey = keyof typeof TILES;
+const doors: Door[] = [
+  { title: "同心阁", note: "在月光下相见", to: "/chat", x: 48, y: 46, kind: "window" },
+  { title: "云笺室", note: "写一封未寄出的信", to: "/diary", x: 18, y: 69, kind: "desk" },
+  { title: "花镜园", note: "让记忆开成花", to: "/album", x: 82, y: 65, kind: "garden" },
+  { title: "月声", note: "收藏此刻的声音", to: "/music", x: 64, y: 76, kind: "record" },
+  { title: "月下人", note: "关于那个重要的人", to: "/mit", x: 35, y: 27, kind: "portrait" },
+  { title: "月约", note: "把重要的日子留住", to: "/calendar", x: 91, y: 34, kind: "clock" },
+];
 
-/** 记住首页停在第几屏，从子页返回时原位恢复（像手机一样不重置） */
-let lastHomeIndex = 0;
-
-/**
- * 首页（小手机桌面 · 三屏纯横滑 + 留白美 · 杂志风）：
- * 第 1 屏 社交互动 / 第 2 屏 记录创作 / 第 3 屏 生活工具。
- * 每屏像翻一本杂志的内页，功能以清爽 app 图标排列，配信息卡与装饰模块。
- */
 export function Home() {
-  const t = useText();
   const life = useLifeStore();
-
   const days = daysTogether(life.anniversary);
-  const pending = life.todos.filter((x) => !x.done).length;
+  const track = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState<string | null>(null);
 
-  const [page, setPage] = useState(lastHomeIndex);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [toast, setToast] = useState("");
-
-  // 从子页返回时恢复到上次停留的那一屏
-  useLayoutEffect(() => {
-    const el = trackRef.current;
-    if (el && lastHomeIndex > 0) el.scrollLeft = el.clientWidth * lastHomeIndex;
-  }, []);
-
-  const say = (s: string) => {
-    setToast(s);
-    window.setTimeout(() => setToast(""), 2000);
-  };
-
-  /* 每日情话（写给你的话 / 摘句碎片） */
-  const [msg, setMsg] = useState<{ text: string; mock: boolean } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const refresh = () => {
-    setLoading(true);
-    getTodayMessage().then((m) => {
-      setMsg(m);
-      setLoading(false);
-    });
-  };
   useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    getTodayMessage().then((m) => alive && (setMsg(m), setLoading(false)));
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const onTrackScroll = () => {
-    const el = trackRef.current;
+    const el = track.current;
     if (!el) return;
-    const idx = Math.round(el.scrollLeft / el.clientWidth);
-    setPage(idx);
-    lastHomeIndex = idx;
-  };
-
-  return (
-    <div className="relative flex h-full flex-col">
-      {/* 桌面：横滑三屏 */}
-      <div
-        ref={trackRef}
-        onScroll={onTrackScroll}
-        className="desk-track rise mt-1 min-h-0 flex-1"
-        aria-label="首页内容，可横向滑动"
-      >
-        {/* ───────── 第 1 屏：社交互动 ───────── */}
-        <section className="desk-page home-page home-page-cover px-5 pb-8 pt-9" aria-label="我们的日常">
-          <header className="mb-7">
-            <p className="home-date text-[11px] tracking-[0.16em] text-ink-faint">
-              {`${new Date().getMonth() + 1}月${new Date().getDate()}日 ${WEEK[new Date().getDay()]}`}
-            </p>
-            <h1 className="serif-display home-wordmark mt-1 text-[38px] italic leading-[1.02] text-ink">
-              镜花水月
-            </h1>
-          </header>
-
-          <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
-            {/* 双人头像 + days together：柔粉玻璃主卡（参考 Rifugio） */}
-            <div className="soft-rose-card home-love-card col-span-4 rounded-[30px] px-6 py-8 text-center">
-              <div className="flex items-center justify-center gap-5">
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[19px] font-semibold text-[#9c6b52] shadow-md ring-4 ring-white/70">
-                  {t.people.wan[0]}
-                </span>
-                <Squiggle />
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-[19px] font-semibold text-white shadow-md ring-4 ring-white/70">
-                  {t.people.yan[0]}
-                </span>
-              </div>
-              <p className="serif-display mt-5 text-[46px] italic leading-none text-[var(--accent)]">
-                {days}
-              </p>
-              <p className="mt-1.5 text-[13px] tracking-[0.08em] text-[#b98a90]">
-                days together
-              </p>
-              <p className="mt-1.5 text-[11px] tracking-[0.04em] text-ink-faint">
-                从 {life.anniversary ?? ""} 开始 · 含当天
-              </p>
-            </div>
-
-            {/* 照片墙：可以直接放照片（不跳去记忆） */}
-            <HomeAlbumCard />
-
-            {/* 四个社交入口 */}
-            <AppIcon label="聊天" tile="cream" icon={<IconChat width={18} height={18} />} to="/chat" />
-            <AppIcon label="情侣空间" tile="blush" icon={<IconHeart width={18} height={18} />} to="/together" />
-            <AppIcon label="朋友圈" tile="blue" icon={<IconMoments width={18} height={18} />} to="/moments" />
-            <AppIcon
-              label="一对一"
-              tile="sand"
-              icon={<IconPhone width={18} height={18} />}
-              onClick={() => say("正在呼叫 淼淼…（演示）")}
-            />
-          </div>
-        </section>
-
-        {/* ───────── 第 2 屏：记录 & 创作 ───────── */}
-        <section className="desk-page home-page-create px-6 pb-8 pt-12" aria-label="记录与创作">
-          <SectionHead zh="记录" en="CREATE" />
-          <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
-            {/* 摘抄 / 短句卡片 */}
-            <section className="card home-glass-card col-span-4 rounded-[26px] p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] tracking-[0.2em] text-ink-faint">摘句 · FRAGMENT</span>
-                <button
-                  onClick={refresh}
-                  disabled={loading}
-                  className="tap flex items-center gap-1 text-[12px] text-ink-faint disabled:opacity-50"
-                >
-                  <IconRefresh width={13} height={13} className={loading ? "animate-spin" : ""} />
-                  换一句
-                </button>
-              </div>
-              <p className="kai mt-3 min-h-[66px] text-[18px] leading-[1.9] text-ink">
-                {loading ? "正在想今天要对你说的话…" : msg?.text}
-              </p>
-              <div className="mt-2 flex items-center justify-between border-t border-[var(--line)] pt-2.5">
-                <span className="text-[12px] text-ink-faint">
-                  — {t.people.yan}
-                  {msg?.mock ? "（示例）" : ""}
-                </span>
-                <Link to="/chat" className="text-[13px] font-medium text-[var(--accent)]">
-                  去聊聊 ›
-                </Link>
-              </div>
-            </section>
-
-            <AppIcon label="日记" tile="cream" icon={<IconEdit width={18} height={18} />} to="/diary" />
-            <AppIcon label="相册" tile="blue" icon={<IconImages width={18} height={18} />} to="/album" />
-            <AppIcon label="生图室" tile="blush" icon={<IconStudio width={18} height={18} />} to="/studio" />
-            <AppIcon label="共读听影" tile="mint" icon={<IconLounge width={18} height={18} />} to="/lounge" />
-            <AppIcon label="记忆" tile="sand" icon={<IconMemory width={18} height={18} />} to="/memory" />
-          </div>
-        </section>
-
-        {/* ───────── 第 3 屏：生活工具 ───────── */}
-        <section className="desk-page home-page-tools px-6 pb-8 pt-12" aria-label="生活工具">
-          <SectionHead zh="工具" en="TOOLS" />
-          <div className="grid grid-cols-4 gap-x-3.5 gap-y-5">
-            {/* 日程概览卡片 */}
-            <div className="card home-glass-card col-span-4 flex items-center justify-between rounded-[26px] px-5 py-5">
-              <div className="flex items-end gap-3">
-                <span className="serif-display text-[40px] leading-none text-ink">
-                  {new Date().getDate()}
-                </span>
-                <div className="pb-1">
-                  <p className="text-[11px] tracking-[0.16em] text-ink-faint">
-                    {new Date().getFullYear()} · {WEEK[new Date().getDay()]}
-                  </p>
-                  <p className="num mt-0.5 text-[12px] text-[var(--accent)]">
-                    在一起 {days} 天
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-[11px] tracking-[0.14em] text-ink-faint">待办</p>
-                <p className="num text-[24px] leading-none text-ink">{pending}</p>
-                <p className="mt-1 text-[11px] text-ink-faint">项待完成</p>
-              </div>
-            </div>
-
-            <AppIcon label="日历" tile="cream" icon={<IconCalendar width={18} height={18} />} to="/calendar" />
-            <AppIcon label="旅游" tile="blue" icon={<IconTravel width={18} height={18} />} to="/travel" />
-            <AppIcon label="音乐" tile="blush" icon={<IconMusic width={18} height={18} />} to="/music" />
-            <AppIcon label="健康" tile="mint" icon={<IconHealth width={18} height={18} />} to="/health" />
-            <AppIcon label="账本" tile="sand" icon={<IconCoin width={18} height={18} />} to="/ledger" />
-            <AppIcon label="额度" tile="cream" icon={<IconWallet width={18} height={18} />} to="/budget" />
-
-            {/* 音乐小组件（同步听歌） */}
-            <MusicCard />
-          </div>
-        </section>
-      </div>
-
-      {/* 可触达的分屏导航 */}
-      <nav className="home-page-indicator flex items-center justify-center gap-2 pb-3 pt-1" aria-label="首页分屏导航">
-        {[0, 1, 2].map((i) => (
-          <button
-            key={i}
-            type="button"
-            aria-label={`第 ${i + 1} 屏`}
-            aria-current={page === i ? "page" : undefined}
-            onClick={() => {
-              const el = trackRef.current;
-              if (!el) return;
-              el.scrollTo({ left: el.clientWidth * i, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-            }}
-            className={`home-page-dot ${page === i ? "is-active" : ""}`}
-          />
-        ))}
-        <span className="home-page-count" aria-live="polite">{page + 1} / 3</span>
-      </nav>
-
-      {toast && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center">
-          <p className="glass-solid rounded-full px-4 py-2 text-[12.5px] text-ink shadow-[var(--shadow-float)]">
-            {toast}
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** 桌面 app 图标：squircle 瓷砖 + 标签 */
-function AppIcon({
-  label,
-  tile,
-  icon,
-  to,
-  onClick,
-}: {
-  label: string;
-  tile: TileKey;
-  icon: React.ReactNode;
-  to?: string;
-  onClick?: () => void;
-}) {
-  const body = (
-    <>
-      <span className="tile" style={TILES[tile] as React.CSSProperties}>
-        {icon}
-      </span>
-      <span className="label">{label}</span>
-    </>
-  );
-  if (to) {
-    return (
-      <Link to={to} className="app-icon tap select-none">
-        {body}
-      </Link>
-    );
-  }
-  return (
-    <button onClick={onClick} className="app-icon tap select-none">
-      {body}
-    </button>
-  );
-}
-
-/** 头像间的小波浪（参考 Rifugio 的 〜 装饰） */
-function Squiggle() {
-  return (
-    <svg
-      width="24"
-      height="14"
-      viewBox="0 0 24 14"
-      fill="none"
-      className="text-[#d98f97]"
-      aria-hidden
-    >
-      <path
-        d="M2 8.5 C5 2, 9 2, 12 8.5 S 19 15, 22 8.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-/** 分屏小标题（第 2/3 屏，无编号，保持留白美） */
-function SectionHead({ zh, en }: { zh: string; en: string }) {
-  return (
-    <div className="mb-7 flex items-baseline gap-3">
-      <h2 className="text-[22px] font-semibold text-ink">{zh}</h2>
-      <span className="text-[11px] tracking-[0.24em] text-ink-faint">{en}</span>
-    </div>
-  );
-}
-
-/** 首页照片墙：直接放照片（上传到本地相册），不跳去记忆 */
-function HomeAlbumCard() {
-  const photos = useAlbumStore((s) => s.photos);
-  const add = useAlbumStore((s) => s.add);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const slots = photos.slice(0, 3);
-
-  const pick = async (files: FileList | null) => {
-    if (!files) return;
-    for (const f of Array.from(files).slice(0, 3)) {
-      if (!f.type.startsWith("image/")) continue;
-      try {
-        add({ dataUrl: await fileToDataUrl(f), caption: "" });
-      } catch {
-        /* 忽略单张失败 */
-      }
+    // 首次停在场景中段，像从宅邸中央醒来；返回时浏览器保留滚动位置。
+    if (el.scrollLeft === 0 && window.matchMedia("(max-width: 640px)").matches) {
+      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) * 0.28);
     }
-  };
+  }, []);
 
   return (
-    <div className="card home-glass-card col-span-4 overflow-hidden rounded-[26px]">
-      <div className="grid grid-cols-3 gap-2 p-3">
-        {[0, 1, 2].map((i) => {
-          const p = slots[i];
-          return p ? (
-            <Link
-              key={p.id}
-              to="/album"
-              className="relative block aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--surface-2)]"
-            >
-              <img src={p.dataUrl} alt="" className="h-full w-full object-cover" />
+    <div className="moon-home">
+      <header className="moon-home-head">
+        <div>
+          <p className="moon-kicker">A PRIVATE WORLD FOR TWO</p>
+          <h1>镜花水月</h1>
+          <p className="moon-motto">以镜为界，以花为念，以水为时，以月为家。</p>
+        </div>
+        <div className="moon-days"><span>相伴</span><strong>{days}</strong><span>天</span></div>
+      </header>
+
+      <div className="moon-scene-viewport" ref={track} aria-label="月庭全景，可左右滑动探索">
+        <div className="moon-scene">
+          <svg className="moon-art" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMid slice" role="img" aria-label="月光下的幻想宅邸、拱窗与玻璃花房">
+            <defs>
+              <linearGradient id="sky" x2="0" y2="1"><stop stopColor="#23384a"/><stop offset=".56" stopColor="#718b9b"/><stop offset="1" stopColor="#d4dce0"/></linearGradient>
+              <linearGradient id="wall" x2="1" y2="1"><stop stopColor="#f0eee8"/><stop offset=".5" stopColor="#cbd4d6"/><stop offset="1" stopColor="#899da8"/></linearGradient>
+              <linearGradient id="floor" x2="0" y2="1"><stop stopColor="#a9b9bd"/><stop offset="1" stopColor="#526a78"/></linearGradient>
+              <linearGradient id="glass" x2="1" y2="1"><stop stopColor="#eaf5f5" stopOpacity=".78"/><stop offset=".5" stopColor="#9cb9c5" stopOpacity=".18"/><stop offset="1" stopColor="#fff" stopOpacity=".5"/></linearGradient>
+              <radialGradient id="moon"><stop stopColor="#fff"/><stop offset=".55" stopColor="#e6edf0"/><stop offset="1" stopColor="#d5e2e7" stopOpacity="0"/></radialGradient>
+              <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+              <filter id="shadow"><feGaussianBlur stdDeviation="12"/></filter>
+            </defs>
+            <rect width="1600" height="760" fill="url(#sky)"/>
+            <circle cx="1110" cy="150" r="130" fill="url(#moon)"/>
+            <g fill="#f2f5f2" opacity=".35" filter="url(#blur)"><ellipse cx="340" cy="280" rx="360" ry="90"/><ellipse cx="1260" cy="390" rx="400" ry="100"/></g>
+            <path d="M0 0H1600V590H0Z" fill="url(#wall)" opacity=".24"/>
+            <path d="M0 0H1600V90H0Z" fill="#e8e9e4" opacity=".28"/>
+            <path d="M0 0H1600V22H0Z" fill="#f5f1e8" opacity=".8"/>
+            <g stroke="#edf0ec" strokeWidth="13" fill="url(#glass)">
+              <path d="M90 570V190Q90 55 225 55Q360 55 360 190V570Z"/>
+              <path d="M400 570V160Q400 20 545 20Q690 20 690 160V570Z"/>
+              <path d="M920 570V160Q920 20 1065 20Q1210 20 1210 160V570Z"/>
+              <path d="M1240 570V190Q1240 55 1375 55Q1510 55 1510 190V570Z"/>
+            </g>
+            <g stroke="#f7f7f1" strokeWidth="5" opacity=".7"><path d="M225 55V570M90 340H360M545 20V570M400 300H690M1065 20V570M920 300H1210M1375 55V570M1240 340H1510"/></g>
+            <path d="M0 570H1600V760H0Z" fill="url(#floor)"/>
+            <path d="M0 610Q800 560 1600 610V760H0Z" fill="#d9e0df" opacity=".2"/>
+            <g opacity=".24" stroke="#f5f4ed" strokeWidth="3"><path d="M800 590L800 760M400 610L180 760M1200 610L1420 760"/></g>
+            <g>
+              <path d="M0 530Q90 510 180 530V590H0M1420 530Q1510 510 1600 530V590H1420" fill="#718b91"/>
+              <path d="M0 550Q150 520 280 560L300 590H0M1320 560Q1450 520 1600 550V590H1320" fill="#536f75"/>
+            </g>
+            <g transform="translate(160 475)">
+              <ellipse cx="130" cy="155" rx="180" ry="25" fill="#243d4c" opacity=".3" filter="url(#shadow)"/>
+              <path d="M0 70Q0 0 75 0H190Q255 0 255 70V145H0Z" fill="#9eafb5" stroke="#e8eee9" strokeWidth="7"/>
+              <path d="M22 62Q22 18 80 18H180Q230 18 230 62V110H22Z" fill="#d9e1df"/>
+              <path d="M-20 115H275V155H-20Z" fill="#738c99"/>
+              <path d="M18 155V205M238 155V205" stroke="#526b77" strokeWidth="13"/>
+              <path d="M40 20Q80 -20 125 20" fill="none" stroke="#f5f3e9" strokeWidth="5"/>
+            </g>
+            <g transform="translate(710 485)">
+              <ellipse cx="90" cy="145" rx="150" ry="20" fill="#263d4c" opacity=".28"/>
+              <path d="M0 80Q0 40 42 40H145Q180 40 180 80V100H0Z" fill="#d9dfdc" stroke="#f5f3e9" strokeWidth="6"/>
+              <path d="M-12 100H194V122H-12Z" fill="#9baeb4"/>
+              <path d="M20 122V170M160 122V170" stroke="#647e89" strokeWidth="9"/>
+              <path d="M50 38Q90 -8 130 38" fill="none" stroke="#f8f4e9" strokeWidth="4"/>
+            </g>
+            <g transform="translate(1280 470)">
+              <path d="M0 180V45Q0 0 70 0Q140 0 140 45V180Z" fill="url(#glass)" stroke="#f2f3ec" strokeWidth="8"/>
+              <path d="M70 0V180M0 90H140" stroke="#eaf0ed" strokeWidth="4"/>
+              <g fill="#dce9df"><circle cx="35" cy="120" r="20"/><circle cx="90" cy="105" r="25"/><circle cx="112" cy="145" r="18"/></g>
+              <g stroke="#6e9588" strokeWidth="5"><path d="M35 180V118M90 180V105M112 180V145"/></g>
+            </g>
+            <g transform="translate(520 530)">
+              <path d="M0 0H110L96 75H14Z" fill="#a8b9bc" stroke="#f5f1e8" strokeWidth="5"/>
+              <ellipse cx="55" cy="0" rx="55" ry="13" fill="#e5e9e4"/>
+              <path d="M55 0Q10 -55 20 -90M55 0Q105 -60 90 -100M55 0Q52 -80 58 -120" fill="none" stroke="#718f83" strokeWidth="6"/>
+              <g fill="#e7e2d5"><circle cx="20" cy="-90" r="17"/><circle cx="90" cy="-100" r="19"/><circle cx="58" cy="-120" r="16"/></g>
+            </g>
+            <g fill="#f5f2e9" opacity=".22"><path d="M0 0H1600V12H0Z"/><path d="M0 565Q800 520 1600 565V580Q800 540 0 580Z"/></g>
+          </svg>
+
+          {doors.map((door) => (
+            <Link key={door.title} to={door.to} className={`moon-hotspot ${active === door.title ? "is-active" : ""}`} style={{ left: door.x + "%", top: door.y + "%" }} onFocus={() => setActive(door.title)} onBlur={() => setActive(null)} onMouseEnter={() => setActive(door.title)} onMouseLeave={() => setActive(null)} onTouchStart={() => setActive(door.title)} aria-label={`进入${door.title}`}>
+              <span className={`moon-hotspot-name ${active === door.title ? "is-lit" : ""}`}>{door.title}</span>
+              <span className="moon-hotspot-note">{door.note}</span>
             </Link>
-          ) : (
-            <button
-              key={i}
-              onClick={() => inputRef.current?.click()}
-              className="flex aspect-[4/3] flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-[var(--line-strong)] text-ink-faint transition-colors hover:border-[var(--accent)] hover:text-[var(--accent-deep)]"
-            >
-              <IconPlus width={17} height={17} />
-              {i === 0 && <span className="text-[10px]">添加照片</span>}
-            </button>
-          );
-        })}
+          ))}
+          <div className="moon-scene-caption">THE MOONLIT COURTYARD <span>·</span> 月庭</div>
+        </div>
       </div>
-      <div className="flex items-center justify-between border-t border-[var(--line)] px-4 py-2.5">
-        <p className="serif-display text-[12px] italic tracking-[0.06em] text-ink-soft">
-          our little world · 最近的瞬间
-        </p>
-        <Link to="/album" className="text-[11.5px] text-ink-faint">
-          全部 ›
-        </Link>
-      </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={(e) => {
-          void pick(e.target.files);
-          e.target.value = "";
-        }}
-      />
+      <div className="moon-explore-hint"><span>←</span> 左右滑动，探索这座家 <span>→</span></div>
+      <div className="moon-home-foot"><span>今天也有一处地方，为你留着灯。</span><span>✧</span></div>
     </div>
-  );
-}
-
-/** 音乐播放器小组件（本地演示进度） */
-function MusicCard() {
-  const [playing, setPlaying] = useState(false);
-  const [p, setP] = useState(38);
-  useEffect(() => {
-    if (!playing) return;
-    const id = setInterval(() => setP((v) => (v >= 100 ? 0 : v + 0.6)), 1000);
-    return () => clearInterval(id);
-  }, [playing]);
-
-  return (
-    <section className="card home-glass-card col-span-4 flex items-center gap-4 overflow-hidden rounded-[26px] p-5">
-      <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white shadow-md shadow-[var(--accent-soft)]">
-        <IconPlay width={19} height={19} />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[14.5px] font-medium text-ink">晚安，淼淼</p>
-        <p className="truncate text-[12px] text-ink-faint">宋祁 · 私房歌单</p>
-      </div>
-      <button
-        onClick={() => setPlaying((v) => !v)}
-        className="tap flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[var(--surface-2)] text-ink transition-colors hover:bg-[var(--accent-soft)]"
-        aria-label={playing ? "暂停" : "播放"}
-      >
-        {playing ? <IconPause width={17} height={17} /> : <IconPlay width={17} height={17} />}
-      </button>
-      <div className="absolute inset-x-0 bottom-0 h-[3px] bg-[var(--surface-2)]">
-        <div className="h-full bg-[var(--accent)] transition-[width] duration-1000" style={{ width: `${p}%` }} />
-      </div>
-    </section>
   );
 }
