@@ -17,11 +17,12 @@ const isBackupMemory = (value: unknown): value is MemoryEntry => {
   if (!value || typeof value !== "object") return false;
   const entry = value as Partial<MemoryEntry>;
   return typeof entry.id === "string" && entry.id.length > 0 && entry.id.length <= 160
-    && typeof entry.text === "string" && entry.text.length <= 5000
+    && typeof entry.text === "string" && entry.text.trim().length > 0 && entry.text.length <= 5000
     && (entry.kind === "fact" || entry.kind === "feel" || entry.kind === "todo")
     && Array.isArray(entry.tags) && entry.tags.length <= 8
     && entry.tags.every((tag) => typeof tag === "string" && tag.length <= 20)
     && (entry.source === "conversation" || entry.source === "manual" || entry.source === "reflection")
+    && (entry.sourceRef === undefined || (typeof entry.sourceRef === "string" && entry.sourceRef.length <= 500))
     && Number.isFinite(entry.createdAt) && Number.isFinite(entry.updatedAt)
     && Number.isFinite(entry.weight) && Number(entry.weight) >= 0 && Number(entry.weight) <= 1
     && typeof entry.pinned === "boolean" && typeof entry.resolved === "boolean"
