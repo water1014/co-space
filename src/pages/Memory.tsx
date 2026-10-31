@@ -13,10 +13,10 @@ const entryDay = (entry: MemoryEntry) => dayKey(new Date(entry.createdAt));
 export function Memory() {
   const memories = useMemoryStore((s) => s.memories);
   const treeFrame = useRef<HTMLIFrameElement>(null);
-  const treeRecords = useMemo(() => { const grouped = new Map<string, MemoryEntry[]>(); memories.forEach((m) => { const key = entryDay(m); grouped.set(key, [...(grouped.get(key) ?? []), m]); }); return [...grouped.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([day, entries]) => ({ day, count: entries.length, text: entries.map((m) => m.text).join(" · "), createdAt: entries[0]?.createdAt ?? Date.now() })); }, [memories]);
+  const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const treeRecords = useMemo(() => { const monthKey = `${month.getFullYear()}-${pad(month.getMonth() + 1)}`; const grouped = new Map<string, MemoryEntry[]>(); memories.forEach((m) => { const key = entryDay(m); if (!key.startsWith(monthKey)) return; grouped.set(key, [...(grouped.get(key) ?? []), m]); }); return [...grouped.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([day, entries]) => ({ day, count: entries.length, text: entries.map((m) => m.text).join(" · "), createdAt: entries[0]?.createdAt ?? Date.now() })); }, [memories, month]);
   useEffect(() => { const send = () => treeFrame.current?.contentWindow?.postMessage({ type: "mirror-memory-data", records: treeRecords }, window.location.origin); const onMessage = (event: MessageEvent) => { if (event.origin !== window.location.origin) return; if (event.data?.type === "mirror-memory-ready") send(); if (event.data?.type === "mirror-memory-open" && typeof event.data.day === "string") setSelectedDay(event.data.day); }; window.addEventListener("message", onMessage); send(); return () => window.removeEventListener("message", onMessage); }, [treeRecords]);
   const loading = useMemoryStore((s) => s.loading);
-  const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selectedDay, setSelectedDay] = useState(dayKey(new Date()));
   const [view, setView] = useState<"tree" | "saved" | "index">("tree");
   const [query, setQuery] = useState("");
