@@ -4956,71 +4956,104 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
 }
 
 
-/* ===== Mirror House · 暂停玻璃材质，回归纸面与留白 =====
-   参考图到来前，全站以实体纸面、发丝分隔线和排版层次建立质感。
-   交互与组件结构不变，只替换视觉材质。 */
+/* ===== 镜花水月 · 珍珠雾光材质系统 =====
+   依据用户提供的 UI 参考：轻透白雾、银灰细边、清晰文字；
+   夜间切换为近黑底与低亮度银灰面层。保留背景模糊，但只用于指定面板。 */
 :root,
-[data-theme="day"],
+[data-theme="day"] {
+  --glass-bg: rgba(255,255,255,.46);
+  --glass-bg-strong: rgba(255,255,255,.70);
+  --glass-border: rgba(255,255,255,.76);
+  --glass-sheen: rgba(255,255,255,.34);
+  --glass-blur: 15px;
+  --shadow-glass: 0 12px 32px -22px rgba(48,58,70,.28), inset 0 1px 0 rgba(255,255,255,.76);
+}
 [data-theme="night"] {
-  --glass-bg: var(--surface);
-  --glass-bg-strong: var(--surface);
-  --glass-border: var(--line);
-  --glass-sheen: transparent;
-  --glass-blur: 0px;
-  --shadow-glass: var(--shadow-card);
+  --glass-bg: rgba(24,24,28,.72);
+  --glass-bg-strong: rgba(31,31,36,.88);
+  --glass-border: rgba(205,208,216,.20);
+  --glass-sheen: rgba(255,255,255,.045);
+  --glass-blur: 13px;
+  --shadow-glass: 0 14px 34px -20px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.055);
 }
 
-/* 全站停用背景采样模糊，避免旧组件遗漏玻璃效果。 */
-*,
-*::before,
-*::after {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
+/* 柔雾背景：保持低对比，避免影响正文阅读。 */
+.app-bg {
+  background:
+    radial-gradient(ellipse at 18% 14%, rgba(255,255,255,.94) 0%, transparent 42%),
+    radial-gradient(ellipse at 86% 34%, rgba(218,225,232,.48) 0%, transparent 46%),
+    radial-gradient(ellipse at 50% 88%, rgba(238,240,243,.82) 0%, transparent 50%),
+    linear-gradient(145deg,#f8f8fa 0%,#eef0f3 52%,#f7f7f8 100%);
+}
+[data-theme="night"] .app-bg {
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(75,75,84,.17) 0%, transparent 38%),
+    radial-gradient(ellipse at 88% 72%, rgba(68,68,78,.13) 0%, transparent 42%),
+    linear-gradient(160deg,#09090b 0%,#111114 58%,#080809 100%);
+}
+.app-bg .glow { opacity:.26; filter:blur(46px); }
+[data-theme="night"] .app-bg .glow { opacity:.34; }
+
+/* 面板只做轻透，不把所有容器都变成玻璃。 */
+.glass,.glass-hi,.glass-flat,.glass-solid,.sheet-solid,.editorial-sheet {
+  background: linear-gradient(145deg,var(--glass-sheen),transparent 48%),var(--glass-bg) !important;
+  background-image: linear-gradient(145deg,var(--glass-sheen),transparent 48%) !important;
+  border:1px solid var(--glass-border) !important;
+  box-shadow:var(--shadow-glass) !important;
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(125%) !important;
+  backdrop-filter:blur(var(--glass-blur)) saturate(125%) !important;
+}
+.glass { border-radius:22px; }
+.glass-hi { background-color:var(--glass-bg-strong) !important; border-radius:18px; }
+.glass-flat { background-color:var(--glass-bg) !important; border-radius:16px; }
+.editorial-sheet { border-radius:22px; }
+
+/* 对话与输入区域：半透明层次更轻，正文维持高对比。 */
+.bubble,.user-bubble,.assistant-bubble,.composer-pill,.chat-round {
+  background:var(--glass-bg-strong) !important;
+  border:1px solid var(--glass-border) !important;
+  box-shadow:0 5px 18px -15px rgba(35,42,52,.28),inset 0 1px 0 var(--glass-sheen) !important;
+  -webkit-backdrop-filter:blur(12px) saturate(120%) !important;
+  backdrop-filter:blur(12px) saturate(120%) !important;
+}
+[data-theme="night"] .bubble,
+[data-theme="night"] .user-bubble,
+[data-theme="night"] .assistant-bubble,
+[data-theme="night"] .composer-pill,
+[data-theme="night"] .chat-round {
+  background:rgba(27,27,31,.76) !important;
+  border-color:rgba(208,210,218,.17) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045) !important;
 }
 
-.glass,
-.glass-hi,
-.glass-flat,
-.glass-solid,
-.sheet-solid,
-.editorial-sheet {
-  background: var(--surface) !important;
-  background-image: none !important;
-  border: 1px solid var(--line) !important;
-  box-shadow: var(--shadow-card) !important;
+/* 记忆档案：保留纸页感，同时让面层与背景有轻微距离。 */
+.memory-ledger-intro,.memory-entry,.memory-type-tile,.memory-editorial-tabs {
+  background:linear-gradient(145deg,rgba(255,255,255,.66),rgba(255,255,255,.40)) !important;
+  border-color:rgba(255,255,255,.74) !important;
+  box-shadow:0 8px 24px -20px rgba(48,58,70,.30),inset 0 1px 0 rgba(255,255,255,.66) !important;
+  -webkit-backdrop-filter:blur(13px) saturate(120%) !important;
+  backdrop-filter:blur(13px) saturate(120%) !important;
 }
-
-.glass-flat,
-.glass-hi {
-  background: var(--surface-2) !important;
+.memory-type-tile { background:rgba(255,255,255,.36) !important; }
+.memory-entry::before { opacity:.72; }
+[data-theme="night"] .memory-ledger-intro,
+[data-theme="night"] .memory-entry,
+[data-theme="night"] .memory-type-tile,
+[data-theme="night"] .memory-editorial-tabs {
+  background:rgba(28,28,33,.72) !important;
+  border-color:rgba(210,212,220,.17) !important;
+  box-shadow:0 10px 28px -20px rgba(0,0,0,.66),inset 0 1px 0 rgba(255,255,255,.05) !important;
 }
+[data-theme="night"] .memory-type-tile { background:rgba(40,40,46,.60) !important; }
 
-.bubble,
-.user-bubble,
-.assistant-bubble,
-.composer-pill,
-.chat-round {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  background: var(--surface-2) !important;
-  border: 1px solid var(--line) !important;
-  box-shadow: none !important;
+/* 小屏降低模糊强度，避免滚动时过重。 */
+@media(max-width:600px) {
+  .glass,.glass-hi,.glass-flat,.glass-solid,.sheet-solid,.editorial-sheet,
+  .bubble,.user-bubble,.assistant-bubble,.composer-pill,.chat-round {
+    -webkit-backdrop-filter:blur(10px) saturate(118%) !important;
+    backdrop-filter:blur(10px) saturate(118%) !important;
+  }
 }
-
-.memory-ledger-intro,
-.memory-entry,
-.memory-type-tile,
-.memory-editorial-tabs {
-  background: var(--surface) !important;
-  background-image: none !important;
-  border-color: var(--line) !important;
-  box-shadow: none !important;
-}
-
-.memory-type-tile {
-  background: var(--surface-2) !important;
-}
-
-.memory-entry::before {
-  opacity: .55;
+@media(prefers-reduced-motion:reduce) {
+  .glass,.glass-hi,.glass-flat,.glass-solid,.card { transition:none !important; }
 }
