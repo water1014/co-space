@@ -1,4 +1,4 @@
-// 月庭：以独立日夜原画为底的横向全景入口。
+// 月庭：全屏沉浸式横向场景，文字入口融入原画。
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLifeStore } from "../stores/lifeStore";
@@ -7,25 +7,31 @@ import { useThemeStore } from "../stores/themeStore";
 
 const dayArtwork = `${import.meta.env.BASE_URL}日.jpg`;
 const nightArtwork = `${import.meta.env.BASE_URL}夜.jpg`;
-
-// 保留离开月庭前的横向浏览位置。
 let savedMoonSceneScrollLeft = 0;
 
-type Door = { id: string; title: string; note: string; to: string; x: number; y: number };
+type Door = {
+  id: string;
+  title: string;
+  en: string;
+  note: string;
+  to: string;
+  x: number;
+  y: number;
+  align?: "left" | "right";
+};
 
-// 日夜保持同一套五空间职责；坐标后续可依据原画中的真实物件精调。
 const dayDoors: Door[] = [
-  { id: "chat", title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 18, y: 47 },
-  { id: "memory", title: "藏忆阁", note: "把一起走过的时光收好", to: "/memory", x: 40, y: 69 },
-  { id: "partner", title: "月下人", note: "认识那个与你相伴的人", to: "/partner", x: 64, y: 39 },
-  { id: "mit", title: "镜心", note: "布置属于自己的小天地", to: "/mit", x: 86, y: 66 },
+  { id: "chat", title: "同心阁", en: "LE SALON", note: "与我相见 · 聊聊此刻", to: "/chat", x: 51, y: 49 },
+  { id: "memory", title: "藏忆阁", en: "LA MÉMOIRE", note: "收藏我们共同的时光", to: "/memory", x: 17, y: 29 },
+  { id: "partner", title: "月下人", en: "LES RÉVEILS", note: "认识那个与你相伴的人", to: "/partner", x: 74, y: 43 },
+  { id: "mit", title: "镜心", en: "LES RÉGLAGES", note: "把这里布置成喜欢的模样", to: "/mit", x: 87, y: 72, align: "right" },
 ];
 
 const nightDoors: Door[] = [
-  { id: "memory", title: "藏忆阁", note: "把一起走过的时光收好", to: "/memory", x: 16, y: 64 },
-  { id: "chat", title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 39, y: 40 },
-  { id: "partner", title: "月下人", note: "认识那个与你相伴的人", to: "/partner", x: 64, y: 67 },
-  { id: "mit", title: "镜心", note: "布置属于自己的小天地", to: "/mit", x: 86, y: 42 },
+  { id: "chat", title: "同心阁", en: "LE SALON", note: "与我相见 · 聊聊此刻", to: "/chat", x: 53, y: 57 },
+  { id: "memory", title: "藏忆阁", en: "LA MÉMOIRE", note: "收藏我们共同的时光", to: "/memory", x: 19, y: 36 },
+  { id: "partner", title: "月下人", en: "LES RÉVEILS", note: "认识那个与你相伴的人", to: "/partner", x: 75, y: 34 },
+  { id: "mit", title: "镜心", en: "LES RÉGLAGES", note: "把这里布置成喜欢的模样", to: "/mit", x: 88, y: 73, align: "right" },
 ];
 
 export function Home() {
@@ -38,6 +44,7 @@ export function Home() {
   const suppressClick = useRef(false);
   const [active, setActive] = useState<string | null>(null);
   const [sceneProgress, setSceneProgress] = useState(0);
+  const date = new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric" }).format(new Date());
 
   useEffect(() => {
     const el = track.current;
@@ -63,7 +70,6 @@ export function Home() {
     pointerStart.current = { x: event.clientX, y: event.clientY };
     suppressClick.current = false;
   };
-
   const onPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!pointerStart.current) return;
     const dx = Math.abs(event.clientX - pointerStart.current.x);
@@ -71,11 +77,10 @@ export function Home() {
     suppressClick.current = dx > 10 && dx > dy;
     pointerStart.current = null;
   };
-
   const handleSceneKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const el = track.current;
     if (!el) return;
-    const step = Math.max(220, Math.round(el.clientWidth * 0.58));
+    const step = Math.max(240, Math.round(el.clientWidth * 0.62));
     const behavior: ScrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
     if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
       event.preventDefault();
@@ -86,92 +91,62 @@ export function Home() {
     }
   };
 
-  const date = new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric" }).format(new Date());
-
   return (
-    <div className="moon-home">
-      <header className="moon-home-head">
-        <div className="moon-heading-copy">
-          <p className="moon-kicker">A PRIVATE WORLD FOR TWO</p>
-          <h1>镜花水月</h1>
-          <p className="moon-motto">以镜为界，以花为念，以水为时，以月为家。</p>
-        </div>
-        <div className="moon-days" aria-label={`相伴${days}天`}>
-          <span>相伴</span><strong>{days}</strong><span>天</span>
-        </div>
-      </header>
+    <div className={`moon-home moon-home-immersive ${theme === "night" ? "is-night" : "is-day"}`}>
+      <div className="moon-scene-viewport" ref={track} role="region" tabIndex={0}
+        aria-label="月庭全景，可左右滑动探索" aria-roledescription="横向全景"
+        onScroll={rememberScenePosition} onKeyDown={handleSceneKeyDown}
+        onPointerDown={onPointerDown} onPointerUp={onPointerUp}
+        onPointerCancel={() => { pointerStart.current = null; }}>
+        <div className="moon-scene">
+          <div className="moon-artwork" aria-hidden="true">
+            <img key={theme} className="moon-artwork-image"
+              src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
+          </div>
 
-      <section className="moon-panorama-wrap" aria-label="月庭探索">
-        <div
-          className="moon-scene-viewport"
-          ref={track}
-          role="region"
-          tabIndex={0}
-          aria-label="月庭全景，可左右滑动探索"
-          aria-roledescription="横向全景"
-          onScroll={rememberScenePosition}
-          onKeyDown={handleSceneKeyDown}
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onPointerCancel={() => { pointerStart.current = null; }}
-        >
-          <div className="moon-scene">
-            <div className="moon-artwork" aria-hidden="true">
-              <img
-                key={theme}
-                className="moon-artwork-image"
-                src={theme === "night" ? nightArtwork : dayArtwork}
-                alt=""
-                draggable={false}
-              />
-            </div>
+          <header className="moon-immersive-brand">
+            <span className="moon-brand-overline">A WORLD BETWEEN US</span>
+            <h1>镜花水月</h1>
+            <span className="moon-brand-translation">MIRROR · FLOWER · MOON</span>
+            <i aria-hidden="true" />
+            <p>有些相遇，是为了在一生里，慢慢看。</p>
+          </header>
 
-            <div className="moon-scene-brand" aria-hidden="true">
-              <span className="moon-brand-title">镜花水月</span>
-              <span className="moon-brand-divider">✧</span>
-              <span className="moon-brand-motto">有些相遇，是为了在一生里，慢慢看。</span>
-            </div>
-            <div className="moon-scene-meta" aria-hidden="true">
-              <span>{theme === "night" ? "☾" : "☼"}</span>
-              <span>{theme === "night" ? "月色" : "晨光"}</span>
-              <i />
-              <span>{date}</span>
-            </div>
+          <div className="moon-immersive-date" aria-label={`相伴${days}天`}>
+            <span className="moon-date-symbol">{theme === "night" ? "☾" : "✧"}</span>
+            <span>{date}</span>
+            <i />
+            <span>相伴 {days} 天</span>
+          </div>
 
-            {doors.map((door) => (
-              <Link
-                key={door.id}
-                to={door.to}
-                className={`moon-hotspot ${active === door.id ? "is-active" : ""}`}
-                style={{ left: `${door.x}%`, top: `${door.y}%` }}
-                onClick={(event) => {
-                  if (suppressClick.current) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                  }
-                  suppressClick.current = false;
-                }}
-                onFocus={() => setActive(door.id)}
-                onBlur={() => setActive(null)}
-                onMouseEnter={() => setActive(door.id)}
-                onMouseLeave={() => setActive(null)}
-                onTouchStart={() => setActive(door.id)}
-                aria-label={`进入${door.title}：${door.note}`}
-              >
-                <span className="moon-hotspot-name">{door.title}</span>
-                <span className="moon-hotspot-note">{door.note}</span>
-                <span className="moon-hotspot-mark" aria-hidden="true">✧</span>
-              </Link>
-            ))}
+          {doors.map((door, index) => (
+            <Link key={door.id} to={door.to}
+              className={`moon-hotspot moon-door-${door.id} ${door.align === "right" ? "align-right" : ""} ${active === door.id ? "is-active" : ""}`}
+              style={{ left: `${door.x}%`, top: `${door.y}%` }}
+              onClick={(event) => {
+                if (suppressClick.current) { event.preventDefault(); event.stopPropagation(); }
+                suppressClick.current = false;
+              }}
+              onFocus={() => setActive(door.id)} onBlur={() => setActive(null)}
+              onMouseEnter={() => setActive(door.id)} onMouseLeave={() => setActive(null)}
+              onTouchStart={() => setActive(door.id)}
+              aria-label={`进入${door.title}：${door.note}`}>
+              <span className="moon-door-en">{door.en}</span>
+              <span className="moon-hotspot-name">{door.title}</span>
+              <span className="moon-hotspot-note">{door.note}</span>
+              <span className="moon-door-rule" aria-hidden="true" />
+            </Link>
+          ))}
+
+          <div className="moon-immersive-footer" aria-hidden="true">
+            <span>THE PLACE WE CALL HOME</span>
+            <span>向右滑动，继续探索 <b>→</b></span>
           </div>
         </div>
-        <div className="moon-panorama-progress" role="progressbar" aria-label="月庭全景浏览位置" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(sceneProgress)}>
-          <span style={{ width: `${sceneProgress}%` }} />
-        </div>
-      </section>
-
-      <div className="moon-explore-hint"><span>←</span> 左右滑动，慢慢探索这座家 <span>→</span></div>
-      <footer className="moon-home-foot"><span>今天也有一处地方，为你留着灯。</span><span>✧</span></footer>
+      </div>
+      <div className="moon-immersive-progress" aria-hidden="true">
+        <span style={{ width: `${sceneProgress}%` }} />
+      </div>
     </div>
   );
 }
