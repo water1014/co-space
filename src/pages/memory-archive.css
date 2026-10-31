@@ -103,3 +103,41 @@
 [data-theme="night"] .ma-day-jump button{background:rgba(35,54,65,.55);border-color:rgba(153,190,207,.24);color:#d9e8ee}
 @media(max-width:420px){.ma-calendar-foot{align-items:flex-start;flex-direction:column}.ma-day-jump{width:100%;justify-content:flex-end}.ma-day-jump span{margin-left:auto}}
 @media(prefers-reduced-motion:reduce){.ma-entry,.ma-compose:before{transition:none}}
+
+
+/* JHSY editorial glass direction — magazine hierarchy, not dashboard tiles */
+.memory-archive-page{position:relative}
+.ma-topline{letter-spacing:.2em}
+.ma-heading{position:relative;align-items:flex-end;padding:clamp(28px,7vw,58px) 0 30px;border-bottom:1px solid var(--line)}
+.ma-heading h1{font-family:var(--f-serif,Georgia,serif);font-size:clamp(46px,12vw,76px);font-weight:500;letter-spacing:.1em;line-height:1.05}
+.ma-heading h1 span{color:#8eb7c8}
+.ma-eyebrow{letter-spacing:.22em}
+.ma-subtitle{max-width:22em;line-height:1.9;letter-spacing:.08em}
+.ma-seal{border:1px solid rgba(128,174,193,.38);background:linear-gradient(145deg,rgba(255,255,255,.48),rgba(178,211,224,.14));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:inset 0 1px rgba(255,255,255,.72),0 12px 30px rgba(87,137,157,.08)}
+.ma-nav{border-bottom:1px solid var(--line);border-radius:0;background:transparent;backdrop-filter:none;padding:8px 0}
+.ma-nav button.active{background:rgba(173,207,221,.2);border:1px solid rgba(133,179,197,.3);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.ma-calendar-section{border:1px solid rgba(139,180,198,.28);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.54),rgba(207,229,237,.2));backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:inset 0 1px rgba(255,255,255,.78),0 18px 42px -34px rgba(55,112,137,.38)}
+.ma-record-heading{align-items:flex-end;padding-bottom:15px;border-bottom:1px solid var(--line)}
+.ma-record-heading h2{font-family:var(--f-serif,Georgia,serif);font-size:clamp(25px,7vw,36px);font-weight:500;letter-spacing:.08em}
+.ma-record-count{font-family:Georgia,serif;font-size:25px;font-weight:400;letter-spacing:.06em}
+.ma-search{border:1px solid rgba(139,180,198,.3);background:rgba(226,240,245,.34);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.ma-entry-list{border-top:1px solid var(--line)}
+.ma-entry{display:grid;grid-template-columns:38px minmax(0,1fr) 34px;gap:10px;padding:19px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none}
+.ma-entry-body{min-width:0;padding:0;text-align:left;background:transparent}
+.ma-entry-body p{font-family:var(--f-serif,Georgia,serif);font-size:16px;line-height:1.85;letter-spacing:.025em}
+.ma-entry-meta{font-size:10px;letter-spacing:.08em}
+.ma-entry-rail{color:var(--ink-ghost);font:11px Georgia,serif}
+.ma-pin{align-self:start;border:1px solid rgba(137,179,196,.26);border-radius:50%;background:rgba(222,239,245,.24);backdrop-filter:blur(12px)}
+.ma-compose{border:1px solid rgba(133,180,199,.42);border-radius:18px;background:linear-gradient(120deg,rgba(231,244,248,.56),rgba(175,210,224,.25));backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:inset 0 1px rgba(255,255,255,.86),0 12px 32px -25px rgba(66,125,148,.45);letter-spacing:.12em}
+.ma-compose-date{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:11px 13px;border:1px solid rgba(133,180,199,.3);border-radius:13px;background:rgba(218,237,244,.28);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);font-size:12px}
+.ma-compose-date span{color:var(--ink-faint)}
+.ma-compose-date strong{font:16px Georgia,serif;letter-spacing:.06em;color:var(--ink-soft)}
+.ma-compose-date button{margin-left:auto;padding:6px 10px;border:1px solid rgba(133,180,199,.32);border-radius:15px;background:rgba(255,255,255,.32);color:var(--ink-soft);font-size:11px}
+.memory-mirror-sheet{background:linear-gradient(145deg,rgba(239,248,251,.94),rgba(212,232,240,.91));backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px)}
+[data-theme="night"] .ma-calendar-section{background:linear-gradient(145deg,rgba(49,73,86,.72),rgba(29,48,60,.66));border-color:rgba(157,194,210,.22);box-shadow:inset 0 1px rgba(236,248,251,.08),0 18px 42px -34px rgba(0,0,0,.7)}
+[data-theme="night"] .ma-search{background:rgba(35,54,65,.5)}
+[data-theme="night"] .ma-compose-date{background:rgba(43,68,82,.55);border-color:rgba(157,194,210,.2)}
+[data-theme="night"] .ma-compose-date button{background:rgba(75,109,126,.36);color:#dceaf0}
+[data-theme="night"] .memory-mirror-sheet{background:linear-gradient(145deg,rgba(34,54,66,.97),rgba(25,42,53,.97))}
+@media(max-width:420px){.ma-heading{padding-top:32px}.ma-entry{grid-template-columns:26px minmax(0,1fr) 30px;gap:7px}.ma-entry-body p{font-size:15px}.ma-calendar-section{padding:16px 13px}}
+@media(prefers-reduced-transparency:reduce){.ma-calendar-section,.ma-search,.ma-compose,.ma-compose-date,.memory-mirror-sheet{backdrop-filter:none;-webkit-backdrop-filter:none}}
