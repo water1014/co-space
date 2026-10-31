@@ -44,9 +44,25 @@ function EntranceMark() {
 export function Home() {
   const theme = useThemeStore((state) => state.theme);
   const track = useRef<HTMLDivElement>(null);
+  const scene = useRef<HTMLDivElement>(null);
+  const artwork = useRef<HTMLImageElement>(null);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const suppressClick = useRef(false);
   const dragState = useRef<{ pointerId: number; x: number; scrollLeft: number; moved: boolean } | null>(null);
+
+  useEffect(() => {
+    const fitArtwork = () => {
+      const viewport = track.current;
+      const sceneElement = scene.current;
+      const image = artwork.current;
+      if (!viewport || !sceneElement || !image?.naturalWidth || !image?.naturalHeight) return;
+      const naturalWidth = image.naturalWidth / image.naturalHeight * viewport.clientHeight;
+      sceneElement.style.width = `${Math.max(viewport.clientWidth, naturalWidth)}px`;
+    };
+    fitArtwork();
+    window.addEventListener("resize", fitArtwork);
+    return () => window.removeEventListener("resize", fitArtwork);
+  }, []);
 
   useEffect(() => {
     const el = track.current;
@@ -109,8 +125,8 @@ export function Home() {
           }
         }}
       >
-        <div className="moon-scene">
-          <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="镜花水月的日夜全景地图" draggable={false} />
+        <div className="moon-scene" ref={scene}>
+          <img ref={artwork} onLoad={() => { const image = artwork.current; const viewport = track.current; const sceneElement = scene.current; if (image && viewport && sceneElement) sceneElement.style.width = `${Math.max(viewport.clientWidth, image.naturalWidth / image.naturalHeight * viewport.clientHeight)}px`; }} className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="镜花水月的日夜全景地图" draggable={false} />
           <div className="moon-map-entries">
             {places.map((place) => (
               <Link
