@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { BackButton } from "../components/ui/BackButton";
 import { Sheet } from "../components/ui/kit";
@@ -25,6 +25,12 @@ export function Memory() {
   const [draft, setDraft] = useState("");
   const [newText, setNewText] = useState("");
   const [showComposer, setShowComposer] = useState(false);
+  useEffect(() => {
+    const candidate = initialDay && /^\\d{4}-\\d{2}-\\d{2}$/.test(initialDay) ? new Date(initialDay + "T12:00:00") : null;
+    if (!candidate || dayKey(candidate) !== initialDay) return;
+    setSelectedDay(initialDay);
+    setMonth(new Date(candidate.getFullYear(), candidate.getMonth(), 1));
+  }, [initialDay]);
   const createMemory = useMemoryStore((s) => s.createMemory);
   const patchMemory = useMemoryStore((s) => s.patchMemory);
   const removeMemory = useMemoryStore((s) => s.removeMemory);
