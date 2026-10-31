@@ -5,8 +5,8 @@ import { useLifeStore } from "../stores/lifeStore";
 import { daysTogether } from "../lib/life/derive";
 import { useThemeStore } from "../stores/themeStore";
 
-const dayArtwork = new URL("../../镜花水月：晨光花庭界面.png", import.meta.url).href;
-const nightArtwork = new URL("../../月光下的镜花水月 salon.png", import.meta.url).href;
+const dayArtwork = `${import.meta.env.BASE_URL}日.jpg`;
+const nightArtwork = `${import.meta.env.BASE_URL}夜.jpg`;
 
 type Door = { title: string; note: string; to: string; x: number; y: number };
 
@@ -67,7 +67,7 @@ export function Home() {
               key={door.title}
               to={door.to}
               className={`moon-hotspot ${active === door.title ? "is-active" : ""}`}
-              style={{ left: (14.375 + door.x * 0.7125) + "%", top: door.y + "%" }}
+              style={{ left: door.x + "%", top: door.y + "%" }}
               onFocus={() => setActive(door.title)}
               onBlur={() => setActive(null)}
               onMouseEnter={() => setActive(door.title)}
