@@ -75,7 +75,6 @@ export function Home() {
             <span>THE PLACE WE CALL HOME</span>
             <span>一方只属于我们的天地</span>
           </div>
-          <div className="moon-mobile-swipe" aria-hidden="true">轻触文字进入 · 左右滑动探索 <span>↔</span></div>
         </div>
       </div>
     </section>
