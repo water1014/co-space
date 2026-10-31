@@ -3195,3 +3195,33 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:
   .moon-scene { width:min(2048px,100%); height:auto; aspect-ratio:16/9; }
 }
 @media (prefers-reduced-motion:reduce) { .moon-hotspot { transition:none; } }
+
+
+/* 月庭可访问性与精细交互 */
+.moon-scene-viewport:focus { outline:none; }
+.moon-scene-viewport:focus-visible {
+  outline:2px solid rgba(143,170,189,.72);
+  outline-offset:-3px;
+}
+.moon-hotspot {
+  min-height:76px;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.moon-hotspot::before {
+  border-radius:3px;
+  box-shadow:0 8px 28px rgba(16,30,43,.12);
+}
+.moon-hotspot-note {
+  transition:opacity .3s ease, transform .3s ease;
+}
+.moon-scene-brand,.moon-scene-meta {
+  user-select:none;
+}
+@media (max-width:640px) {
+  .moon-hotspot { min-width:126px; min-height:68px; }
+  .moon-scene-viewport:focus-visible { outline-offset:-4px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .moon-hotspot-note { transition:none; }
+}
