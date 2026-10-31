@@ -14,6 +14,7 @@ type MemoryState = {
   filter: MemoryFilter;
 
   load: () => Promise<void>;
+  restoreMemories: (entries: MemoryEntry[]) => Promise<number>;
   createMemory: (
     text: string,
     input?: {
@@ -63,6 +64,22 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
       console.error("[memory] load failed", err);
       set({ loading: false });
     }
+  },
+
+  restoreMemories: async (entries) => {
+    const existingIds = new Set(get().memories.map((memory) => memory.id));
+    const added: MemoryEntry[] = [];
+    try {
+      for (const entry of entries) {
+        if (existingIds.has(entry.id)) continue;
+        await dbClient.putMemory(entry);
+        existingIds.add(entry.id);
+        added.push(entry);
+      }
+    } finally {
+      if (added.length) set((state) => ({ memories: [...added, ...state.memories].sort((a, b) => b.createdAt - a.createdAt) }));
+    }
+    return added.length;
   },
 
   createMemory: async (text, input = {}) => {
