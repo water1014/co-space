@@ -1,0 +1,59 @@
+/* Moon Garden — full feature atlas */
+.moon-home-atlas{position:relative!important;width:100%;height:100%;overflow:hidden;background:#dce9f0}
+.moon-home-atlas .moon-atlas-viewport{position:relative;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;scroll-behavior:smooth}
+.moon-home-atlas .moon-atlas-viewport::-webkit-scrollbar{display:none}
+.moon-home-atlas .moon-atlas-scene{position:relative!important;width:max(100vw,3200px)!important;height:100%!important;min-height:560px;aspect-ratio:auto!important;overflow:hidden;isolation:isolate}
+.moon-home-atlas .moon-artwork-image{position:absolute!important;inset:0;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center;pointer-events:none;user-select:none}
+.moon-home-atlas .moon-artwork-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(14,37,56,.22),transparent 20%,transparent 82%,rgba(14,37,56,.16)),linear-gradient(180deg,rgba(12,33,51,.12),transparent 28%,transparent 75%,rgba(12,33,51,.2))}
+.moon-home-atlas.is-day{--atlas-ink:#28465d;--atlas-muted:#55758b;--atlas-glass:rgba(237,248,253,.72);--atlas-line:rgba(255,255,255,.86);--atlas-glow:rgba(220,244,255,.92)}
+.moon-home-atlas.is-night{--atlas-ink:#e4f1f8;--atlas-muted:#b1cbdc;--atlas-glass:rgba(17,43,65,.68);--atlas-line:rgba(202,229,244,.55);--atlas-glow:rgba(170,219,248,.9)}
+.moon-atlas-brand{position:absolute;z-index:3;left:3.5%;top:8%;width:310px;color:var(--atlas-ink);text-shadow:0 1px 16px rgba(255,255,255,.3);pointer-events:none}
+.moon-atlas-kicker,.moon-atlas-translation{display:block;font:9px/1.6 Georgia,serif;letter-spacing:.2em;color:var(--atlas-muted)}
+.moon-atlas-brand h1{margin:12px 0 7px;font:400 44px/1.15 "Noto Serif SC","Songti SC",serif;letter-spacing:.2em}
+.moon-atlas-brand p{margin-top:20px;font:13px/2 "Noto Serif SC","Songti SC",serif;letter-spacing:.1em;color:var(--atlas-muted)}
+.moon-atlas-date{position:absolute;z-index:3;right:3.5%;top:7%;display:flex;align-items:center;gap:13px;padding:10px 16px;border:1px solid var(--atlas-line);border-radius:999px;background:var(--atlas-glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:var(--atlas-ink);font:11px Georgia,"Noto Serif SC",serif;letter-spacing:.08em}
+.moon-atlas-date span:first-child{font-size:17px}.moon-atlas-date i{width:1px;height:13px;background:currentColor;opacity:.3}
+.moon-atlas-room-labels{position:absolute;inset:0;z-index:2;pointer-events:none}
+.moon-atlas-room{position:absolute;top:14%;display:flex;flex-direction:column;gap:5px;color:var(--atlas-ink);white-space:nowrap;text-shadow:0 1px 12px rgba(255,255,255,.5)}
+.moon-atlas-room:after{content:"";width:50px;height:1px;margin-top:5px;background:linear-gradient(90deg,var(--atlas-line),transparent)}
+.moon-atlas-room span{font:8px Georgia,serif;letter-spacing:.16em;color:var(--atlas-muted)}
+.moon-atlas-room strong{font:400 19px "Noto Serif SC","Songti SC",serif;letter-spacing:.2em}
+.moon-atlas-features{position:absolute;inset:0;z-index:4}
+.moon-atlas-feature{position:absolute;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:94px;transform:translate(-50%,-50%);color:var(--atlas-ink);text-decoration:none;outline:none;animation:atlas-arrive .65s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--feature-order)*24ms);-webkit-tap-highlight-color:transparent}
+.moon-atlas-object{position:relative;display:grid;place-items:center;width:54px;height:54px;border:1px solid var(--atlas-line);border-radius:50%;background:linear-gradient(145deg,rgba(255,255,255,.55),var(--atlas-glass));box-shadow:0 8px 28px rgba(18,48,70,.13),inset 0 1px 0 rgba(255,255,255,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s}
+.moon-atlas-object-ring{position:absolute;inset:5px;border:1px solid var(--atlas-line);border-radius:50%;opacity:.72}
+.moon-atlas-object-glyph{position:relative;z-index:1;font:400 19px "Noto Serif SC","Songti SC",serif;letter-spacing:.04em}
+.moon-atlas-object-orbit{position:absolute;inset:-5px;border:1px solid var(--atlas-line);border-radius:50%;transform:rotate(-28deg) scaleX(1.22);opacity:.58}
+.moon-atlas-feature-copy{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 10px 6px;border-radius:10px;background:var(--atlas-glass);border:1px solid var(--atlas-line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(18,48,70,.08);white-space:nowrap}
+.moon-atlas-feature-copy small{font:7px Georgia,serif;letter-spacing:.15em;color:var(--atlas-muted)}
+.moon-atlas-feature-copy strong{font:500 12px "Noto Serif SC","Songti SC",serif;letter-spacing:.08em}
+.moon-atlas-feature.is-large .moon-atlas-object{width:68px;height:68px}
+.moon-atlas-feature.is-large .moon-atlas-object-glyph{font-size:24px}
+.moon-atlas-feature:active .moon-atlas-object{transform:scale(.92)}
+@media(hover:hover){.moon-atlas-feature:hover .moon-atlas-object{transform:translateY(-5px) scale(1.06);box-shadow:0 14px 32px rgba(18,48,70,.2),0 0 24px var(--atlas-glow);border-color:var(--atlas-glow)}.moon-atlas-feature:hover .moon-atlas-feature-copy{background:var(--atlas-glow)}}
+.moon-atlas-signature{position:absolute;z-index:3;right:3.5%;bottom:5%;display:flex;flex-direction:column;align-items:flex-end;gap:5px;color:var(--atlas-ink);font:8px Georgia,"Noto Serif SC",serif;letter-spacing:.15em;text-shadow:0 1px 12px rgba(255,255,255,.5);pointer-events:none}
+.moon-atlas-signature span+span{font:10px "Noto Serif SC","Songti SC",serif;letter-spacing:.08em;color:var(--atlas-muted)}
+.moon-atlas-scroll-hint{position:absolute;z-index:8;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:9px;padding:7px 13px;border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(236,247,252,.58);backdrop-filter:blur(12px);color:#46657a;font:10px "Noto Serif SC","Songti SC",serif;letter-spacing:.1em;pointer-events:none;white-space:nowrap}
+.moon-atlas-scroll-hint span{width:18px;height:1px;background:currentColor;position:relative}
+.moon-atlas-scroll-hint span:after{content:"";position:absolute;right:0;top:-3px;width:6px;height:6px;border-top:1px solid;border-right:1px solid;transform:rotate(45deg)}
+.moon-home-atlas.is-night .moon-atlas-scroll-hint{background:rgba(17,43,65,.68);color:#c2d9e8;border-color:rgba(202,229,244,.4)}
+@keyframes atlas-arrive{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
+@media(max-width:767px){
+ .moon-home-atlas .moon-atlas-scene{width:3200px!important;min-height:100%!important}
+ .moon-atlas-brand{left:4%;top:7%;width:240px}
+ .moon-atlas-brand h1{font-size:36px}
+ .moon-atlas-brand p{font-size:11px;margin-top:12px}
+ .moon-atlas-kicker,.moon-atlas-translation{font-size:7px}
+ .moon-atlas-date{right:auto;left:4%;top:29%;padding:7px 11px;font-size:9px;gap:8px}
+ .moon-atlas-room{top:17%}
+ .moon-atlas-room strong{font-size:16px}
+ .moon-atlas-feature{min-width:86px;gap:6px}
+ .moon-atlas-object{width:48px;height:48px}
+ .moon-atlas-object-glyph{font-size:17px}
+ .moon-atlas-feature-copy{padding:4px 8px}
+ .moon-atlas-feature-copy strong{font-size:11px}
+ .moon-atlas-feature-copy small{font-size:6px}
+ .moon-atlas-feature.is-large .moon-atlas-object{width:60px;height:60px}
+ .moon-atlas-signature{right:3%;bottom:5%}
+}
+@media(prefers-reduced-motion:reduce){.moon-atlas-feature{animation:none}}
