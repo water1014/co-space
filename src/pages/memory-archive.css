@@ -79,3 +79,8 @@
 [data-theme="night"] .ma-tree-charm small{color:#e0edf2}
 @media(max-width:380px){.ma-tree-stage{margin-left:-3px;margin-right:-3px;padding-left:5px;padding-right:5px}.ma-tree-art{height:250px}.ma-tree-note b{font-size:11px}.ma-tree-note span{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.ma-tree-orbit{animation:none}.ma-tree-charm{transition:none}}
+
+/* Original Sealed Days tree, embedded without redrawing its artwork */
+.ma-original-tree-stage{padding:0;overflow:hidden;border:0;border-radius:0;background:transparent;box-shadow:none}
+.ma-original-tree-frame{display:block;width:100%;height: min(760px, 188vw);min-height:620px;border:0;background:transparent}
+@media(max-width:380px){.ma-original-tree-frame{height:700px;min-height:700px}}
