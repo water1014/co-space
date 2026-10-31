@@ -104,7 +104,7 @@ export function Home() {
 
           <div className="moon-atlas-room-labels" aria-hidden="true">
             {rooms.map((room) => (
-              <div className="moon-atlas-room" key={room.no} style={{ left: `${room.x}%` }}>
+              <div className="moon-atlas-room" key={room.no} style={{ left: `${room.x / 1.65}%` }}>
                 <span>{room.no} / {room.en}</span>
                 <strong>{room.name}</strong>
               </div>
@@ -117,7 +117,7 @@ export function Home() {
                 key={feature.id}
                 to={feature.to}
                 className={`moon-atlas-feature ${feature.size === "large" ? "is-large" : ""}`}
-                style={{ left: `${feature.x}%`, top: `${feature.y}%`, ["--feature-order" as string]: index }}
+                style={{ left: `${feature.x / 1.65}%`, top: `${feature.y}%`, ["--feature-order" as string]: index }}
                 aria-label={`${feature.room}：${feature.name}`}
                 title={`${feature.name} · ${feature.room}`}
               >
