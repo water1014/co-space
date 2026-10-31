@@ -4954,3 +4954,73 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
   .memory-index-mark { flex-basis:48px; width:48px; height:48px; font-size:22px; }
   .memory-ledger-intro { padding:13px; }
 }
+
+
+/* ===== Mirror House · 暂停玻璃材质，回归纸面与留白 =====
+   参考图到来前，全站以实体纸面、发丝分隔线和排版层次建立质感。
+   交互与组件结构不变，只替换视觉材质。 */
+:root,
+[data-theme="day"],
+[data-theme="night"] {
+  --glass-bg: var(--surface);
+  --glass-bg-strong: var(--surface);
+  --glass-border: var(--line);
+  --glass-sheen: transparent;
+  --glass-blur: 0px;
+  --shadow-glass: var(--shadow-card);
+}
+
+/* 全站停用背景采样模糊，避免旧组件遗漏玻璃效果。 */
+*,
+*::before,
+*::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.glass,
+.glass-hi,
+.glass-flat,
+.glass-solid,
+.sheet-solid,
+.editorial-sheet {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+.glass-flat,
+.glass-hi {
+  background: var(--surface-2) !important;
+}
+
+.bubble,
+.user-bubble,
+.assistant-bubble,
+.composer-pill,
+.chat-round {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: var(--surface-2) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: none !important;
+}
+
+.memory-ledger-intro,
+.memory-entry,
+.memory-type-tile,
+.memory-editorial-tabs {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+
+.memory-type-tile {
+  background: var(--surface-2) !important;
+}
+
+.memory-entry::before {
+  opacity: .55;
+}
