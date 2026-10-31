@@ -15,3 +15,12 @@
   .mt-original-tree{width:720px;max-width:none;height:760px;min-height:760px}
 }
 @media(prefers-reduced-motion:reduce){.mt-tree-shell{scroll-behavior:auto}}
+
+
+/* Clear keyboard focus and comfortable touch feedback for the tree controls. */
+.mt-period-controls select:focus-visible,.mt-month-jump button:focus-visible{outline:2px solid rgba(104,157,181,.85);outline-offset:3px}
+.mt-period-controls select,.mt-month-jump button{-webkit-tap-highlight-color:transparent}
+.mt-month-jump button{transition:background .18s ease,transform .18s ease,border-color .18s ease}
+.mt-month-jump button:active{border-color:rgba(104,157,181,.55)}
+.mt-original-tree:focus-visible{outline:2px solid rgba(104,157,181,.65);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.mt-month-jump button{transition:none}}
