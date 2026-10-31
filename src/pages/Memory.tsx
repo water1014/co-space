@@ -22,6 +22,7 @@ export function Memory() {
   const [selectedDay, setSelectedDay] = useState(() => dayKey(parsedInitialDay));
   const [view, setView] = useState<"saved" | "index">("index");
   const [query, setQuery] = useState("");
+  const [selectedTag, setSelectedTag] = useState("");
   const [opened, setOpened] = useState<MemoryEntry | null>(null);
   const [draft, setDraft] = useState("");
   const [draftTags, setDraftTags] = useState("");
@@ -49,12 +50,14 @@ export function Memory() {
     memories.forEach((m) => map.set(entryDay(m), (map.get(entryDay(m)) ?? 0) + 1));
     return map;
   }, [memories]);
+  const tagOptions = useMemo(() => [...new Set(memories.flatMap((memory) => memory.tags))].sort((a, b) => a.localeCompare(b, "zh-CN")), [memories]);
   const visible = useMemo(() => {
     const q = query.trim().toLocaleLowerCase();
     return memories.filter((m) => view === "saved" ? m.pinned : entryDay(m) === selectedDay)
       .filter((m) => !q || m.text.toLocaleLowerCase().includes(q) || m.tags.some((tag) => tag.toLocaleLowerCase().includes(q)))
+      .filter((m) => !selectedTag || m.tags.includes(selectedTag))
       .sort((a, b) => b.createdAt - a.createdAt);
-  }, [memories, query, selectedDay, view]);
+  }, [memories, query, selectedDay, selectedTag, view]);
   const moveMonth = (delta: number) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
   const selectDay = (key: string) => { setSelectedDay(key); setSearchParams({ day: key }, { replace: true }); const [y, m] = key.split("-").map(Number); setMonth(new Date(y, m - 1, 1)); };
   const moveDay = (delta: number) => { const [y,m,d] = selectedDay.split("-").map(Number); const next = new Date(y,m-1,d+delta); selectDay(dayKey(next)); };
@@ -76,6 +79,18 @@ export function Memory() {
   const saveNewMemory = () => runMemoryAction("create", () => createMemory(newText, { tags: parseTags(newTags), createdAt: new Date(`${selectedDay}T12:00:00`).getTime() }), () => { setNewText(""); setNewTags(""); setShowComposer(false); });
   const saveOpenedMemory = () => opened && runMemoryAction("edit", () => patchMemory(opened.id, { text: draft.trim(), tags: parseTags(draftTags) }), () => setOpened(null));
   const deleteOpenedMemory = () => opened && runMemoryAction("delete", () => removeMemory(opened.id), () => setOpened(null));
+  const exportMemories = () => {
+    const payload = { exportedAt: new Date().toISOString(), format: "jinghua-memory-backup-v1", memories };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `镜花水月-记忆备份-${dayKey(new Date())}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
 
   return <main className="memory-archive-page">
     <header className="ma-topline"><BackButton /><span>JING HUA SHUI YUE <i>/</i> MEMORY ATLAS</span><span className="ma-top-index">03 — 12</span></header>
@@ -98,6 +113,7 @@ export function Memory() {
       {view === "saved" && <div className="ma-collection-intro"><div className="ma-collection-kicker"><span>THE PRIVATE EDITION</span><i>✧</i><span>VOL. 01</span></div><div className="ma-collection-title"><div><span className="ma-eyebrow">A FEW THINGS WORTH KEEPING</span><h2>珍藏<span>。</span></h2><p>那些不想让时间带走的片刻。</p></div><div className="ma-collection-index"><strong>{memories.filter((m) => m.pinned).length.toString().padStart(2,"0")}</strong><small>KEPT MOMENTS</small></div></div><div className="ma-collection-rule"><span>SELECTED MEMORIES</span><i /></div></div>}
       <div className="ma-record-heading"><div><span className="ma-eyebrow">{view === "saved" ? "KEPT CLOSE, KEPT SAFE" : "A DAY IN YOUR STORY"}</span><h2>{view === "saved" ? "精选目录" : "日常记忆"}</h2></div><span className="ma-record-count">{visible.length.toString().padStart(2, "0")} <small>ENTRIES</small></span></div>
       <label className="ma-search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索文字、标签与片段…" />{query && <button className="ma-search-clear" type="button" onClick={() => setQuery("")}>清除</button>}<kbd>SEARCH</kbd></label>
+      <div className="ma-tools-row"><div className="ma-tag-filters" aria-label="按标签筛选"><button type="button" className={!selectedTag ? "active" : ""} aria-pressed={!selectedTag} onClick={() => setSelectedTag("")}>全部标签</button>{tagOptions.map((tag) => <button type="button" key={tag} className={selectedTag === tag ? "active" : ""} aria-pressed={selectedTag === tag} onClick={() => setSelectedTag(selectedTag === tag ? "" : tag)}>#{tag}</button>)}</div><button type="button" className="ma-export" onClick={exportMemories} disabled={!memories.length}>↓ 导出备份</button></div>
       <div className="ma-entry-list">{visible.map((entry, index) => <article className={`ma-entry ${view === "saved" ? "ma-entry-saved" : ""} ${view === "saved" && index === 0 ? "ma-entry-featured" : ""}`} key={entry.id}><div className="ma-entry-rail"><span>{String(index + 1).padStart(2, "0")}</span><i /></div><button className="ma-entry-body" onClick={() => openEntry(entry)}>{view === "saved" && (!visible[index - 1] || entryDay(visible[index - 1]) !== entryDay(entry)) && <span className="ma-entry-date-divider"><i />{new Date(entry.createdAt).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}<small>DAY NOTE</small></span>}<div className="ma-entry-meta"><span>{new Date(entry.createdAt).toLocaleString("zh-CN", { month:"numeric", day:"numeric", hour:"2-digit", minute:"2-digit" })}</span><span>{entry.pinned ? "✦ 已珍藏" : entry.kind === "todo" ? "待完成" : entry.kind === "feel" ? "心绪" : "记忆"}</span></div><p>{entry.text}</p>{entry.tags.length > 0 && <div className="ma-tags">{entry.tags.slice(0, 4).map((tag) => <span key={tag}>#{tag}</span>)}</div>}</button><button className={`ma-pin ${entry.pinned ? "is-pinned" : ""}`} aria-label={entry.pinned ? "取消珍藏" : "加入珍藏"} onClick={() => void runMemoryAction(`pin:${entry.id}`, () => togglePin(entry.id))} disabled={busyAction === `pin:${entry.id}`}>✧</button></article>)}
         {!visible.length && <div className="ma-empty"><span>◌</span><strong>{loading ? "正在整理记忆…" : view === "saved" ? "还没有珍藏的片段" : "这一天暂时空白"}</strong><p>{view === "saved" ? "试试其他关键词，或把值得留下的片段标记为珍藏。" : "留白也是时间的一部分。你可以在这里写下一段记忆。"}</p></div>}
       </div>
