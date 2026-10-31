@@ -1,39 +1,20 @@
-/* Moon Garden — hairline entrances, never boxed cards. */
-html:has(.moon-world-map),body:has(.moon-world-map),#root:has(.moon-world-map){width:100%;height:100%;min-height:100%;margin:0;padding:0;overflow:hidden;background:transparent!important}
-body:has(.moon-world-map) .pocket-shell,body:has(.moon-world-map) .pocket-shell>div,body:has(.moon-world-map) main:has(.moon-world-map){width:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;filter:none!important;background:transparent!important;overflow:hidden!important}
-.moon-home.immersive-moon.moon-world-map{position:fixed!important;inset:0!important;z-index:0;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}
-.moon-scene-viewport{position:absolute;inset:0;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;scroll-behavior:smooth;outline:none;border:0;border-radius:0;box-shadow:none;background:transparent;cursor:grab;user-select:none;-webkit-user-select:none}
-.moon-scene-viewport::-webkit-scrollbar{display:none}
-.moon-scene-viewport:active{cursor:grabbing}
-.moon-scene{position:relative;width:max(100vw,177.7778dvh);height:100%;min-height:100%;isolation:isolate;overflow:hidden;background:transparent!important}
-.moon-artwork-image{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center center;user-select:none;pointer-events:none;-webkit-user-drag:none}
+/* Edge-to-edge Moon Garden. The artwork is the surface; entrances stay light. */
+html:has(.moon-world-map),body:has(.moon-world-map),#root:has(.moon-world-map){width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}
+body:has(.moon-world-map) .moon-garden-shell,body:has(.moon-world-map) .pocket-shell,body:has(.moon-world-map) .pocket-shell>div,body:has(.moon-world-map) .scroll-area,body:has(.moon-world-map) main:has(.moon-world-map){position:static!important;inset:auto!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;filter:none!important;background:transparent!important;background-image:none!important;overflow:hidden!important}
+.moon-home.immersive-moon.moon-world-map{position:fixed!important;inset:0!important;z-index:999!important;display:block!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.moon-scene-viewport{position:absolute!important;inset:0!important;width:100vw!important;height:100%!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;scroll-behavior:smooth;outline:none;border:0;border-radius:0;box-shadow:none;background:transparent!important;cursor:grab;user-select:none;-webkit-user-select:none}
+.moon-scene-viewport::-webkit-scrollbar{display:none}.moon-scene-viewport:active{cursor:grabbing}
+.moon-scene{position:relative;width:max(100vw,177.7778dvh);height:100%!important;min-height:0!important;isolation:isolate;overflow:hidden;background:transparent!important}
+.moon-artwork-image{position:absolute!important;inset:0!important;z-index:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center!important;user-select:none;pointer-events:none;-webkit-user-drag:none}
 .moon-map-entries{position:absolute;inset:0;z-index:2;pointer-events:none}
-.moon-map-place{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:92px;padding:7px 11px 8px;color:#254b65;text-decoration:none;transform:translate(-50%,-50%);pointer-events:auto;-webkit-tap-highlight-color:transparent;transition:transform .36s cubic-bezier(.2,.8,.2,1),filter .36s ease,opacity .25s ease}
+.moon-map-place{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;padding:5px 8px;color:#254b65;text-decoration:none;transform:translate(-50%,-50%);pointer-events:auto;-webkit-tap-highlight-color:transparent;transition:transform .25s ease,filter .25s ease}
 .moon-map-place.is-right{transform:translate(-85%,-50%)}
-.moon-entry-ornament{display:grid;place-items:center;height:24px;opacity:.86;transition:transform .36s ease,opacity .36s ease}
-.moon-entry-mark{width:34px;height:22px;overflow:visible;fill:none;stroke:currentColor;stroke-width:.8;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 2px rgba(255,255,255,.72))}
-.moon-entry-copy{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 8px 4px;background:linear-gradient(110deg,rgba(235,248,255,.08),rgba(222,242,252,.24) 48%,rgba(235,248,255,.08));border-top:1px solid rgba(242,251,255,.76);border-bottom:1px solid rgba(102,158,190,.48);box-shadow:0 5px 16px rgba(37,81,111,.08),inset 0 1px 0 rgba(255,255,255,.55);backdrop-filter:blur(7px) saturate(125%);-webkit-backdrop-filter:blur(7px) saturate(125%)}
-.moon-entry-copy:before,.moon-entry-copy:after{content:"";position:absolute;top:3px;bottom:3px;width:5px;border-top:1px solid currentColor;border-bottom:1px solid currentColor;opacity:.48}
-.moon-entry-copy:before{left:0;border-left:1px solid currentColor}
-.moon-entry-copy:after{right:0;border-right:1px solid currentColor}
-.moon-entry-en{font-family:"EB Garamond",Georgia,serif;font-size:8px;line-height:1.1;letter-spacing:.22em;font-weight:500;opacity:.62;white-space:nowrap}
-.moon-map-label{display:block;font-family:"Noto Serif SC","Songti SC","STSong",serif;font-size:clamp(15px,1.22vw,19px);font-weight:500;line-height:1.35;letter-spacing:.16em;white-space:nowrap;color:inherit;text-shadow:0 1px 2px rgba(255,255,255,.92),0 0 10px rgba(255,255,255,.72)}
-.moon-entry-rule{position:relative;display:block;width:36px;height:5px;margin-top:2px;border-top:1px solid currentColor;opacity:.54;transition:width .35s ease,opacity .35s ease}
-.moon-entry-rule:before,.moon-entry-rule:after{content:"";position:absolute;top:-3px;width:4px;height:4px;border:1px solid currentColor;transform:rotate(45deg);background:rgba(238,248,255,.35)}
-.moon-entry-rule:before{left:0}.moon-entry-rule:after{right:0}
-.moon-entry-rule i{position:absolute;left:50%;top:-3px;width:4px;height:4px;border:1px solid currentColor;border-radius:50%;transform:translateX(-50%);background:rgba(238,248,255,.55)}
-.moon-map-place.is-major .moon-entry-mark{width:40px;height:26px}
-.moon-map-place.is-major .moon-entry-copy{padding:4px 11px 5px}
-.moon-map-place.is-major .moon-map-label{font-size:clamp(16px,1.35vw,21px);letter-spacing:.19em}
-.moon-map-place.is-major .moon-entry-rule{width:46px}
-.moon-map-place:focus-visible{outline:none;filter:drop-shadow(0 0 8px rgba(180,224,248,.95))}
-.moon-map-place:active{transform:translate(-50%,-50%) scale(.96);opacity:.84}
-.moon-map-place.is-right:active{transform:translate(-85%,-50%) scale(.96)}
-@media(hover:hover){.moon-map-place:hover{transform:translate(-50%,-54%);filter:drop-shadow(0 3px 8px rgba(174,222,247,.72))}.moon-map-place.is-right:hover{transform:translate(-85%,-54%)}.moon-map-place:hover .moon-entry-ornament{transform:translateY(-2px);opacity:1}.moon-map-place:hover .moon-entry-rule{width:62px;opacity:.9}}
-.immersive-moon.is-night .moon-map-place{color:#e4f2fa}
-.immersive-moon.is-night .moon-entry-copy{background:linear-gradient(110deg,rgba(9,35,56,.16),rgba(13,48,70,.42) 48%,rgba(9,35,56,.16));border-top-color:rgba(211,237,250,.48);border-bottom-color:rgba(159,202,225,.42);box-shadow:0 6px 18px rgba(0,10,22,.12),inset 0 1px 0 rgba(230,247,255,.22)}
-.immersive-moon.is-night .moon-entry-mark{filter:drop-shadow(0 1px 3px rgba(0,10,22,.7))}
-.immersive-moon.is-night .moon-map-label{text-shadow:0 1px 3px rgba(4,18,32,.92),0 0 12px rgba(4,18,32,.72)}
-.immersive-moon.is-night .moon-entry-rule:before,.immersive-moon.is-night .moon-entry-rule:after,.immersive-moon.is-night .moon-entry-rule i{background:rgba(12,37,56,.65)}
-@media(max-width:767px){.moon-map-place{min-width:80px;padding:6px 7px}.moon-entry-ornament{height:20px}.moon-entry-mark{width:29px;height:19px}.moon-map-place.is-major .moon-entry-mark{width:34px;height:22px}.moon-entry-copy{padding:3px 7px 4px;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}.moon-entry-en{font-size:7px;letter-spacing:.18em}.moon-map-label{font-size:14px;letter-spacing:.12em}.moon-map-place.is-major .moon-map-label{font-size:15px}.moon-entry-rule{width:28px}.moon-map-place.is-major .moon-entry-rule{width:36px}}
-@media(prefers-reduced-motion:reduce){.moon-scene-viewport,.moon-map-place,.moon-entry-ornament,.moon-entry-rule{scroll-behavior:auto;transition:none}}
+.moon-entry-ornament{display:grid;place-items:center;height:10px;opacity:.78}
+.moon-entry-mark{display:block;width:28px;height:12px;fill:none;stroke:currentColor;stroke-width:.85;stroke-linecap:round;stroke-linejoin:round}
+.moon-map-label{display:block;padding:0;border:0;background:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;font-family:"Noto Serif SC","Songti SC","STSong",serif;font-size:clamp(15px,1.25vw,19px);font-weight:500;line-height:1.4;letter-spacing:.15em;white-space:nowrap;color:inherit;text-shadow:0 1px 2px rgba(255,255,255,.95),0 0 9px rgba(255,255,255,.88)}
+.moon-map-place.is-major .moon-entry-mark{width:32px;height:14px}.moon-map-place.is-major .moon-map-label{font-size:clamp(16px,1.35vw,21px);letter-spacing:.18em}
+.moon-map-place:focus-visible{outline:1px solid currentColor;outline-offset:5px}.moon-map-place:active{transform:translate(-50%,-50%) scale(.97)}.moon-map-place.is-right:active{transform:translate(-85%,-50%) scale(.97)}
+@media(hover:hover){.moon-map-place:hover{transform:translate(-50%,-53%);filter:drop-shadow(0 2px 5px rgba(177,220,244,.55))}.moon-map-place.is-right:hover{transform:translate(-85%,-53%)}}
+.immersive-moon.is-night .moon-map-place{color:#e4f2fa}.immersive-moon.is-night .moon-map-label{text-shadow:0 1px 3px rgba(4,18,32,.95),0 0 9px rgba(4,18,32,.82)}
+@media(max-width:767px){.moon-map-place{padding:4px 5px;gap:2px}.moon-entry-ornament{height:8px}.moon-entry-mark{width:23px;height:10px}.moon-map-place.is-major .moon-entry-mark{width:27px;height:12px}.moon-map-label{font-size:14px;letter-spacing:.12em}.moon-map-place.is-major .moon-map-label{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.moon-scene-viewport,.moon-map-place{scroll-behavior:auto;transition:none}}
