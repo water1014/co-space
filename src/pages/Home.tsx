@@ -11,21 +11,21 @@ const nightArtwork = new URL("../../月光下的镜花水月 salon.png", import.
 type Door = { title: string; note: string; to: string; x: number; y: number };
 
 const dayDoors: Door[] = [
-  { title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 21, y: 28 },
-  { title: "云笺室", note: "写一封想说的话", to: "/diary", x: 21, y: 83 },
-  { title: "花镜园", note: "让回忆在这里生长", to: "/album", x: 74, y: 28 },
-  { title: "月声", note: "收藏此刻的声音", to: "/music", x: 63, y: 83 },
-  { title: "月下人", note: "关于那个重要的人", to: "/mit", x: 93, y: 32 },
-  { title: "月约", note: "把重要的日子留住", to: "/calendar", x: 89, y: 59 },
+  { title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 21, y: 34 },
+  { title: "云笺室", note: "写一封想说的话", to: "/diary", x: 21, y: 75 },
+  { title: "花镜园", note: "让回忆在这里生长", to: "/album", x: 74, y: 34 },
+  { title: "月声", note: "收藏此刻的声音", to: "/music", x: 63, y: 75 },
+  { title: "月下人", note: "关于那个重要的人", to: "/mit", x: 93, y: 37 },
+  { title: "月约", note: "把重要的日子留住", to: "/calendar", x: 89, y: 56 },
 ];
 
 const nightDoors: Door[] = [
-  { title: "藏忆阁", note: "收藏我们的回忆", to: "/memory", x: 12, y: 27 },
-  { title: "幽梦居", note: "只属于我们的夜晚", to: "/studio", x: 10, y: 79 },
-  { title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 53, y: 42 },
-  { title: "花镜园", note: "让回忆在这里生长", to: "/album", x: 87, y: 29 },
-  { title: "月约", note: "把重要的日子留住", to: "/calendar", x: 92, y: 67 },
-  { title: "月声", note: "收藏此刻的声音", to: "/music", x: 59, y: 81 },
+  { title: "藏忆阁", note: "收藏我们的回忆", to: "/memory", x: 12, y: 33 },
+  { title: "幽梦居", note: "只属于我们的夜晚", to: "/studio", x: 10, y: 72 },
+  { title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 53, y: 44 },
+  { title: "花镜园", note: "让回忆在这里生长", to: "/album", x: 87, y: 35 },
+  { title: "月约", note: "把重要的日子留住", to: "/calendar", x: 92, y: 62 },
+  { title: "月声", note: "收藏此刻的声音", to: "/music", x: 59, y: 73 },
 ];
 
 export function Home() {
