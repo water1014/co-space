@@ -18,15 +18,12 @@ const depthOf = (p: string) => p.split("/").filter(Boolean).length;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
-
+  const isMoonGarden = location.pathname === "/";
   const mainRef = useRef<HTMLElement>(null);
   const scrollMem = useRef<Record<string, number>>({});
   const prevPath = useRef(location.pathname);
-
-  // 更深 = 前进（右滑入），否则 = 返回（左滑入）
   const dir = depthOf(location.pathname) > depthOf(prevPath.current) ? "page-push" : "page-pop";
 
-  // 切页后恢复该页上次的滚动位置
   useLayoutEffect(() => {
     const el = mainRef.current;
     if (el) el.scrollTop = scrollMem.current[location.pathname] ?? 0;
@@ -42,39 +39,32 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
-      <BackgroundLayer />
-
+    <div className={`relative h-full w-full overflow-hidden ${isMoonGarden ? "moon-garden-shell" : ""}`}>
+      {!isMoonGarden && <BackgroundLayer />}
       <div className="pocket-shell relative flex h-full w-full justify-center">
-        <div className={`relative flex h-full w-full ${location.pathname === "/" ? "max-w-none" : "max-w-[600px]"} flex-col`}>
+        <div className={`relative flex h-full w-full ${isMoonGarden ? "max-w-none" : "max-w-[600px]"} flex-col`}>
           <main
             key={location.pathname}
             ref={mainRef}
             onScroll={onScroll}
-            className={`scroll-area min-h-0 flex-1 ${location.pathname === "/" ? "pb-0 overflow-hidden" : "pb-24"} ${dir}`}
+            className={`scroll-area min-h-0 flex-1 ${isMoonGarden ? "h-full overflow-hidden p-0" : "pb-24"} ${dir}`}
           >
             {children}
           </main>
-
-          <TabBar />
+          {!isMoonGarden && <TabBar />}
         </div>
       </div>
-
     </div>
   );
 }
 
 type TabIcon = React.ComponentType<SVGProps<SVGSVGElement> & { strokeWidth?: number }>;
 
-/** 底部悬浮胶囊导航（参考「河床」的浮动底栏） */
+/** 底部悬浮胶囊导航（仅在房间页面显示；月庭由场景入口承担导航） */
 function TabBar() {
   const location = useLocation();
   return (
-    <nav
-      aria-label="主导航"
-      className="fixed inset-x-0 bottom-0 z-40"
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)" }}
-    >
+    <nav aria-label="主导航" className="fixed inset-x-0 bottom-0 z-40" style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)" }}>
       <div className="pocket-dock mx-auto flex w-[min(94%,420px)] items-center rounded-[26px] border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-1.5 py-1.5 shadow-[var(--shadow-float)] backdrop-blur-2xl">
         {TAB_DEFS.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.to === "/"}
