@@ -33,6 +33,8 @@ export function Home() {
   const theme = useThemeStore((state) => state.theme);
   const doors = theme === "night" ? nightDoors : dayDoors;
   const days = daysTogether(life.anniversary);
+  const dateParts = new Intl.DateTimeFormat("en-GB", { month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const today = `${dateParts.find((part) => part.type === "month")?.value ?? "--"} / ${dateParts.find((part) => part.type === "day")?.value ?? "--"}`;
   const track = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<string | null>(null);
 
@@ -55,7 +57,7 @@ export function Home() {
         <div className="moon-days"><span>相伴</span><strong>{days}</strong><span>天</span></div>
       </header>
 
-      <div className="moon-scene-viewport" ref={track} aria-label="月庭全景，可左右滑动探索">
+      <div className="moon-scene-viewport" ref={track} role="region" tabIndex={0} aria-label="月庭全景，可左右滑动探索" aria-roledescription="横向全景">
         <div className="moon-scene">
           <div className="moon-artwork" aria-hidden="true">
             <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
@@ -67,7 +69,7 @@ export function Home() {
             <span className="moon-brand-motto">有些相遇，是为了在一生里，慢慢看。</span>
           </div>
           <div className="moon-scene-meta" aria-hidden="true">
-            <span>☾</span><span>月色 · 晴</span><i></i><span>04 / 24</span>
+            <span>{theme === "night" ? "☾" : "☼"}</span><span>{theme === "night" ? "月色" : "晨光"}</span><i></i><span>{today}</span>
           </div>
           {doors.map((door) => (
             <Link
@@ -80,7 +82,7 @@ export function Home() {
               onMouseEnter={() => setActive(door.title)}
               onMouseLeave={() => setActive(null)}
               onTouchStart={() => setActive(door.title)}
-              aria-label={`进入${door.title}`}
+              aria-label={`进入${door.title}：${door.note}`}
             >
               <span className="moon-hotspot-name">{door.title}</span>
               <span className="moon-hotspot-note">{door.note}</span>
