@@ -62,7 +62,6 @@ export function Memory() {
           <img className="ma-sealed-tree-img" src={SEALED_DAYS_TREE} alt="封存树" />
           {memories.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,8).map((entry,i)=>{const a=[[17.93,64.63,14,90,60],[4.13,45.99,88,60,90],[62.3,49.75,264,40,40],[71.35,55.02,95,120,90],[30.84,54.52,26,90,120],[16.43,46.24,20,90,60],[34.8,41.64,6,60,90],[58.61,40.38,123,40,40]][i];const day=entryDay(entry);const date=new Date(entry.createdAt);return <button key={entry.id} className="ma-sealed-tag" style={{left:`${a[0]}%`,top:`${a[1]}%`,["--rope" as any]:`${a[2]}px`,["--cw" as any]:`${a[3]}px`,["--ch" as any]:`${a[4]}px`,["--delay" as any]:`${i*.12}s`}} onClick={()=>{setSelectedDay(day);setMonth(new Date(date.getFullYear(),date.getMonth(),1));}} aria-label={`查看${day}的记忆`} title={entry.text}><span className="ma-sealed-sway"><i className="ma-sealed-line"/><span className="ma-sealed-card"/><span className="ma-sealed-date">{date.getDate()}</span></span></button>})}
         </div>
-        </div>
         <p className="ma-tree-motto">“时间没有带走一切，它让珍贵的事物长成了树。”</p>
       </div>
       <div className="ma-calendar">{["日","一","二","三","四","五","六"].map((d) => <span className="ma-weekday" key={d}>{d}</span>)}
