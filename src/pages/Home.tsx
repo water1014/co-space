@@ -51,6 +51,8 @@ export function Home() {
         ? Math.min(savedMoonSceneScrollLeft, maxScroll)
         : maxScroll * 0.5;
     }
+    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+    setSceneProgress(maxScroll > 0 ? (el.scrollLeft / maxScroll) * 100 : 0);
   }, []);
 
   const rememberScenePosition = () => {
