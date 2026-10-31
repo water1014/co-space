@@ -2,24 +2,22 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import type { ReactNode, SVGProps } from "react";
 import { BackgroundLayer } from "./BackgroundLayer";
-import { IconGear, IconSpark, IconHome, IconChat, IconBook, IconHeart } from "../components/ui/icons";
+import { IconGear, IconHome, IconChat, IconMemory, IconUser } from "../components/ui/icons";
 import { BeautifyPanel } from "../components/ui/BeautifyPanel";
 
 /**
- * Persistent pocket navigation: the four daily destinations stay reachable
- * from every page; appearance controls remain one tap away.
+ * Five primary destinations for the private digital home.
  */
 type TabDef =
   | { kind: "route"; to: string; label: string; icon: TabIcon; match: (path: string) => boolean }
-  | { kind: "action"; action: "beauty"; label: string; icon: TabIcon };
+  | { kind: "action"; action: "settings"; label: string; icon: TabIcon };
 
 const TAB_DEFS: TabDef[] = [
-  { kind: "route", to: "/", label: "首页", icon: IconHome, match: (p) => p === "/" },
-  { kind: "route", to: "/chat", label: "聊天", icon: IconChat, match: (p) => p.startsWith("/chat") },
-  { kind: "route", to: "/diary", label: "记录", icon: IconBook, match: (p) => ["/diary", "/album", "/moments", "/memory"].includes(p) },
-  { kind: "route", to: "/together", label: "共处", icon: IconHeart, match: (p) => ["/together", "/calendar", "/travel", "/music", "/health", "/ledger", "/budget", "/lounge"].includes(p) },
-  { kind: "route", to: "/mit", label: "设置", icon: IconGear, match: (p) => p === "/mit" },
-  { kind: "action", action: "beauty", label: "美化", icon: IconSpark },
+  { kind: "route", to: "/", label: "月庭", icon: IconHome, match: (p) => p === "/" },
+  { kind: "route", to: "/chat", label: "同心阁", icon: IconChat, match: (p) => p.startsWith("/chat") },
+  { kind: "route", to: "/memory", label: "藏忆阁", icon: IconMemory, match: (p) => ["/memory", "/diary", "/album", "/moments"].includes(p) },
+  { kind: "route", to: "/mit", label: "月下人", icon: IconUser, match: (p) => p === "/mit" },
+  { kind: "action", action: "settings", label: "镜心", icon: IconGear },
 ];
 
 const depthOf = (p: string) => p.split("/").filter(Boolean).length;
