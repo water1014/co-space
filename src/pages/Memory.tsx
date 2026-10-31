@@ -75,7 +75,7 @@ export function Memory() {
           <div className="ma-tree-orbit ma-orbit-one">✧</div><div className="ma-tree-orbit ma-orbit-two">·</div><div className="ma-tree-orbit ma-orbit-three">✦</div>
           <div className="ma-tree-note ma-note-left"><small>ROOTED IN TIME</small><b>每一日</b><span>都值得被收藏</span></div>
           <div className="ma-tree-note ma-note-right"><small>MEMORY BLOOMS</small><b>{memories.length.toString().padStart(2,"0")}</b><span>段记忆枝叶</span></div>
-          {memories.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,5).map((entry,i)=><button key={entry.id} className={`ma-tree-charm ma-charm-${i} ${selectedDay===entryDay(entry)?"is-active":""}`} onClick={()=>setSelectedDay(entryDay(entry))} aria-label={`查看${entryDay(entry)}的记忆`}><span>{["✧","❀","◈","✦","❋"][i]}</span><small>{new Date(entry.createdAt).getDate()}</small></button>)}
+          {memories.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,12).map((entry,i)=>{const positions=[[27,27],[68,20],[16,48],[79,44],[47,8],[38,39],[59,48],[29,62],[67,62],[51,30],[11,34],[86,31]];const [left,top]=positions[i];const day=entryDay(entry);const glyph=entry.kind==="todo"?"◇":entry.kind==="feel"?"❀":entry.pinned?"✦":"✧";return <button key={entry.id} className={`ma-tree-charm ma-tree-charm-${entry.kind} ${selectedDay===day?"is-active":""}`} style={{left:`${left}%`,top:`${top}%`}} onClick={()=>{setSelectedDay(day);const d=new Date(entry.createdAt);setMonth(new Date(d.getFullYear(),d.getMonth(),1));}} aria-label={`查看${day}的记忆：${entry.text.slice(0,24)}`} title={entry.text.slice(0,48)}><span>{glyph}</span><small>{new Date(entry.createdAt).getDate()}</small></button>})}
         </div>
         <p className="ma-tree-motto">“时间没有带走一切，它让珍贵的事物长成了树。”</p>
       </div>
