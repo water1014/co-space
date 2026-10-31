@@ -4533,3 +4533,41 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
 [data-theme="night"] .partner-archive .archive-fields input,[data-theme="night"] .partner-archive .archive-date-control input,[data-theme="night"] .partner-archive .archive-milestone-form input{color:#e4e8e8}
 [data-theme="night"] .partner-archive .archive-persona-fields textarea,[data-theme="night"] .partner-archive .archive-milestone-form textarea{background:rgba(23,33,38,.72);color:#e4e8e8}
 [data-theme="night"] .partner-archive .archive-button{background:rgba(170,154,123,.14);color:#d6c7a7}
+
+
+/* ===== 月下人 · 相伴纪：收藏式纵向时间轴 ===== */
+.partner-archive .archive-storyline{position:relative;border:0;padding:8px 0 0 0}
+.partner-archive .archive-storyline:before{content:"";position:absolute;left:55px;top:20px;bottom:20px;width:1px;background:linear-gradient(180deg,rgba(178,160,127,.12),rgba(178,160,127,.55) 18%,rgba(178,160,127,.28) 82%,transparent)}
+.partner-archive .archive-story{position:relative;display:grid;grid-template-columns:34px 64px minmax(0,1fr) 22px;gap:12px;align-items:start;padding:17px 0 22px;border:0}
+.partner-archive .archive-story:before{content:"";position:absolute;left:50px;top:27px;width:11px;height:11px;border:1px solid #b5a17e;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(181,161,126,.09)}
+.partner-archive .archive-story-index{padding-top:5px;color:#b2a487;font:10px Georgia,serif;letter-spacing:.08em}
+.partner-archive .archive-story-date{display:flex;flex-direction:column;align-items:flex-start;padding-left:4px;color:#8c8d88}
+.partner-archive .archive-story-date strong{font:300 34px/.95 Georgia,serif;color:#8f8066;letter-spacing:-.04em}
+.partner-archive .archive-story-date span{margin-top:6px;font:11px "Noto Serif SC","Songti SC",serif;color:#8f9695}
+.partner-archive .archive-story-date small{margin-top:4px;font:9px Georgia,serif;letter-spacing:.1em;color:#b2a487}
+.partner-archive .archive-story-content{position:relative;margin-left:4px;padding:14px 17px 13px;background:linear-gradient(125deg,rgba(255,255,255,.95),rgba(248,248,245,.8));border:1px solid rgba(177,166,143,.2);box-shadow:0 12px 30px -26px rgba(67,65,55,.28)}
+.partner-archive .archive-story-content:before{content:"";position:absolute;left:-5px;top:17px;width:8px;height:8px;transform:rotate(45deg);background:#fff;border-left:1px solid rgba(177,166,143,.2);border-bottom:1px solid rgba(177,166,143,.2)}
+.partner-archive .archive-story-kind{font:8px Georgia,serif;letter-spacing:.17em;color:#b2a487}
+.partner-archive .archive-story-content h3{margin-top:7px;font:400 17px/1.55 "Noto Serif SC","Songti SC",serif;color:#35434a}
+.partner-archive .archive-story-content p{margin-top:7px;font:12px/1.85 "Noto Serif SC","Songti SC",serif;color:#858e90;white-space:pre-wrap;overflow-wrap:anywhere}
+.partner-archive .archive-story-content time{display:block;margin-top:10px;padding-top:8px;border-top:1px solid rgba(157,160,157,.16);font:9px Georgia,serif;letter-spacing:.1em;color:#a3a6a1}
+.partner-archive .archive-story>button{position:relative;z-index:1;padding:2px;color:#aaa69c;font-size:19px;opacity:.65}
+.partner-archive .archive-story>button:hover{opacity:1;color:#8d7860}
+.partner-archive .archive-storyline .archive-empty{min-height:190px}
+@media(max-width:480px){
+ .partner-archive .archive-storyline:before{left:43px}
+ .partner-archive .archive-story{grid-template-columns:22px 54px minmax(0,1fr) 18px;gap:8px;padding:14px 0 18px}
+ .partner-archive .archive-story:before{left:38px;width:10px;height:10px}
+ .partner-archive .archive-story-date strong{font-size:30px}
+ .partner-archive .archive-story-content{margin-left:2px;padding:12px 12px 11px}
+ .partner-archive .archive-story-content h3{font-size:16px}
+}
+[data-theme="night"] .partner-archive .archive-storyline:before{background:linear-gradient(180deg,rgba(197,177,139,.1),rgba(197,177,139,.5) 18%,rgba(197,177,139,.2) 82%,transparent)}
+[data-theme="night"] .partner-archive .archive-story:before{background:#26353c;border-color:#c4ae85;box-shadow:0 0 0 4px rgba(196,174,133,.1)}
+[data-theme="night"] .partner-archive .archive-story-date strong{color:#d2c2a1}
+[data-theme="night"] .partner-archive .archive-story-date span{color:#c0c7c7}
+[data-theme="night"] .partner-archive .archive-story-content{background:linear-gradient(125deg,rgba(53,65,70,.96),rgba(42,54,60,.9));border-color:rgba(196,174,133,.2)}
+[data-theme="night"] .partner-archive .archive-story-content:before{background:#354349;border-color:rgba(196,174,133,.2)}
+[data-theme="night"] .partner-archive .archive-story-content h3{color:#edf0ed}
+[data-theme="night"] .partner-archive .archive-story-content p{color:#b8c1c1}
+[data-theme="night"] .partner-archive .archive-story-content time{border-color:rgba(220,225,221,.12);color:#aeb9b8}
