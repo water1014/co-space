@@ -161,6 +161,19 @@ body{background:#e6e6e6;color:#3f3f3f;-webkit-font-smoothing:antialiased}
   background:none;border:0;cursor:pointer;padding:9px 11px;color:#8f8f8f;transition:color .15s}
 .sealentry:hover{color:#141414}
 .sealentry svg{display:block}
+
+/* Mirror House: full-scene mobile layout with a light frosted-glass finish. */
+.page{min-height:0;background:rgba(249,252,254,.58);-webkit-backdrop-filter:blur(12px) saturate(125%);backdrop-filter:blur(12px) saturate(125%);box-shadow:0 24px 70px -50px rgba(42,83,103,.28)}
+body{background:transparent}
+.stage{width:min(92%,760px)}
+.tag .card{background:rgba(246,251,254,.58);background-image:none;border:1px solid rgba(130,169,188,.52);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);box-shadow:0 5px 14px -10px rgba(38,78,98,.42)}
+.tag .txt b{font-size:clamp(9px,2.6vw,19px)}
+.tag .txt em{font-size:clamp(7px,1.4vw,10.5px)}
+@media(max-width:520px){
+  html,body{width:100%;overflow-x:hidden}
+  .page{width:100%;max-width:100%;min-height:0;overflow-x:hidden}
+  .stage{width:92%;max-width:760px}
+}
 </style>
 </head>
 <body>
