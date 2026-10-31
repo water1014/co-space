@@ -1,24 +1,36 @@
-/* Full-bleed Moon Garden: the illustration is the interface. */
-.moon-home.immersive-moon{position:relative;width:100%;height:100%;height:100dvh;min-height:100%;overflow:hidden;background:#dceaf2}
+/* Moon Garden is a navigable atlas, not a page with a toolbar. */
+.moon-home.immersive-moon.moon-world-map{position:relative;width:100%;height:100%;height:100dvh;min-height:100%;overflow:hidden;background:#dceaf2}
 .moon-scene-viewport{position:absolute;inset:0;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;scroll-behavior:smooth;outline:none}
 .moon-scene-viewport::-webkit-scrollbar{display:none}
 .moon-scene{position:relative;width:max(100vw,177.7778dvh);height:100%;min-height:100%;isolation:isolate;overflow:hidden}
-.moon-artwork-image{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:fill;user-select:none;pointer-events:none;-webkit-user-drag:none}
-.moon-hotspot{position:absolute;z-index:3;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;min-width:clamp(110px,10vw,170px);min-height:54px;padding:8px 13px 9px 15px;border-left:1px solid rgba(255,255,255,.95);border-radius:0 7px 7px 0;color:#183d57;text-decoration:none;transform:translate(-9px,-50%);text-shadow:0 1px 2px rgba(255,255,255,.95),0 0 12px rgba(255,255,255,.88);-webkit-tap-highlight-color:transparent;transition:transform .24s ease,color .24s ease,background .24s ease; background:linear-gradient(90deg,rgba(246,251,255,.48),rgba(246,251,255,.08) 82%,transparent);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
-.moon-hotspot:before{content:"";position:absolute;left:-4px;top:10px;width:7px;height:7px;border:1px solid #fff;border-radius:50%;background:#6d9bb8;box-shadow:0 0 0 3px rgba(255,255,255,.48),0 0 12px rgba(255,255,255,.85)}
-.moon-hotspot-name{font:500 clamp(17px,1.35vw,22px)/1.25 "Noto Serif SC","Songti SC",serif;letter-spacing:.14em;white-space:nowrap;color:inherit}
-.moon-hotspot-note{font:500 clamp(10px,.78vw,12px)/1.4 "Noto Serif SC","Songti SC",serif;letter-spacing:.04em;color:rgba(31,65,88,.92);white-space:nowrap}
-.moon-hotspot:focus-visible{outline:2px solid #fff;outline-offset:4px}
-.moon-hotspot:active,.moon-hotspot.is-active{transform:translate(-9px,-50%) scale(.97);background:linear-gradient(90deg,rgba(255,255,255,.76),rgba(255,255,255,.16) 86%,transparent)}
-@media(hover:hover){.moon-hotspot:hover{transform:translate(-9px,calc(-50% - 4px));color:#092d48;background:linear-gradient(90deg,rgba(255,255,255,.78),rgba(255,255,255,.12) 86%,transparent)}}
-.immersive-moon.is-night .moon-hotspot{color:#f0f7fc;border-left-color:rgba(226,242,252,.95);text-shadow:0 1px 3px rgba(8,26,43,.96),0 0 14px rgba(8,26,43,.9);background:linear-gradient(90deg,rgba(13,35,54,.62),rgba(13,35,54,.12) 86%,transparent)}
-.immersive-moon.is-night .moon-hotspot-note{color:rgba(232,244,251,.96)}
-.immersive-moon.is-night .moon-hotspot:before{background:#c9e5f5;box-shadow:0 0 0 3px rgba(10,32,51,.52),0 0 14px rgba(211,239,255,.85)}
-.immersive-moon.is-night .moon-hotspot:active,.immersive-moon.is-night .moon-hotspot.is-active,.immersive-moon.is-night .moon-hotspot:hover{background:linear-gradient(90deg,rgba(20,48,69,.82),rgba(20,48,69,.18) 86%,transparent)}
+.moon-artwork-image{position:absolute;inset:0;z-index:-2;display:block;width:100%;height:100%;object-fit:fill;user-select:none;pointer-events:none;-webkit-user-drag:none}
+.moon-map-trail{position:absolute;inset:0;z-index:0;width:100%;height:100%;overflow:visible;pointer-events:none;opacity:.46}
+.moon-map-trail path{fill:none;stroke:rgba(242,250,255,.92);stroke-width:1.35;stroke-dasharray:2.2 5.5;vector-effect:non-scaling-stroke;filter:drop-shadow(0 1px 2px rgba(26,69,99,.35))}
+.moon-map-trail .moon-map-trail-soft{stroke-width:.8;stroke-dasharray:1 8;opacity:.58}
+.moon-map-place{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:76px;padding:5px 9px 7px;color:#153d59;text-decoration:none;transform:translate(-50%,-50%);-webkit-tap-highlight-color:transparent;transition:transform .22s ease,filter .22s ease}
+.moon-map-place.is-right{transform:translate(-85%,-50%)}
+.moon-map-pin{position:relative;display:grid;place-items:center;width:17px;height:17px;border:1px solid rgba(255,255,255,.96);border-radius:50%;background:rgba(204,229,243,.56);box-shadow:0 0 0 3px rgba(255,255,255,.25),0 2px 10px rgba(19,54,79,.2);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.moon-map-pin:before{content:"";position:absolute;inset:4px;border-radius:50%;background:#477f9f;box-shadow:0 0 7px rgba(255,255,255,.95)}
+.moon-map-pin i{position:absolute;width:27px;height:27px;border:1px solid rgba(255,255,255,.52);border-radius:50%;animation:moon-map-pulse 3.8s ease-out infinite}
+.moon-map-label{position:relative;padding:3px 7px 4px;border-bottom:1px solid rgba(255,255,255,.76);font:600 clamp(14px,1.2vw,19px)/1.25 "Noto Serif SC","Songti SC",serif;letter-spacing:.13em;white-space:nowrap;color:inherit;text-shadow:0 1px 2px rgba(255,255,255,.98),0 0 10px rgba(255,255,255,.95),0 0 18px rgba(255,255,255,.7);background:linear-gradient(180deg,rgba(250,253,255,.18),rgba(250,253,255,.04));}
+.moon-map-place:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:8px}
+.moon-map-place:active{transform:translate(-50%,-50%) scale(.94);filter:brightness(1.12)}
+.moon-map-place.is-right:active{transform:translate(-85%,-50%) scale(.94)}
+@media(hover:hover){.moon-map-place:hover{transform:translate(-50%,-54%) scale(1.05);filter:brightness(1.12)}.moon-map-place.is-right:hover{transform:translate(-85%,-54%) scale(1.05)}}
+.moon-map-compass{position:absolute;right:3.2%;bottom:5%;z-index:1;color:rgba(255,255,255,.86);font-size:clamp(22px,3vw,38px);text-shadow:0 1px 8px rgba(22,63,92,.4);pointer-events:none}
+.immersive-moon.is-night .moon-map-place{color:#eff8ff}
+.immersive-moon.is-night .moon-map-pin{background:rgba(17,47,70,.66);border-color:rgba(220,241,255,.95);box-shadow:0 0 0 3px rgba(10,35,55,.28),0 2px 12px rgba(0,0,0,.25)}
+.immersive-moon.is-night .moon-map-pin:before{background:#d7efff;box-shadow:0 0 9px rgba(210,240,255,.95)}
+.immersive-moon.is-night .moon-map-pin i{border-color:rgba(221,241,255,.45)}
+.immersive-moon.is-night .moon-map-label{border-bottom-color:rgba(217,239,252,.68);text-shadow:0 1px 3px rgba(3,19,34,.98),0 0 10px rgba(3,19,34,.98),0 0 18px rgba(3,19,34,.78);background:linear-gradient(180deg,rgba(9,31,49,.32),rgba(9,31,49,.04))}
+.immersive-moon.is-night .moon-map-trail path{stroke:rgba(203,231,249,.84);filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+@keyframes moon-map-pulse{0%{transform:scale(.65);opacity:.72}75%,100%{transform:scale(1.45);opacity:0}}
 @media(max-width:767px){
  .moon-scene{width:max(100vw,177.7778dvh)}
- .moon-hotspot{min-width:106px;min-height:52px;padding:7px 9px 8px 12px;gap:4px}
- .moon-hotspot-name{font-size:16px;letter-spacing:.1em}
- .moon-hotspot-note{font-size:9px}
+ .moon-map-place{min-width:70px;gap:4px;padding:4px 6px 6px}
+ .moon-map-pin{width:15px;height:15px}
+ .moon-map-pin:before{inset:4px}
+ .moon-map-label{font-size:14px;letter-spacing:.08em;padding:3px 5px}
+ .moon-map-compass{right:2%;bottom:3%}
 }
-@media(prefers-reduced-motion:reduce){.moon-scene-viewport,.moon-hotspot{scroll-behavior:auto;transition:none}}
+@media(prefers-reduced-motion:reduce){.moon-scene-viewport,.moon-map-place{scroll-behavior:auto;transition:none}.moon-map-pin i{animation:none}}
