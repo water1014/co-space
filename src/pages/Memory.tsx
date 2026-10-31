@@ -28,18 +28,23 @@ export function Memory() {
   return (
     <div className="memory-page relative flex h-full flex-col overflow-hidden">
       {/* 页头：‹ Memory / Things I remember. + 绿点 */}
-      <header className="px-5 pt-6">
-        <div className="flex items-start gap-2">
+      <header className="memory-editorial-head px-5 pt-6">
+        <div className="flex items-center gap-2">
           <BackButton className="mt-1.5" />
-          <div className="flex-1">
-            <h1 className="page-head-title text-[30px] leading-none text-ink">{t.pages.memory.title}</h1>
-            <p className="page-head-sub mt-1 text-[12.5px]">{t.pages.memory.sub}</p>
+          <span className="editorial-kicker">JING HUA SHUI YUE / PRIVATE ARCHIVE</span>
+          <span className="ml-auto editorial-meta">02 — 05</span>
+        </div>
+        <div className="memory-title-row mt-5 flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="editorial-kicker">A QUIET PLACE FOR WHAT REMAINS</p>
+            <h1 className="page-head-title memory-editorial-title mt-1 text-[34px] leading-none text-ink">{t.pages.memory.title}</h1>
+            <p className="page-head-sub mt-2 text-[12px]">{t.pages.memory.sub}</p>
           </div>
-          <span className="mt-2 h-[7px] w-[7px] rounded-full bg-[var(--accent)]" />
+          <span className="memory-index-mark" aria-hidden="true">忆<span>✳</span></span>
         </div>
 
         {/* 三 Tab */}
-        <div className="mt-4 flex items-center gap-2">
+        <div className="memory-editorial-tabs mt-5 flex items-center gap-2">
           {TABS.map((t) => {
             const on = t.key === tab;
             return (
@@ -102,9 +107,21 @@ function LibraryTab() {
   return (
     <div className="flex h-full flex-col">
       <div className="scroll-area min-h-0 flex-1 px-5 pb-28">
-        <p className="text-[12px] text-ink-faint">
-          {memories.length} memories · 固化 {solidified} 动态 {dynamic} 归档 0
-        </p>
+        <section className="memory-ledger-intro editorial-sheet mt-2 px-4 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <span className="editorial-kicker">THE MEMORY LEDGER</span>
+            <span className="editorial-meta">NO. 01 / COLLECTION</span>
+          </div>
+          <div className="memory-ledger-count mt-3 flex items-end gap-2">
+            <strong>{String(memories.length).padStart(2, "0")}</strong>
+            <span>份记忆<br/>被妥善收藏</span>
+          </div>
+          <div className="memory-ledger-rule mt-3" />
+          <div className="mt-2 flex items-center justify-between text-[10px] text-ink-faint">
+            <span>固化 {solidified} · 动态 {dynamic}</span>
+            <span>每一段经历，都有回声</span>
+          </div>
+        </section>
 
         {/* 类型卡 */}
         <div className="mt-3 grid grid-cols-3 gap-2">
@@ -116,7 +133,7 @@ function LibraryTab() {
             <button
               key={k}
               onClick={() => setType(k as LibType)}
-              className={`press rounded-2xl border py-3 text-center ${
+              className={`memory-type-tile press rounded-2xl border py-3 text-center ${
                 type === k
                   ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
                   : "border-[var(--line)] text-ink-soft"
@@ -174,7 +191,7 @@ function LibraryTab() {
             <button
               key={m.id}
               onClick={() => setEditing(m.id)}
-              className="press block w-full rounded-2xl bg-[var(--glass-hi)] px-3.5 py-3 text-left"
+              className="memory-entry editorial-sheet press block w-full rounded-2xl px-3.5 py-3 text-left"
             >
               <div className="flex items-center gap-1.5 text-[10px] text-ink-faint">
                 <span className="rounded bg-[var(--glass-solid)] px-1.5 py-0.5 tracking-[0.12em]">
