@@ -62,6 +62,14 @@ export function Home() {
             <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
           </div>
 
+          <div className="moon-scene-brand" aria-hidden="true">
+            <span className="moon-brand-title">镜花水月</span>
+            <span className="moon-brand-divider">✧</span>
+            <span className="moon-brand-motto">有些相遇，是为了在一生里，慢慢看。</span>
+          </div>
+          <div className="moon-scene-meta" aria-hidden="true">
+            <span>☾</span><span>月色 · 晴</span><i></i><span>04 / 24</span>
+          </div>
           {doors.map((door) => (
             <Link
               key={door.title}
