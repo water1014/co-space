@@ -18,3 +18,7 @@ body:has(.moon-world-map) .moon-garden-shell,body:has(.moon-world-map) .pocket-s
 .immersive-moon.is-night .moon-map-place{color:#e4f2fa}.immersive-moon.is-night .moon-map-label{text-shadow:0 1px 3px rgba(4,18,32,.95),0 0 9px rgba(4,18,32,.82)}
 @media(max-width:767px){.moon-map-place{padding:4px 5px;gap:2px}.moon-entry-ornament{height:8px}.moon-entry-mark{width:23px;height:10px}.moon-map-place.is-major .moon-entry-mark{width:27px;height:12px}.moon-map-label{font-size:14px;letter-spacing:.12em}.moon-map-place.is-major .moon-map-label{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.moon-scene-viewport,.moon-map-place{scroll-behavior:auto;transition:none}}
+
+/* Keep the panorama hidden until its saved horizontal position has been restored. */
+.moon-world-map.panorama-restoring .moon-scene-viewport{visibility:hidden!important}
+.moon-world-map.panorama-ready .moon-scene-viewport{visibility:visible!important}

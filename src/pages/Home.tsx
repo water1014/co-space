@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useThemeStore } from "../stores/themeStore";
 import "./home-scene.css";
@@ -43,6 +43,7 @@ function EntranceMark() {
 
 export function Home() {
   const theme = useThemeStore((state) => state.theme);
+  const [panoramaReady, setPanoramaReady] = useState(false);
   const track = useRef<HTMLDivElement>(null);
   const scene = useRef<HTMLDivElement>(null);
   const artwork = useRef<HTMLImageElement>(null);
@@ -50,18 +51,44 @@ export function Home() {
   const suppressClick = useRef(false);
   const dragState = useRef<{ pointerId: number; x: number; scrollLeft: number; moved: boolean } | null>(null);
 
-  useEffect(() => {
-    const fitArtwork = () => {
-      const viewport = track.current;
-      const sceneElement = scene.current;
-      const image = artwork.current;
-      if (!viewport || !sceneElement || !image?.naturalWidth || !image?.naturalHeight) return;
-      const naturalWidth = image.naturalWidth / image.naturalHeight * viewport.clientHeight;
-      sceneElement.style.width = `${Math.max(viewport.clientWidth, naturalWidth)}px`;
+  const fitAndRestorePanorama = () => {
+    const viewport = track.current;
+    const sceneElement = scene.current;
+    const image = artwork.current;
+    if (!viewport || !sceneElement || !image?.naturalWidth || !image?.naturalHeight) return false;
+
+    const naturalWidth = image.naturalWidth / image.naturalHeight * viewport.clientHeight;
+    sceneElement.style.width = `${Math.max(viewport.clientWidth, naturalWidth)}px`;
+
+    const stored = Number(sessionStorage.getItem(PANORAMA_PROGRESS_KEY));
+    const progress = Number.isFinite(stored) && sessionStorage.getItem(PANORAMA_PROGRESS_KEY) !== null
+      ? Math.min(Math.max(stored, 0), 1)
+      : 0.36;
+    const restore = () => {
+      const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+      viewport.scrollLeft = max * progress;
+      setPanoramaReady(true);
     };
-    fitArtwork();
-    window.addEventListener("resize", fitArtwork);
-    return () => window.removeEventListener("resize", fitArtwork);
+    restore();
+    requestAnimationFrame(restore);
+    return true;
+  };
+
+  useLayoutEffect(() => {
+    if (artwork.current?.complete && artwork.current.naturalWidth) fitAndRestorePanorama();
+    const fitOnResize = () => {
+      const viewport = track.current;
+      const previousMax = viewport ? Math.max(0, viewport.scrollWidth - viewport.clientWidth) : 0;
+      const progress = previousMax > 0 && viewport ? viewport.scrollLeft / previousMax : 0;
+      if (fitAndRestorePanorama() && viewport) {
+        requestAnimationFrame(() => {
+          const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+          viewport.scrollLeft = max * progress;
+        });
+      }
+    };
+    window.addEventListener("resize", fitOnResize);
+    return () => window.removeEventListener("resize", fitOnResize);
   }, []);
 
 
@@ -70,7 +97,6 @@ export function Home() {
     suppressClick.current = false;
     if (event.pointerType === "mouse" && event.button === 0) {
       dragState.current = { pointerId: event.pointerId, x: event.clientX, scrollLeft: event.currentTarget.scrollLeft, moved: false };
-      event.currentTarget.setPointerCapture(event.pointerId);
     }
   };
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -85,7 +111,6 @@ export function Home() {
     if (drag && drag.pointerId === event.pointerId) {
       suppressClick.current = drag.moved;
       dragState.current = null;
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     } else if (pointerStart.current) {
       const dx = Math.abs(event.clientX - pointerStart.current.x);
       const dy = Math.abs(event.clientY - pointerStart.current.y);
@@ -95,14 +120,14 @@ export function Home() {
   };
 
   return (
-    <main className={`moon-home immersive-moon moon-world-map ${theme === "night" ? "is-night" : "is-day"}`}>
+    <main className={`moon-home immersive-moon moon-world-map ${theme === "night" ? "is-night" : "is-day"} ${panoramaReady ? "panorama-ready" : "panorama-restoring"}`}>
       <div
         className="moon-scene-viewport"
         ref={track}
         role="region"
         tabIndex={0}
         aria-label="镜花水月地图，左右滑动探索地点"
-        onScroll={(event) => { const el = event.currentTarget; const max = Math.max(0, el.scrollWidth - el.clientWidth); sessionStorage.setItem(PANORAMA_PROGRESS_KEY, String(max > 0 ? el.scrollLeft / max : 0)); }}
+        onScroll={(event) => { const el = event.currentTarget; const max = Math.max(0, el.scrollWidth - el.clientWidth); if (max > 0) sessionStorage.setItem(PANORAMA_PROGRESS_KEY, String(el.scrollLeft / max)); }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -118,19 +143,7 @@ export function Home() {
         }}
       >
         <div className="moon-scene" ref={scene}>
-          <img ref={artwork} onLoad={() => {
-            const image = artwork.current;
-            const viewport = track.current;
-            const sceneElement = scene.current;
-            if (!image || !viewport || !sceneElement) return;
-            sceneElement.style.width = `${Math.max(viewport.clientWidth, image.naturalWidth / image.naturalHeight * viewport.clientHeight)}px`;
-            requestAnimationFrame(() => {
-              const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-              const stored = Number(sessionStorage.getItem(PANORAMA_PROGRESS_KEY));
-              const progress = Number.isFinite(stored) && stored >= 0 ? Math.min(stored, 1) : 0.36;
-              viewport.scrollLeft = max * progress;
-            });
-          }} className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="镜花水月的日夜全景地图" draggable={false} />
+          <img ref={artwork} onLoad={() => { fitAndRestorePanorama(); }} className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="镜花水月的日夜全景地图" draggable={false} />
           <div className="moon-map-entries">
             {places.map((place) => (
               <Link
@@ -139,6 +152,8 @@ export function Home() {
                 className={`moon-map-place ${place.level === "major" ? "is-major" : "is-minor"} ${place.side === "right" ? "is-right" : ""}`}
                 style={{ left: `${place.x}%`, top: `${place.y}%` }}
                 onClick={(event) => {
+                  const viewport = track.current;
+                  if (viewport) { const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth); if (max > 0) sessionStorage.setItem(PANORAMA_PROGRESS_KEY, String(viewport.scrollLeft / max)); }
                   if (suppressClick.current) { event.preventDefault(); event.stopPropagation(); }
                   suppressClick.current = false;
                 }}
