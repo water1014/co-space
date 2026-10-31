@@ -202,3 +202,12 @@
 .ma-delete-confirm button.danger{border-color:rgba(174,126,111,.42);background:rgba(174,126,111,.12);color:#986d60}
 [data-theme="night"] .ma-delete-confirm{border-color:rgba(207,160,141,.25);border-left-color:rgba(207,160,141,.62);background:rgba(170,119,99,.1)}
 [data-theme="night"] .ma-delete-confirm button.danger{color:#e0b8a9}
+
+
+.ma-tag-editor{display:grid;gap:7px;margin:12px 0 16px;color:var(--ink-faint);font-size:11px;letter-spacing:.08em}
+.ma-tag-editor>span{display:flex;align-items:center;gap:8px}
+.ma-tag-editor small{color:var(--ink-ghost);font-size:9px;letter-spacing:.04em}
+.ma-tag-editor input{width:100%;min-height:40px;box-sizing:border-box;padding:9px 12px;border:1px solid rgba(139,180,198,.3);border-radius:11px;outline:none;background:rgba(226,240,245,.34);color:var(--ink);font:12px var(--f-sans,sans-serif);letter-spacing:.02em}
+.ma-tag-editor input:focus-visible{border-color:rgba(104,157,181,.72);box-shadow:0 0 0 3px rgba(104,157,181,.12)}
+.ma-tag-editor input::placeholder{color:var(--ink-ghost)}
+[data-theme="night"] .ma-tag-editor input{background:rgba(35,54,65,.52);border-color:rgba(157,194,210,.22);color:#e0edf2}
