@@ -3089,3 +3089,26 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:
     animation: none !important;
   }
 }
+
+
+/* 月庭原画层：原画承载空间与文字，热点只负责点击，不重复叠字。 */
+.moon-scene {
+  width: 1600px;
+  height: clamp(600px, calc(100svh - 205px), 760px);
+  min-height: 600px;
+  background: #263b4b;
+}
+.moon-artwork { position:absolute; inset:0; overflow:hidden; }
+.moon-artwork-image {
+  display:block; width:100%; height:100%; object-fit:cover;
+  object-position:center 42%; user-select:none; pointer-events:none;
+}
+.moon-hotspot { min-width:104px; min-height:68px; padding:8px; background:transparent; border:1px solid transparent; }
+.moon-hotspot-name,.moon-hotspot-note {
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip-path:inset(50%); white-space:nowrap;
+}
+.moon-hotspot::before { background:rgba(228,238,242,.16); border-color:rgba(255,255,255,.5); }
+.moon-hotspot:focus-visible { outline:2px solid rgba(246,239,220,.95); outline-offset:2px; }
+.moon-scene-caption { display:none; }
+@media (max-width:640px) { .moon-scene { height:max(600px,calc(100svh - 220px)); } }
