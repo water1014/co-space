@@ -18,11 +18,11 @@ import type {
 
 const splitLines = (value: string) => value.split("\n").map((v) => v.trim()).filter(Boolean);
 const dateToTimestamp = (value: string) => value ? new Date(`${value}T12:00:00`).getTime() : null;
-const timestampToDate = (value: number | null) => value ? new Date(value).toISOString().slice(0, 10) : "";
+const timestampToDate = (value: number | null) => { if (!value) return ""; const d = new Date(value); const pad = (n: number) => String(n).padStart(2, "0"); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
 
 export function Partner() {
-  const legacySelfName = useBoundaryStore((s) => s.selfName);
-  const legacySetSelfName = useBoundaryStore((s) => s.setSelfName);
+  const legacyName = useBoundaryStore((s) => s.name);
+  const legacySetName = useBoundaryStore((s) => s.setName);
   const legacySetAnniversary = useLifeStore((s) => s.setAnniversary);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -34,14 +34,14 @@ export function Partner() {
   const [milestones, setMilestones] = useState<RelationshipMilestoneRecord[]>([]);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [name, setName] = useState("");
-  const [selfName, setSelfName] = useState(legacySelfName === "它" ? "" : legacySelfName);
+  const [selfName, setSelfName] = useState(legacyName);
   const [startDate, setStartDate] = useState("");
   const [personality, setPersonality] = useState("");
   const [speakingStyle, setSpeakingStyle] = useState("");
   const [values, setValues] = useState("");
   const [boundaries, setBoundaries] = useState("");
   const [milestoneTitle, setMilestoneTitle] = useState("");
-  const [milestoneDate, setMilestoneDate] = useState(new Date().toISOString().slice(0, 10));
+  const [milestoneDate, setMilestoneDate] = useState(timestampToDate(Date.now()));
   const [milestoneDescription, setMilestoneDescription] = useState("");
   const days = daysTogether(startDate);
 
@@ -95,7 +95,7 @@ export function Partner() {
       await db.companions.update(companion.id, { name: name.trim().slice(0, 40), updatedAt: now });
       await db.relationships.update(relationship.id, { startAt: dateToTimestamp(startDate), updatedAt: now });
       // Legacy conversation address is updated only after the user presses Save.
-      legacySetSelfName(selfName.trim().slice(0, 24) || "它");
+      legacySetName(selfName.trim().slice(0, 16));
       legacySetAnniversary(startDate);
       await refresh();
       setNotice("基础资料已保存");
