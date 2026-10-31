@@ -79,3 +79,22 @@
 [data-theme="night"] .ma-tree-charm small{color:#e0edf2}
 @media(max-width:380px){.ma-tree-stage{margin-left:-3px;margin-right:-3px;padding-left:5px;padding-right:5px}.ma-tree-art{height:250px}.ma-tree-note b{font-size:11px}.ma-tree-note span{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.ma-tree-orbit{animation:none}.ma-tree-charm{transition:none}}
+
+/* Sealed Days original tree transplant — MIT, adapted for 镜花水月 */
+.ma-tree-stage{margin:18px -5px 22px;padding:14px 8px 12px;background:rgba(240,248,251,.58);border-color:rgba(135,174,190,.24);box-shadow:none}
+.ma-tree-art.ma-sealed-tree-art{position:relative;width:min(100%,520px);height:auto;aspect-ratio:1138/1620;margin:12px auto 4px;overflow:visible}
+.ma-sealed-tree-img{display:block;width:100%;height:100%;object-fit:fill;filter:sepia(.08) saturate(.72) hue-rotate(145deg);mix-blend-mode:multiply}
+.ma-sealed-tag{position:absolute;z-index:2;display:block;width:0;height:0;padding:0;border:0;background:none;transform:translateX(-50%);transform-origin:50% 0;cursor:pointer;animation:ma-sealed-hang .85s ease-out var(--delay,0s) both}
+.ma-sealed-sway{display:block;transform-origin:50% 0;animation:ma-sealed-sway 4.8s ease-in-out calc(var(--delay,0s) - 1s) infinite}
+.ma-sealed-line{display:block;width:1px;height:calc(var(--rope,20px) * .42);margin:0 auto;background:rgba(111,151,168,.58)}
+.ma-sealed-card{display:block;width:clamp(22px,calc(var(--cw,60px) * .42),52px);height:clamp(24px,calc(var(--ch,60px) * .42),52px);margin:0 auto;border:1px solid rgba(132,169,184,.55);border-radius:2px;background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(221,238,244,.88));box-shadow:0 3px 10px rgba(67,111,130,.12),inset 0 0 0 3px rgba(255,255,255,.52)}
+.ma-sealed-date{position:absolute;top:calc(var(--rope,20px) * .42 + clamp(24px,calc(var(--ch,60px) * .21),26px));left:50%;transform:translate(-50%,-50%);white-space:nowrap;color:#486c7d;font:italic 12px Georgia,serif;text-shadow:0 1px 4px rgba(255,255,255,.9)}
+.ma-sealed-tag:focus-visible{outline:2px solid #78a9bd;outline-offset:5px}
+.ma-sealed-tag:active .ma-sealed-card{background:#d8eaf1}
+@keyframes ma-sealed-hang{from{opacity:0;transform:translateX(-50%) translateY(-10px) rotate(-4deg)}to{opacity:1;transform:translateX(-50%) rotate(0)}}
+@keyframes ma-sealed-sway{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}}
+[data-theme="night"] .ma-tree-stage{background:rgba(37,58,70,.35);border-color:rgba(151,188,204,.18)}
+[data-theme="night"] .ma-sealed-tree-img{filter:invert(.82) sepia(.12) saturate(.7) hue-rotate(155deg);mix-blend-mode:screen;opacity:.82}
+[data-theme="night"] .ma-sealed-card{background:linear-gradient(145deg,rgba(115,153,170,.92),rgba(65,99,116,.9));border-color:rgba(193,220,231,.45)}
+[data-theme="night"] .ma-sealed-date{color:#e3f0f5}
+@media(prefers-reduced-motion:reduce){.ma-sealed-tag,.ma-sealed-sway{animation:none;opacity:1}}
