@@ -4486,3 +4486,50 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
  .archive-milestones{grid-template-columns:1fr;gap:24px;margin-top:38px}
 }
 @media(prefers-reduced-motion:reduce){.partner-archive *{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* ===== 月下人 · 珍珠白收藏档案 / 2026 visual refinement ===== */
+.partner-archive{
+  --archive-ink:#303b43;--archive-muted:#92999e;--archive-blue:#8299a7;--archive-rule:rgba(111,124,132,.19);
+  background:radial-gradient(ellipse at 88% 4%,rgba(226,233,236,.62),transparent 30%),radial-gradient(ellipse at 3% 28%,rgba(239,239,235,.72),transparent 34%),linear-gradient(180deg,#fff 0%,#fafbfb 42%,#f7f8f7 100%);
+  color:var(--archive-ink);
+}
+.partner-archive .archive-atmosphere{opacity:.55;background-image:radial-gradient(circle at 88% 7%,transparent 0 82px,rgba(160,171,176,.2) 83px,transparent 84px),radial-gradient(circle at 88% 7%,transparent 0 108px,rgba(160,171,176,.11) 109px,transparent 110px),linear-gradient(115deg,transparent 0 49.9%,rgba(174,179,178,.07) 50%,transparent 50.1%)}
+.partner-archive .archive-topbar{color:#9a9fa2}
+.partner-archive .archive-wordmark i,.partner-archive .archive-heading h1 span,.partner-archive .archive-persona-heading h2 span{color:#b3a58d}
+.partner-archive .archive-kicker,.partner-archive .archive-section-meta,.partner-archive .archive-eyebrow{color:#9a9d9d}
+.partner-archive .archive-heading{border-color:rgba(157,160,157,.22)}.partner-archive .archive-heading h1{color:#303b43;letter-spacing:.19em}.partner-archive .archive-lede{color:#858d91}
+.partner-archive .archive-seal{border-color:rgba(174,160,133,.38);color:#a99778;box-shadow:inset 0 0 0 5px rgba(255,255,255,.55)}.partner-archive .archive-seal:before{border-color:rgba(174,160,133,.2)}
+.partner-archive .archive-identity{grid-template-columns:minmax(210px,.72fr) minmax(0,1.6fr);background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.98);box-shadow:0 24px 65px -48px rgba(53,62,67,.28),0 1px 0 rgba(167,164,154,.13)}
+.partner-archive .archive-identity-art{background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.96),transparent 59%),linear-gradient(145deg,#f5f6f4,#e9edec);border-color:rgba(154,163,162,.17)}
+.partner-archive .archive-identity-art:before{border-color:rgba(169,157,132,.24)}.partner-archive .archive-identity-art:after{border-color:rgba(169,157,132,.13)}
+.partner-archive .archive-portrait{background:linear-gradient(145deg,#fff,#e6e8e5 55%,#c9d1d1);box-shadow:0 18px 38px -23px rgba(57,66,69,.34),0 0 0 1px rgba(255,255,255,.8)}
+.partner-archive .archive-portrait>span{background:linear-gradient(145deg,#fff,#e7eceb);color:#a9987a}.partner-archive .archive-upload{background:#a99a7e;box-shadow:0 4px 12px rgba(77,67,48,.16)}.partner-archive .archive-art-caption{color:#a2a5a2}
+.partner-archive .archive-section-meta{border-color:rgba(157,160,157,.2)}
+.partner-archive .archive-identity-content h2,.partner-archive .archive-time-copy h2,.partner-archive .archive-persona-heading h2,.partner-archive .archive-milestone-intro h2,.partner-archive .archive-milestone-list h3{color:#303b43}
+.partner-archive .archive-identity-content h2 small{color:#a2a5a5}
+.partner-archive .archive-fields label,.partner-archive .archive-date-control label,.partner-archive .archive-milestone-form label{color:#92999b}
+.partner-archive .archive-fields input,.partner-archive .archive-date-control input,.partner-archive .archive-milestone-form input{color:#39464d;border-color:rgba(137,146,147,.25)}
+.partner-archive .archive-fields input:focus,.partner-archive .archive-date-control input:focus,.partner-archive .archive-milestone-form input:focus{border-color:#b4a587}
+.partner-archive .archive-button{border:1px solid rgba(169,154,124,.48);background:linear-gradient(110deg,#fff,#f3f0e9);color:#82765f;box-shadow:0 8px 22px -17px rgba(75,65,46,.38),inset 0 1px 0 #fff}
+.partner-archive .archive-button:hover{background:#fff;border-color:#aa9978}
+.partner-archive .archive-time{border-color:rgba(157,160,157,.22)}.partner-archive .archive-counter{color:#9b8b6e}.partner-archive .archive-counter strong{font-size:clamp(54px,8vw,76px);font-weight:300}.partner-archive .archive-counter span{color:#a3a19a}
+.partner-archive .archive-date-control{border-color:rgba(157,160,157,.22)}.partner-archive .archive-text-button{color:#928064}
+.partner-archive .archive-time-note,.partner-archive .archive-milestone-intro>p{color:#92999b}
+.partner-archive .archive-persona{background:rgba(255,255,255,.76);border-top:1px solid #fff;border-bottom:1px solid rgba(157,160,157,.2);box-shadow:0 16px 45px -42px rgba(53,62,67,.24)}
+.partner-archive .archive-persona-heading>p{color:#8e9698}.partner-archive .archive-persona-fields label{color:#59676e}.partner-archive .archive-persona-fields label span{color:#b2a487}
+.partner-archive .archive-persona-fields textarea,.partner-archive .archive-milestone-form textarea{border-color:rgba(150,157,155,.2);background:rgba(249,250,248,.88);color:#3d4b50;border-radius:2px}
+.partner-archive .archive-persona-fields textarea:focus,.partner-archive .archive-milestone-form textarea:focus{border-color:rgba(169,154,124,.65);background:#fff}
+.partner-archive .archive-persona-foot{border-color:rgba(157,160,157,.2)}.partner-archive .archive-persona-foot p{color:#9a9f9f}
+.partner-archive .archive-milestone-list{border-color:rgba(157,160,157,.22)}.partner-archive .archive-milestone-list article{border-color:rgba(157,160,157,.19)}
+.partner-archive .archive-milestone-no{color:#ad9b7d}.partner-archive .archive-milestone-list time{color:#9a9d9b}.partner-archive .archive-milestone-list h3{font-size:18px}
+.partner-archive .archive-milestone-list article button{color:#aaa69c}.partner-archive .archive-empty{color:#ad9d80}
+.partner-archive .archive-footer{border-color:rgba(157,160,157,.2);color:#9a9e9d}.partner-archive .archive-footer i{color:#aa9877}.partner-archive .archive-footer p{color:#a1a5a4}
+.partner-archive .archive-feedback{border-left-color:#b5a585;background:rgba(255,255,255,.8);color:#7f735e}.partner-archive .archive-feedback.is-error{border-left-color:#c98282;color:#a15e5e}
+@media(max-width:640px){.partner-archive .archive-wrap{padding-left:20px;padding-right:20px}.partner-archive .archive-heading{padding-top:30px}.partner-archive .archive-identity{box-shadow:0 16px 42px -34px rgba(53,62,67,.26)}.partner-archive .archive-identity-art{min-height:208px}.partner-archive .archive-time{border-top:1px solid rgba(157,160,157,.22)}.partner-archive .archive-persona{background:rgba(255,255,255,.82)}}
+[data-theme="night"] .partner-archive{--archive-ink:#e4e8e8;--archive-rule:rgba(199,207,207,.17);background:linear-gradient(180deg,#202a30,#1b252b 58%,#202a30)}
+[data-theme="night"] .partner-archive .archive-identity,[data-theme="night"] .partner-archive .archive-persona{background:rgba(43,54,59,.8);border-color:rgba(215,220,216,.1)}
+[data-theme="night"] .partner-archive .archive-identity-art{background:linear-gradient(145deg,#46545a,#303d43)}
+[data-theme="night"] .partner-archive .archive-fields input,[data-theme="night"] .partner-archive .archive-date-control input,[data-theme="night"] .partner-archive .archive-milestone-form input{color:#e4e8e8}
+[data-theme="night"] .partner-archive .archive-persona-fields textarea,[data-theme="night"] .partner-archive .archive-milestone-form textarea{background:rgba(23,33,38,.72);color:#e4e8e8}
+[data-theme="night"] .partner-archive .archive-button{background:rgba(170,154,123,.14);color:#d6c7a7}
