@@ -4954,3 +4954,54 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
   .memory-index-mark { flex-basis:48px; width:48px; height:48px; font-size:22px; }
   .memory-ledger-intro { padding:13px; }
 }
+
+
+/* 拾光日记 · 横向翻阅卡片 */
+.diary-card-rail {
+  display:flex;
+  align-items:stretch;
+  gap:13px;
+  width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:3px 2px 12px;
+  scroll-snap-type:x mandatory;
+  scroll-padding-inline:2px;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.diary-card-rail::-webkit-scrollbar { display:none; }
+.diary-card-rail > .diary-card {
+  flex:0 0 min(84%, 360px);
+  min-width:0;
+  min-height:214px;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  padding:18px 17px 15px;
+  border-radius:19px;
+  transition:transform .24s ease, box-shadow .24s ease, background .24s ease;
+  touch-action:pan-x;
+}
+.diary-card-rail > .diary-card:active { transform:scale(.985); }
+.diary-swipe-hint {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:13px;
+  margin:2px 0 0;
+  color:var(--ink-ghost);
+  font-size:9px;
+  letter-spacing:.18em;
+}
+.diary-swipe-hint span { font-size:13px; opacity:.7; }
+@media (min-width:600px) {
+  .diary-card-rail > .diary-card { flex-basis:min(54%, 360px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .diary-card-rail > .diary-card { transition:none; }
+}
+[data-theme="night"] .diary-card-rail > .diary-card {
+  background:linear-gradient(145deg,rgba(43,62,74,.82),rgba(31,47,58,.72));
+  border-color:rgba(224,239,247,.12);
+}

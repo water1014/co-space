@@ -275,11 +275,20 @@ export function Diary() {
           </div>
         )}
 
-        <div className="flex flex-col gap-3.5">
+        <div
+          className="diary-card-rail"
+          aria-label="日记滑动浏览"
+          role="region"
+        >
           {visible.map((e, i) => (
             <DiaryCard key={e.id} entry={e} index={i} onOpen={() => setOpenId(e.id)} />
           ))}
         </div>
+        {visible.length > 1 && (
+          <p className="diary-swipe-hint" aria-hidden="true">
+            <span>←</span> 左右滑动，翻阅日常 <span>→</span>
+          </p>
+        )}
 
         {visible.length === 0 && (
           <div className="px-2 py-16 text-center">
