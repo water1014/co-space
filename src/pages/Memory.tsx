@@ -26,7 +26,7 @@ export function Memory() {
   const [newText, setNewText] = useState("");
   const [showComposer, setShowComposer] = useState(false);
   useEffect(() => {
-    const candidate = initialDay && /^\\d{4}-\\d{2}-\\d{2}$/.test(initialDay) ? new Date(initialDay + "T12:00:00") : null;
+    const candidate = initialDay && /^\d{4}-\d{2}-\d{2}$/.test(initialDay) ? new Date(initialDay + "T12:00:00") : null;
     if (!candidate || dayKey(candidate) !== initialDay) return;
     setSelectedDay(initialDay);
     setMonth(new Date(candidate.getFullYear(), candidate.getMonth(), 1));
