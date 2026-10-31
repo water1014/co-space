@@ -3,7 +3,6 @@ import { db } from "./schema";
 export const BACKUP_FORMAT = "jinghua-shuiyue-backup";
 export const BACKUP_VERSION = 1;
 
-type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 type EncodedBlob = { __coSpaceBlob: true; mimeType: string; data: string };
 type BackupEnvelope = {
   format: typeof BACKUP_FORMAT;
@@ -166,20 +165,28 @@ export async function restoreBackup(input: unknown): Promise<{ inserted: Record<
   }
 
   const inserted: Record<string, number> = {};
-  await db.transaction("rw", ...TABLE_NAMES.map((name) => db.table(name)), async () => {
-    for (const name of TABLE_NAMES) {
-      const table = db.table(name);
-      const rows = decoded[name] ?? [];
-      const existing = new Set(await table.toCollection().primaryKeys());
-      const keyPath = table.schema.primKey.keyPath;
-      const fresh = rows.filter((row) => {
-        const key = isObject(row) && typeof keyPath === "string" ? row[keyPath] : undefined;
-        return key !== undefined && !existing.has(key as never);
-      });
-      if (fresh.length) await table.bulkAdd(fresh);
-      inserted[name] = fresh.length;
-    }
-  });
+  // Dexie accepts a variadic table list; enumerate it explicitly for TS tuple safety.
+  await db.transaction(
+    "rw",
+    db.memories, db.echoes, db.imprints, db.owners, db.companions,
+    db.personaRevisions, db.relationships, db.relationshipMilestones,
+    db.chatSessions, db.chatMessages, db.memoryLinks, db.journals,
+    db.mediaAssets, db.albums, db.albumItems, db.migrations, db.settings,
+    async () => {
+      for (const name of TABLE_NAMES) {
+        const table = db.table(name);
+        const rows = decoded[name] ?? [];
+        const existing = new Set(await table.toCollection().primaryKeys());
+        const keyPath = table.schema.primKey.keyPath;
+        const fresh = rows.filter((row) => {
+          const key = isObject(row) && typeof keyPath === "string" ? row[keyPath] : undefined;
+          return key !== undefined && !existing.has(key as never);
+        });
+        if (fresh.length) await table.bulkAdd(fresh);
+        inserted[name] = fresh.length;
+      }
+    },
+  );
 
   let settingsAdded = 0;
   for (const [key, raw] of Object.entries(input.localStorage)) {
