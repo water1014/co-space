@@ -3041,3 +3041,106 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:
   .moon-scene { height: max(540px, calc(100svh - 220px)); }
   .moon-hotspot { min-height: 58px; }
 }
+
+
+/* 月庭入口文字：静息时微微浮光，靠近时清晰显现 */
+@keyframes moon-label-glimmer {
+  0%, 100% {
+    opacity: .84;
+    text-shadow: 0 1px 10px rgba(24, 47, 61, .42);
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 16px rgba(255, 255, 255, .42), 0 2px 14px rgba(24, 47, 61, .48);
+    transform: translateY(-2px);
+  }
+}
+@keyframes moon-label-line {
+  0%, 100% { opacity: .24; transform: scaleX(.28); }
+  50% { opacity: .68; transform: scaleX(.62); }
+}
+.moon-hotspot-name {
+  animation: moon-label-glimmer 5.8s ease-in-out infinite;
+}
+.moon-hotspot:nth-of-type(2n) .moon-hotspot-name { animation-delay: -1.7s; }
+.moon-hotspot:nth-of-type(3n) .moon-hotspot-name { animation-delay: -3.1s; }
+.moon-hotspot-name::after {
+  transform-origin: center;
+  animation: moon-label-line 6.5s ease-in-out infinite;
+}
+.moon-hotspot:hover .moon-hotspot-name,
+.moon-hotspot:focus-visible .moon-hotspot-name,
+.moon-hotspot:active .moon-hotspot-name,
+.moon-hotspot.is-active .moon-hotspot-name {
+  animation: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .moon-hotspot {
+    transition: background .35s ease, transform .35s cubic-bezier(.2,.8,.2,1), filter .35s ease;
+  }
+  .moon-hotspot:hover {
+    filter: drop-shadow(0 0 12px rgba(239, 245, 246, .34));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moon-hotspot-name,
+  .moon-hotspot-name::after {
+    animation: none !important;
+  }
+}
+
+
+/* 月庭原画层：原画承载空间与文字，热点只负责点击，不重复叠字。 */
+.moon-scene {
+  width: 1600px;
+  height: 760px;
+  min-height: 760px;
+  background: #263b4b;
+}
+.moon-artwork { position:absolute; inset:0; overflow:hidden; }
+.moon-artwork-image {
+  display:block; width:100%; height:100%; object-fit:contain;
+  object-position:center center; user-select:none; pointer-events:none;
+}
+.moon-hotspot { min-width:104px; min-height:68px; padding:8px; background:transparent; border:1px solid transparent; }
+.moon-hotspot-name,.moon-hotspot-note {
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip-path:inset(50%); white-space:nowrap;
+}
+.moon-hotspot::before { background:rgba(228,238,242,.16); border-color:rgba(255,255,255,.5); }
+.moon-hotspot:focus-visible { outline:2px solid rgba(246,239,220,.95); outline-offset:2px; }
+.moon-scene-caption { display:none; }
+@media (max-width:640px) { .moon-scene { height:760px; min-height:760px; } }
+
+
+/* 月庭横幅两侧以同一幅原画柔化延展，中央原画保持完整比例，不拉伸、不裁切。 */
+.moon-artwork { isolation: isolate; background: #263b4b; }
+.moon-artwork-backdrop {
+  position: absolute;
+  inset: -18px;
+  z-index: -1;
+  display: block;
+  width: calc(100% + 36px);
+  height: calc(100% + 36px);
+  object-fit: cover;
+  object-position: center 48%;
+  filter: blur(18px) brightness(.72) saturate(.78);
+  opacity: .72;
+  user-select: none;
+  pointer-events: none;
+}
+.moon-artwork-image {
+  position: relative;
+  z-index: 0;
+  object-fit: contain;
+  object-position: center;
+}
+.moon-artwork::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(25, 43, 56, .24), transparent 18%, transparent 82%, rgba(25, 43, 56, .24));
+}
