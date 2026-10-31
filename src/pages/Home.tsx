@@ -5,8 +5,11 @@ import { useLifeStore } from "../stores/lifeStore";
 import { daysTogether } from "../lib/life/derive";
 import { useThemeStore } from "../stores/themeStore";
 
-const dayArtwork = new URL("../../镜花水月：晨光花庭界面.png", import.meta.url).href;
-const nightArtwork = new URL("../../月光下的镜花水月 salon.png", import.meta.url).href;
+const dayArtwork = `${import.meta.env.BASE_URL}日.jpg`;
+const nightArtwork = `${import.meta.env.BASE_URL}夜.jpg`;
+
+// Keep the panorama position when leaving a room and returning to Moon Garden.
+let savedMoonSceneScrollLeft = 0;
 
 type Door = { title: string; note: string; to: string; x: number; y: number };
 
@@ -33,16 +36,51 @@ export function Home() {
   const theme = useThemeStore((state) => state.theme);
   const doors = theme === "night" ? nightDoors : dayDoors;
   const days = daysTogether(life.anniversary);
+  const dateParts = new Intl.DateTimeFormat("en-GB", { month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const today = `${dateParts.find((part) => part.type === "month")?.value ?? "--"} / ${dateParts.find((part) => part.type === "day")?.value ?? "--"}`;
   const track = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<string | null>(null);
+  const [sceneProgress, setSceneProgress] = useState(50);
 
   useEffect(() => {
     const el = track.current;
     if (!el) return;
-    if (el.scrollLeft === 0 && window.matchMedia("(max-width: 640px)").matches) {
-      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) * 0.28);
+    if (window.matchMedia("(max-width: 640px)").matches) {
+      const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+      el.scrollLeft = savedMoonSceneScrollLeft > 0
+        ? Math.min(savedMoonSceneScrollLeft, maxScroll)
+        : maxScroll * 0.5;
     }
+    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+    setSceneProgress(maxScroll > 0 ? (el.scrollLeft / maxScroll) * 100 : 0);
   }, []);
+
+  const rememberScenePosition = () => {
+    if (track.current) {
+      savedMoonSceneScrollLeft = track.current.scrollLeft;
+      const maxScroll = track.current.scrollWidth - track.current.clientWidth;
+      setSceneProgress(maxScroll > 0 ? (track.current.scrollLeft / maxScroll) * 100 : 0);
+    }
+  };
+
+  const handleSceneKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const el = track.current;
+    if (!el) return;
+    const step = Math.max(220, Math.round(el.clientWidth * 0.42));
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      el.scrollBy({ left: step, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      el.scrollBy({ left: -step, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      el.scrollTo({ left: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    } else if (event.key === "End") {
+      event.preventDefault();
+      el.scrollTo({ left: el.scrollWidth, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
+  };
 
   return (
     <div className="moon-home">
@@ -55,25 +93,32 @@ export function Home() {
         <div className="moon-days"><span>相伴</span><strong>{days}</strong><span>天</span></div>
       </header>
 
-      <div className="moon-scene-viewport" ref={track} aria-label="月庭全景，可左右滑动探索">
+      <div className="moon-scene-viewport" ref={track} role="region" tabIndex={0} aria-label="月庭全景，可左右滑动探索" aria-roledescription="横向全景" onScroll={rememberScenePosition} onKeyDown={handleSceneKeyDown}>
         <div className="moon-scene">
           <div className="moon-artwork" aria-hidden="true">
-            <img className="moon-artwork-backdrop" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
-            <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
+            <img key={theme} className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
           </div>
 
+          <div className="moon-scene-brand" aria-hidden="true">
+            <span className="moon-brand-title">镜花水月</span>
+            <span className="moon-brand-divider">✧</span>
+            <span className="moon-brand-motto">有些相遇，是为了在一生里，慢慢看。</span>
+          </div>
+          <div className="moon-scene-meta" aria-hidden="true">
+            <span>{theme === "night" ? "☾" : "☼"}</span><span>{theme === "night" ? "月色" : "晨光"}</span><i></i><span>{today}</span>
+          </div>
           {doors.map((door) => (
             <Link
               key={door.title}
               to={door.to}
               className={`moon-hotspot ${active === door.title ? "is-active" : ""}`}
-              style={{ left: (14.375 + door.x * 0.7125) + "%", top: door.y + "%" }}
+              style={{ left: door.x + "%", top: door.y + "%" }}
               onFocus={() => setActive(door.title)}
               onBlur={() => setActive(null)}
               onMouseEnter={() => setActive(door.title)}
               onMouseLeave={() => setActive(null)}
               onTouchStart={() => setActive(door.title)}
-              aria-label={`进入${door.title}`}
+              aria-label={`进入${door.title}：${door.note}`}
             >
               <span className="moon-hotspot-name">{door.title}</span>
               <span className="moon-hotspot-note">{door.note}</span>
@@ -81,7 +126,8 @@ export function Home() {
           ))}
         </div>
       </div>
-      <div className="moon-explore-hint"><span>←</span> 左右滑动，探索这座家 <span>→</span></div>
+      <div className="moon-panorama-progress" role="progressbar" aria-label="月庭全景浏览位置" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(sceneProgress)}><span style={{ width: `${sceneProgress}%` }} /></div>
+      <div className="moon-explore-hint"><span>←</span> 左右滑动探索 · 也可使用键盘方向键 <span>→</span></div>
       <div className="moon-home-foot"><span>今天也有一处地方，为你留着灯。</span><span>✧</span></div>
     </div>
   );
