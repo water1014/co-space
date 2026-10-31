@@ -9,7 +9,7 @@ type TabDef = { to: string; label: string; icon: TabIcon; match: (path: string) 
 const TAB_DEFS: TabDef[] = [
   { to: "/", label: "月庭", icon: IconHome, match: (p) => p === "/" },
   { to: "/chat", label: "同心阁", icon: IconChat, match: (p) => p === "/chat" },
-  { to: "/memory", label: "藏忆阁", icon: IconBook, match: (p) => ["/memory", "/diary", "/album", "/moments"].includes(p) },
+  { to: "/memory", label: "藏忆阁", icon: IconBook, match: (p) => p.startsWith("/memory") || ["/diary", "/album", "/moments"].includes(p) },
   { to: "/partner", label: "月下人", icon: IconHeart, match: (p) => p === "/partner" },
   { to: "/mit", label: "镜心", icon: IconGear, match: (p) => p === "/mit" },
 ];
