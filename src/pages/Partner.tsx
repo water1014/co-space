@@ -244,12 +244,21 @@ export function Partner() {
               <button type="button" disabled={!milestoneTitle.trim()} onClick={() => void addMilestone()} className="archive-text-button">收进相伴纪　＋</button>
             </div>
           </div>
-          <div className="archive-milestone-list">
-            {milestones.length ? milestones.map((item, index) => <article key={item.id}>
-              <span className="archive-milestone-no">{String(index + 1).padStart(2,"0")}</span>
-              <div><time>{timestampToDate(item.happenedAt)}</time><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}</div>
-              <button type="button" aria-label={`删除${item.title}`} onClick={() => void removeMilestone(item.id)}>×</button>
-            </article>) : <div className="archive-empty"><span>✧</span><p>故事尚未写下</p><small>从一个小小的纪念日开始</small></div>}
+          <div className="archive-milestone-list archive-storyline">
+            {milestones.length ? [...milestones].sort((a,b) => b.happenedAt-a.happenedAt).map((item, index) => {
+              const date = new Date(item.happenedAt);
+              const month = date.toLocaleDateString("zh-CN",{month:"long"});
+              const day = String(date.getDate()).padStart(2,"0");
+              const year = date.getFullYear();
+              const previous = index > 0 ? new Date([...milestones].sort((a,b)=>b.happenedAt-a.happenedAt)[index-1].happenedAt).getFullYear() : null;
+              const showYear = index === 0 || previous !== year;
+              return <article className="archive-story" key={item.id}>
+                <span className="archive-story-index">{String(milestones.length-index).padStart(2,"0")}</span>
+                <div className="archive-story-date"><strong>{day}</strong><span>{month}</span>{showYear && <small>{year}</small>}</div>
+                <div className="archive-story-content"><span className="archive-story-kind">A DAY TO KEEP</span><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}<time>{timestampToDate(item.happenedAt)}</time></div>
+                <button type="button" aria-label={`删除${item.title}`} onClick={() => void removeMilestone(item.id)}>×</button>
+              </article>;
+            }) : <div className="archive-empty"><span>✧</span><p>故事尚未写下</p><small>从一个小小的纪念日开始</small></div>}
           </div>
         </section>
 
