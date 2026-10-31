@@ -9,6 +9,7 @@ import {
   ensurePrimaryIdentity,
   saveCompanionAvatar,
 } from "../lib/db/repositories";
+import "./partner-sanctuary.css";
 import type {
   CompanionRecord,
   PersonaRevisionRecord,

@@ -1,0 +1,85 @@
+/* 月下人：冷白月光、纸感留白与细线结构 */
+.partner-archive{--pa-ink:#263d4b;--pa-muted:#8298a5;--pa-line:rgba(103,145,166,.2);--pa-blue:#6f9db4;background:#f7fafb;color:var(--pa-ink);isolation:isolate}
+.partner-archive .archive-atmosphere{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 78% 9%,rgba(173,207,224,.34),transparent 29%),radial-gradient(ellipse at 4% 46%,rgba(220,235,241,.55),transparent 30%),linear-gradient(180deg,#f9fcfd 0%,#f4f8fa 48%,#fbfcfd 100%);z-index:-1}
+.partner-archive .archive-topbar{max-width:760px;padding-top:22px;color:#8299a6}
+.partner-archive .archive-wordmark{font-size:8px;letter-spacing:.2em;color:#8299a6}
+.partner-archive .archive-wordmark i{color:#8bb4c8;font-style:normal}
+.partner-archive .archive-index{font:9px Georgia,serif;color:#9aabb4}
+.partner-archive .archive-wrap{max-width:760px}
+.partner-archive .archive-heading{display:flex;justify-content:space-between;align-items:center;padding:44px 0 27px;border-bottom:1px solid var(--pa-line)}
+.partner-archive .archive-kicker,.partner-archive .archive-eyebrow{font:600 8px/1.8 var(--f-sans,sans-serif);letter-spacing:.19em;color:#8ba3af}
+.partner-archive .archive-heading h1{margin:9px 0 8px;font:500 clamp(38px,10vw,52px)/1.1 var(--f-serif,serif);letter-spacing:.18em;color:#294555}
+.partner-archive .archive-heading h1 span{color:#8ab3c7}
+.partner-archive .archive-lede{font:12px/1.9 var(--f-serif,serif);letter-spacing:.08em;color:#718b99}
+.partner-archive .archive-seal{width:66px;height:66px;border:1px solid rgba(111,157,180,.36);border-radius:50%;color:#6d9ab2;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 5px rgba(162,198,216,.1);display:grid;place-items:center;position:relative}
+.partner-archive .archive-seal span{font:25px var(--f-serif,serif)}.partner-archive .archive-seal i{position:absolute;right:5px;top:7px;font-size:10px;color:#9dbdce}
+.partner-archive .archive-feedback{margin-top:15px;padding:10px 13px;border:1px solid var(--pa-line);border-radius:10px;background:rgba(255,255,255,.7);font-size:11px;color:#55798d}
+.partner-archive .archive-identity{display:grid;grid-template-columns:minmax(112px,.72fr) minmax(0,1.5fr);gap:24px;padding:27px 0 31px;border-bottom:1px solid var(--pa-line)}
+.partner-archive .archive-identity-art{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:185px;background:linear-gradient(145deg,rgba(224,239,246,.7),rgba(255,255,255,.55));border:1px solid rgba(123,166,188,.2);border-radius:4px;position:relative;overflow:hidden}
+.partner-archive .archive-identity-art:before,.partner-archive .archive-identity-art:after{content:"";position:absolute;width:140px;height:140px;border:1px solid rgba(120,166,189,.15);border-radius:50%}
+.partner-archive .archive-identity-art:after{width:110px;height:110px}
+.partner-archive .archive-portrait{position:relative;z-index:1;width:88px;height:88px;border-radius:50%;border:1px solid rgba(111,157,180,.45);background:linear-gradient(145deg,#e8f2f6,#c9e0eb);display:grid;place-items:center;overflow:visible;box-shadow:0 12px 28px -20px #527d94}
+.partner-archive .archive-portrait>span{font:34px var(--f-serif,serif);color:#6c97ad}
+.partner-archive .archive-portrait img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.partner-archive .archive-upload{position:absolute;right:-4px;bottom:1px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid var(--pa-line);color:#628da4;cursor:pointer}
+.partner-archive .archive-upload input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.partner-archive .archive-art-caption{position:absolute;bottom:13px;font:7px Georgia,serif;letter-spacing:.16em;color:#91aab6}
+.partner-archive .archive-identity-content{min-width:0}
+.partner-archive .archive-section-meta{display:flex;justify-content:space-between;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--pa-line);font:7px Georgia,serif;letter-spacing:.15em;color:#93a9b4}
+.partner-archive .archive-identity-content h2{margin:7px 0 14px;font:500 25px var(--f-serif,serif);color:#2b4a5b}
+.partner-archive .archive-identity-content h2 small{display:block;margin-top:4px;font:10px var(--f-sans,sans-serif);letter-spacing:.08em;color:#8da2ad}
+.partner-archive .archive-fields{display:grid;gap:9px}
+.partner-archive .archive-fields label,.partner-archive .archive-date-control label,.partner-archive .archive-milestone-form label{display:grid;gap:5px;font:8px Georgia,serif;letter-spacing:.12em;color:#849ba7}
+.partner-archive .archive-fields input,.partner-archive .archive-date-control input,.partner-archive .archive-milestone-form input,.partner-archive .archive-persona-fields textarea,.partner-archive .archive-milestone-form textarea{width:100%;min-width:0;border:1px solid rgba(113,154,175,.22);border-radius:7px;background:rgba(255,255,255,.7);padding:10px 11px;color:#344f5d;font:12px var(--f-sans,sans-serif);outline:none}
+.partner-archive input:focus,.partner-archive textarea:focus{border-color:rgba(89,145,174,.65);box-shadow:0 0 0 3px rgba(131,180,202,.1)}
+.partner-archive .archive-button{margin-top:13px;padding:10px 14px;border:1px solid rgba(105,153,178,.38);border-radius:4px;background:linear-gradient(110deg,#e4f0f5,#f8fbfc);color:#527c92;font-size:10px;letter-spacing:.06em}
+.partner-archive .archive-button:disabled{opacity:.5}
+.partner-archive .archive-time{display:grid;grid-template-columns:1fr auto;gap:16px;padding:26px 0;border-bottom:1px solid var(--pa-line)}
+.partner-archive .archive-time-copy h2,.partner-archive .archive-persona-heading h2,.partner-archive .archive-milestone-intro h2{margin:9px 0 4px;font:500 23px var(--f-serif,serif);letter-spacing:.12em;color:#2d4b5b}
+.partner-archive .archive-time-note,.partner-archive .archive-persona-heading>p,.partner-archive .archive-milestone-intro>p{font:11px/1.8 var(--f-serif,serif);color:#8499a4}
+.partner-archive .archive-counter{display:flex;align-items:center;gap:8px;color:#6d9bb3}
+.partner-archive .archive-counter strong{font:500 48px/.9 Georgia,serif;letter-spacing:-.06em}
+.partner-archive .archive-counter span{font:7px/1.6 Georgia,serif;letter-spacing:.14em}
+.partner-archive .archive-date-control{grid-column:1/-1;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px}
+.partner-archive .archive-date-control label{grid-column:1/-1}
+.partner-archive .archive-date-control input{max-width:220px}
+.partner-archive .archive-date-control p{grid-column:1/-1;margin:0;font-size:9px;color:#9aabb4}
+.partner-archive .archive-text-button{padding:8px 10px;color:#628da4;font-size:10px;white-space:nowrap}
+.partner-archive .archive-persona{padding:27px 0;border-bottom:1px solid var(--pa-line)}
+.partner-archive .archive-persona-heading h2 span{color:#8ab3c7}
+.partner-archive .archive-persona-fields{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:18px}
+.partner-archive .archive-persona-fields label{display:grid;gap:7px;color:#58788a;font:11px var(--f-serif,serif)}
+.partner-archive .archive-persona-fields label>span{font:8px Georgia,serif;letter-spacing:.14em;color:#9ab0bb}
+.partner-archive .archive-persona-fields textarea{min-height:82px;resize:vertical;font:11px/1.8 var(--f-sans,sans-serif)}
+.partner-archive .archive-persona-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
+.partner-archive .archive-persona-foot p{font-size:9px;line-height:1.7;color:#92a5ae}
+.partner-archive .archive-milestones{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:23px;padding:27px 0}
+.partner-archive .archive-milestone-form{display:grid;gap:7px;margin-top:17px}
+.partner-archive .archive-milestone-form textarea{resize:vertical;font:11px/1.7 var(--f-sans,sans-serif)}
+.partner-archive .archive-storyline{position:relative}
+.partner-archive .archive-storyline:before{content:"";position:absolute;left:29px;top:9px;bottom:9px;width:1px;background:linear-gradient(#9dbdce,rgba(157,189,206,.12))}
+.partner-archive .archive-story{position:relative;display:grid;grid-template-columns:19px 42px minmax(0,1fr) 18px;gap:8px;padding:12px 0;border-bottom:1px solid rgba(103,145,166,.14)}
+.partner-archive .archive-story-index{font:8px Georgia,serif;color:#a2b5be}
+.partner-archive .archive-story-date{display:flex;flex-direction:column;color:#779bb0}
+.partner-archive .archive-story-date strong{font:24px/.9 Georgia,serif;font-weight:400}
+.partner-archive .archive-story-date span{font-size:9px;margin-top:4px}.partner-archive .archive-story-date small{font:8px Georgia,serif;color:#9aabb4}
+.partner-archive .archive-story-kind{font:7px Georgia,serif;letter-spacing:.13em;color:#9ab0bb}
+.partner-archive .archive-story-content h3{margin:4px 0;font:500 14px var(--f-serif,serif);color:#345466}
+.partner-archive .archive-story-content p{margin:0;font-size:10px;line-height:1.7;color:#8298a4}
+.partner-archive .archive-story-content time{display:block;margin-top:5px;font:8px Georgia,serif;color:#a0b1b9}
+.partner-archive .archive-story>button{color:#a1b3bc;font-size:17px}
+.partner-archive .archive-empty{padding:34px 10px;text-align:center;color:#8ca8b6}.partner-archive .archive-empty span{font-size:22px}.partner-archive .archive-empty p{margin:7px 0;font:13px var(--f-serif,serif)}.partner-archive .archive-empty small{font-size:9px;color:#a2b3bc}
+.partner-archive .archive-footer{padding:18px 0 0;border-top:1px solid var(--pa-line);text-align:center;color:#94a9b4;font:8px Georgia,serif;letter-spacing:.14em}
+.partner-archive .archive-footer i{margin:0 10px;color:#8bb4c8;font-style:normal}
+.partner-archive .archive-footer p{margin:10px auto 0;max-width:420px;font:9px/1.8 var(--f-sans,sans-serif);letter-spacing:0;color:#9aabb4}
+[data-theme="night"] .partner-archive{--pa-ink:#e0edf2;--pa-muted:#9bb0ba;--pa-line:rgba(161,194,210,.16);background:#172832;color:#e0edf2}
+[data-theme="night"] .partner-archive .archive-atmosphere{background:radial-gradient(ellipse at 80% 8%,rgba(72,119,145,.24),transparent 32%),linear-gradient(180deg,#1b303c,#172832)}
+[data-theme="night"] .partner-archive .archive-heading h1,[data-theme="night"] .partner-archive .archive-identity-content h2,[data-theme="night"] .partner-archive .archive-time-copy h2,[data-theme="night"] .partner-archive .archive-persona-heading h2,[data-theme="night"] .partner-archive .archive-milestone-intro h2{color:#e0edf2}
+[data-theme="night"] .partner-archive .archive-fields input,[data-theme="night"] .partner-archive .archive-date-control input,[data-theme="night"] .partner-archive .archive-milestone-form input,[data-theme="night"] .partner-archive .archive-persona-fields textarea,[data-theme="night"] .partner-archive .archive-milestone-form textarea{background:rgba(17,31,39,.65);color:#e0edf2;border-color:rgba(160,193,210,.18)}
+[data-theme="night"] .partner-archive .archive-identity-art{background:linear-gradient(145deg,rgba(68,105,123,.35),rgba(31,51,62,.45))}
+[data-theme="night"] .partner-archive .archive-portrait{background:linear-gradient(145deg,#476a7c,#2e4c5c)}
+[data-theme="night"] .partner-archive .archive-portrait>span{color:#d3e7ef}
+[data-theme="night"] .partner-archive .archive-button{background:rgba(89,131,153,.2);color:#c4dce7}
+@media(max-width:560px){.partner-archive .archive-heading{padding:33px 0 22px}.partner-archive .archive-identity{grid-template-columns:104px minmax(0,1fr);gap:14px}.partner-archive .archive-identity-art{min-height:175px}.partner-archive .archive-portrait{width:72px;height:72px}.partner-archive .archive-section-meta{font-size:6px}.partner-archive .archive-identity-content h2{font-size:21px}.partner-archive .archive-persona-fields{grid-template-columns:1fr;gap:10px}.partner-archive .archive-milestones{grid-template-columns:1fr;gap:15px}.partner-archive .archive-persona-foot{align-items:flex-start;flex-direction:column}.partner-archive .archive-time{grid-template-columns:1fr auto}}
+@media(max-width:360px){.partner-archive .archive-wrap{padding-left:15px;padding-right:15px}.partner-archive .archive-topbar{padding-left:15px;padding-right:15px}.partner-archive .archive-identity{grid-template-columns:1fr}.partner-archive .archive-identity-art{min-height:140px}.partner-archive .archive-date-control{grid-template-columns:1fr auto}.partner-archive .archive-date-control input{max-width:none}}
+@media(prefers-reduced-motion:reduce){.partner-archive *{scroll-behavior:auto!important;transition:none!important}}
