@@ -40,6 +40,7 @@ export function Home() {
   const today = `${dateParts.find((part) => part.type === "month")?.value ?? "--"} / ${dateParts.find((part) => part.type === "day")?.value ?? "--"}`;
   const track = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<string | null>(null);
+  const [sceneProgress, setSceneProgress] = useState(50);
 
   useEffect(() => {
     const el = track.current;
@@ -53,7 +54,11 @@ export function Home() {
   }, []);
 
   const rememberScenePosition = () => {
-    if (track.current) savedMoonSceneScrollLeft = track.current.scrollLeft;
+    if (track.current) {
+      savedMoonSceneScrollLeft = track.current.scrollLeft;
+      const maxScroll = track.current.scrollWidth - track.current.clientWidth;
+      setSceneProgress(maxScroll > 0 ? (track.current.scrollLeft / maxScroll) * 100 : 0);
+    }
   };
 
   const handleSceneKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -89,7 +94,7 @@ export function Home() {
       <div className="moon-scene-viewport" ref={track} role="region" tabIndex={0} aria-label="月庭全景，可左右滑动探索" aria-roledescription="横向全景" onScroll={rememberScenePosition} onKeyDown={handleSceneKeyDown}>
         <div className="moon-scene">
           <div className="moon-artwork" aria-hidden="true">
-            <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
+            <img key={theme} className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
           </div>
 
           <div className="moon-scene-brand" aria-hidden="true">
@@ -119,6 +124,7 @@ export function Home() {
           ))}
         </div>
       </div>
+      <div className="moon-panorama-progress" role="progressbar" aria-label="月庭全景浏览位置" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(sceneProgress)}><span style={{ width: `${sceneProgress}%` }} /></div>
       <div className="moon-explore-hint"><span>←</span> 左右滑动探索 · 也可使用键盘方向键 <span>→</span></div>
       <div className="moon-home-foot"><span>今天也有一处地方，为你留着灯。</span><span>✧</span></div>
     </div>
