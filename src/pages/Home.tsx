@@ -56,6 +56,25 @@ export function Home() {
     if (track.current) savedMoonSceneScrollLeft = track.current.scrollLeft;
   };
 
+  const handleSceneKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const el = track.current;
+    if (!el) return;
+    const step = Math.max(220, Math.round(el.clientWidth * 0.42));
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      el.scrollBy({ left: step, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      el.scrollBy({ left: -step, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      el.scrollTo({ left: 0, behavior: "smooth" });
+    } else if (event.key === "End") {
+      event.preventDefault();
+      el.scrollTo({ left: el.scrollWidth, behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="moon-home">
       <header className="moon-home-head">
@@ -67,7 +86,7 @@ export function Home() {
         <div className="moon-days"><span>相伴</span><strong>{days}</strong><span>天</span></div>
       </header>
 
-      <div className="moon-scene-viewport" ref={track} role="region" tabIndex={0} aria-label="月庭全景，可左右滑动探索" aria-roledescription="横向全景" onScroll={rememberScenePosition}>
+      <div className="moon-scene-viewport" ref={track} role="region" tabIndex={0} aria-label="月庭全景，可左右滑动探索" aria-roledescription="横向全景" onScroll={rememberScenePosition} onKeyDown={handleSceneKeyDown}>
         <div className="moon-scene">
           <div className="moon-artwork" aria-hidden="true">
             <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
@@ -100,7 +119,7 @@ export function Home() {
           ))}
         </div>
       </div>
-      <div className="moon-explore-hint"><span>←</span> 左右滑动，探索这座家 <span>→</span></div>
+      <div className="moon-explore-hint"><span>←</span> 左右滑动探索 · 也可使用键盘方向键 <span>→</span></div>
       <div className="moon-home-foot"><span>今天也有一处地方，为你留着灯。</span><span>✧</span></div>
     </div>
   );
