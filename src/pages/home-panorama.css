@@ -3,7 +3,7 @@
 .moon-home-atlas .moon-atlas-viewport{position:relative;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;scroll-behavior:smooth}
 .moon-home-atlas .moon-atlas-viewport::-webkit-scrollbar{display:none}
 .moon-home-atlas .moon-atlas-scene{position:relative!important;width:max(100vw,3200px)!important;height:100%!important;min-height:560px;aspect-ratio:auto!important;overflow:hidden;isolation:isolate}
-.moon-home-atlas .moon-artwork-image{position:absolute!important;inset:0;width:100%!important;height:100%!important;object-fit:fill!important;pointer-events:none;user-select:none}
+.moon-home-atlas .moon-artwork-image{position:absolute!important;inset:0;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center;pointer-events:none;user-select:none}
 .moon-home-atlas .moon-artwork-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(14,37,56,.22),transparent 20%,transparent 82%,rgba(14,37,56,.16)),linear-gradient(180deg,rgba(12,33,51,.12),transparent 28%,transparent 75%,rgba(12,33,51,.2))}
 .moon-home-atlas.is-day{--atlas-ink:#28465d;--atlas-muted:#55758b;--atlas-glass:rgba(237,248,253,.72);--atlas-line:rgba(255,255,255,.86);--atlas-glow:rgba(220,244,255,.92)}
 .moon-home-atlas.is-night{--atlas-ink:#e4f1f8;--atlas-muted:#b1cbdc;--atlas-glass:rgba(17,43,65,.68);--atlas-line:rgba(202,229,244,.55);--atlas-glow:rgba(170,219,248,.9)}
