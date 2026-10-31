@@ -4657,3 +4657,211 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
   .partner-archive .archive-identity-content { padding-left:14px; padding-right:14px; }
   .partner-archive .archive-persona { padding-left:13px; padding-right:13px; }
 }
+
+
+/* ================================================================
+   镜花水月 · 珍珠白杂志系统 v1
+   方向：轻磨砂玻璃组件 + 适配内容的雾感背景 + 编辑式排版。
+   只调整内部空间的材质与色彩，不覆盖月庭全景图。
+   ================================================================ */
+:root,
+[data-theme="day"] {
+  --bg: #f7f9fb;
+  --bg-deep: #edf2f6;
+  --surface: rgba(255,255,255,.94);
+  --surface-2: #f1f5f8;
+
+  --ink: #26333d;
+  --ink-soft: #687985;
+  --ink-faint: #91a0aa;
+  --ink-ghost: #bac5cc;
+
+  --line: rgba(104,129,145,.10);
+  --line-strong: rgba(104,129,145,.18);
+
+  --accent: #7895a8;
+  --accent-deep: #58788d;
+  --accent-soft: rgba(120,149,168,.13);
+  --accent-ink: #fff;
+  --danger: #c77e7b;
+
+  --peer-bubble: #f0f4f7;
+  --peer-bubble-ink: #26333d;
+  --mine-bubble: #6f899a;
+  --mine-bubble-ink: #fff;
+
+  --primary: #e6edf2;
+  --on-ink: #fff;
+  --tint-rgb: 38,51,61;
+
+  --shadow-card: 0 2px 8px rgba(74,96,112,.045);
+  --shadow-float: 0 12px 30px -18px rgba(62,86,104,.24);
+  --shadow-bar: 0 -1px 0 rgba(104,129,145,.08);
+  --shadow-glass: 0 12px 30px -20px rgba(67,91,108,.30);
+
+  --glass-bg: rgba(255,255,255,.68);
+  --glass-bg-strong: rgba(255,255,255,.82);
+  --glass-border: rgba(255,255,255,.86);
+  --glass-sheen: rgba(255,255,255,.66);
+  --glass-blur: 14px;
+
+  color-scheme: light;
+}
+
+[data-theme="night"] {
+  --bg: #17232c;
+  --bg-deep: #101a22;
+  --surface: rgba(32,46,56,.94);
+  --surface-2: #253641;
+
+  --ink: #edf3f6;
+  --ink-soft: rgba(231,240,245,.72);
+  --ink-faint: rgba(220,233,240,.48);
+  --ink-ghost: rgba(220,233,240,.28);
+
+  --line: rgba(222,237,245,.09);
+  --line-strong: rgba(222,237,245,.16);
+
+  --accent: #a7c0d0;
+  --accent-deep: #c4d7e2;
+  --accent-soft: rgba(167,192,208,.15);
+  --accent-ink: #17232c;
+  --danger: #df9994;
+
+  --peer-bubble: #293b47;
+  --peer-bubble-ink: #edf3f6;
+  --mine-bubble: #d5e3eb;
+  --mine-bubble-ink: #17232c;
+
+  --primary: #344956;
+  --on-ink: #17232c;
+  --tint-rgb: 237,243,246;
+
+  --shadow-card: 0 2px 8px rgba(0,0,0,.22);
+  --shadow-float: 0 14px 34px -18px rgba(0,0,0,.55);
+  --shadow-bar: 0 -1px 0 rgba(222,237,245,.07);
+  --shadow-glass: 0 14px 34px -18px rgba(0,0,0,.48);
+
+  --glass-bg: rgba(34,51,62,.62);
+  --glass-bg-strong: rgba(39,58,70,.78);
+  --glass-border: rgba(222,237,245,.14);
+  --glass-sheen: rgba(235,246,252,.10);
+  --glass-blur: 14px;
+
+  color-scheme: dark;
+}
+
+/* 背景只提供淡淡的环境色，让玻璃微微透出，不与内容争夺注意力。 */
+.app-bg {
+  background:
+    radial-gradient(58% 42% at 86% -8%, rgba(197,216,229,.48) 0%, transparent 68%),
+    radial-gradient(44% 38% at 2% 10%, rgba(224,234,241,.62) 0%, transparent 70%),
+    linear-gradient(145deg, #f8fafc 0%, #f1f5f8 58%, #edf2f6 100%);
+}
+[data-theme="night"] .app-bg {
+  background:
+    radial-gradient(58% 42% at 88% -8%, rgba(91,126,148,.25) 0%, transparent 68%),
+    radial-gradient(44% 38% at 2% 10%, rgba(73,102,120,.18) 0%, transparent 70%),
+    linear-gradient(145deg, #1a2a35 0%, #14222c 58%, #101a22 100%);
+}
+.app-bg .glow { opacity: .34; filter: blur(38px); }
+[data-theme="night"] .app-bg .glow { opacity: .7; }
+
+/* 老师组件质感的关键：透明度很轻、边缘细、浮起一点点。 */
+.glass {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.58), transparent 38%),
+    var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(138%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(138%);
+  border: 1px solid var(--glass-border);
+  border-radius: 22px;
+  box-shadow:
+    0 8px 24px -19px rgba(54,79,96,.36),
+    0 1px 2px rgba(54,79,96,.045),
+    inset 0 1px 0 rgba(255,255,255,.72);
+}
+.glass-hi,
+.glass-flat {
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 4px 14px -12px rgba(54,79,96,.24),
+    inset 0 1px 0 rgba(255,255,255,.76);
+}
+.glass-hi { border-radius: 17px; }
+.glass-flat { border-radius: 15px; }
+.glass-solid {
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 9px 24px -18px rgba(54,79,96,.28),
+    inset 0 1px 0 rgba(255,255,255,.72);
+}
+
+/* 实体内容面不做厚重卡片：像稍稍离开纸面的收藏页。 */
+.card {
+  background: linear-gradient(150deg, rgba(255,255,255,.98), rgba(249,252,254,.92));
+  border: 1px solid rgba(255,255,255,.92);
+  box-shadow:
+    0 2px 5px rgba(62,86,104,.035),
+    0 12px 28px -23px rgba(47,73,91,.34),
+    inset 0 1px 0 rgba(255,255,255,.96);
+}
+[data-theme="night"] .glass,
+[data-theme="night"] .glass-hi,
+[data-theme="night"] .glass-flat,
+[data-theme="night"] .glass-solid {
+  box-shadow:
+    0 10px 26px -18px rgba(0,0,0,.52),
+    inset 0 1px 0 rgba(239,248,252,.10);
+}
+[data-theme="night"] .card {
+  background: linear-gradient(150deg, rgba(39,56,67,.96), rgba(31,47,57,.94));
+  border-color: rgba(224,239,247,.10);
+}
+
+/* 编辑式排版工具：页面可组合使用，不强迫每个房间套同一张卡片。 */
+.editorial-kicker {
+  color: var(--ink-faint);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+.editorial-title {
+  color: var(--ink);
+  font-family: var(--f-serif);
+  font-size: clamp(28px, 7vw, 42px);
+  font-weight: 500;
+  letter-spacing: .08em;
+  line-height: 1.18;
+}
+.editorial-meta {
+  color: var(--ink-faint);
+  font-size: 10px;
+  letter-spacing: .12em;
+  font-variant-numeric: tabular-nums;
+}
+.editorial-rule {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, var(--line-strong), var(--line), transparent);
+}
+.editorial-sheet {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(255,255,255,.58));
+  border: 1px solid rgba(255,255,255,.82);
+  border-radius: 20px;
+  box-shadow: 0 9px 26px -22px rgba(52,78,96,.32), inset 0 1px 0 rgba(255,255,255,.8);
+  -webkit-backdrop-filter: blur(12px) saturate(135%);
+  backdrop-filter: blur(12px) saturate(135%);
+}
+[data-theme="night"] .editorial-sheet {
+  background: linear-gradient(145deg, rgba(43,62,74,.78), rgba(31,47,58,.68));
+  border-color: rgba(224,239,247,.12);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .glass, .glass-hi, .glass-flat, .glass-solid, .card {
+    transition: background .28s ease, border-color .28s ease, box-shadow .28s ease, transform .28s ease;
+  }
+}
