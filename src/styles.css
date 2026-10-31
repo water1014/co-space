@@ -4104,3 +4104,141 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a span {font:10px/1.5
   }
   .moon-mobile-swipe {display:none!important}
 }
+
+
+/* ===== 月庭导航：与场景同材质的轻量底部目录 ===== */
+body:has(.moon-home-immersive) nav[aria-label="主导航"] {
+  position:fixed!important;
+  z-index:20;
+  inset:auto 0 0!important;
+  width:100%!important;
+  padding:0 3.2vw max(15px,env(safe-area-inset-bottom))!important;
+  background:linear-gradient(180deg,
+    rgba(8,17,30,0) 0%,
+    rgba(8,17,30,.10) 24%,
+    rgba(8,17,30,.34) 100%)!important;
+  border:0!important;
+  opacity:1;
+  pointer-events:auto;
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] > div {
+  position:relative;
+  display:flex;
+  width:min(100%,900px)!important;
+  max-width:none!important;
+  margin:0 0 0 auto!important;
+  align-items:stretch;
+  justify-content:flex-end;
+  gap:clamp(15px,2.8vw,42px);
+  padding:10px 0 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] > div::before {
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  width:min(100%,760px);
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(232,228,216,.16) 12%,rgba(232,228,216,.48) 55%,rgba(232,228,216,.08));
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] a {
+  position:relative;
+  display:flex;
+  flex:0 1 72px;
+  min-width:52px;
+  align-items:center;
+  justify-content:flex-start;
+  gap:6px;
+  padding:8px 3px 5px!important;
+  border:0!important;
+  border-radius:0!important;
+  color:rgba(235,236,237,.68)!important;
+  background:transparent!important;
+  transition:color .35s ease,transform .35s ease!important;
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] a::after {
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-3px;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:rgba(238,229,207,.9);
+  box-shadow:0 0 10px rgba(226,220,199,.65);
+  opacity:0;
+  transform:translateX(-50%) scale(.5);
+  transition:opacity .35s ease,transform .35s ease;
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] a[aria-current="page"] {
+  color:rgba(255,251,240,.98)!important;
+  background:transparent!important;
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] a[aria-current="page"]::after {
+  opacity:1;
+  transform:translateX(-50%) scale(1);
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] a svg {
+  width:17px;
+  height:17px;
+  stroke-width:1.25;
+  filter:drop-shadow(0 1px 7px rgba(0,0,0,.55));
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] a span {
+  color:inherit;
+  font:10px/1.5 "Noto Serif SC","Songti SC",serif;
+  letter-spacing:.16em;
+  text-shadow:0 1px 9px rgba(3,10,19,.9);
+  white-space:nowrap;
+}
+body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
+  color:#fff!important;
+  transform:translateY(-2px);
+}
+@media (max-width:767px) {
+  body:has(.moon-home-immersive) nav[aria-label="主导航"] {
+    right:0;left:0;width:100%!important;
+    padding:0 4vw max(10px,env(safe-area-inset-bottom))!important;
+    background:linear-gradient(180deg,rgba(8,17,30,0),rgba(8,17,30,.16) 32%,rgba(8,17,30,.48))!important;
+  }
+  body:has(.moon-home-immersive) nav[aria-label="主导航"] > div {
+    width:100%!important;
+    max-width:480px!important;
+    margin:0 auto!important;
+    justify-content:space-between;
+    gap:0;
+    padding:8px 2px 3px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+  }
+  body:has(.moon-home-immersive) nav[aria-label="主导航"] > div::before {
+    right:0;width:100%;
+    background:linear-gradient(90deg,transparent,rgba(232,228,216,.28) 18%,rgba(232,228,216,.42) 50%,rgba(232,228,216,.28) 82%,transparent);
+  }
+  body:has(.moon-home-immersive) nav[aria-label="主导航"] a {
+    flex:1 1 0;
+    min-width:0;
+    gap:5px;
+    padding:7px 1px 5px!important;
+    color:rgba(240,239,236,.72)!important;
+  }
+  body:has(.moon-home-immersive) nav[aria-label="主导航"] a svg {
+    width:17px;height:17px;
+  }
+  body:has(.moon-home-immersive) nav[aria-label="主导航"] a span {
+    font-size:9px;
+    letter-spacing:.12em;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  body:has(.moon-home-immersive) nav[aria-label="主导航"] a,
+  body:has(.moon-home-immersive) nav[aria-label="主导航"] a::after {transition:none!important}
+}
