@@ -235,3 +235,13 @@
 .ma-discard-confirm button.danger{border-color:rgba(174,126,111,.38);background:rgba(174,126,111,.1);color:#986d60}
 [data-theme="night"] .ma-discard-confirm{background:rgba(63,94,110,.22);border-color:rgba(157,194,210,.25);border-left-color:rgba(157,194,210,.65)}
 [data-theme="night"] .ma-discard-confirm button.danger{color:#e0b8a9}
+
+
+/* A quiet reading view for each saved moment */
+.ma-reading-text{margin:18px 0 12px;padding:2px 1px 5px}
+.ma-reading-text>p{margin:0;color:var(--ink);font:14px/2.05 var(--f-serif,serif);letter-spacing:.025em;white-space:pre-wrap;overflow-wrap:anywhere}
+.ma-reading-text .ma-tags{margin-top:20px;padding-top:12px;border-top:1px solid var(--line)}
+.ma-detail-actions button{min-height:36px}
+.ma-detail-actions button:last-child:not(.danger){border-color:rgba(126,171,190,.28);background:rgba(187,216,228,.12)}
+[data-theme="night"] .ma-reading-text>p{color:#e1edf2}
+[data-theme="night"] .ma-reading-text .ma-tags{border-top-color:rgba(157,194,210,.18)}
