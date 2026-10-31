@@ -13,6 +13,7 @@ const Diary = lazy(() =>
   import("./pages/Diary").then((m) => ({ default: m.Diary })),
 );
 import { Mit } from "./pages/Mit";
+import { Partner } from "./pages/Partner";
 import { Moments } from "./pages/Moments";
 import { Studio } from "./pages/Studio";
 import { Lounge } from "./pages/Lounge";
@@ -57,6 +58,7 @@ export default function App() {
           <Route path="/together" element={<Together />} />
           <Route path="/diary" element={<Diary />} />
           <Route path="/mit" element={<Mit />} />
+          <Route path="/partner" element={<Partner />} />
           <Route path="/moments" element={<Moments />} />
           <Route path="/studio" element={<Studio />} />
           <Route path="/lounge" element={<Lounge />} />
