@@ -3041,3 +3041,51 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:
   .moon-scene { height: max(540px, calc(100svh - 220px)); }
   .moon-hotspot { min-height: 58px; }
 }
+
+
+/* 月庭入口文字：静息时微微浮光，靠近时清晰显现 */
+@keyframes moon-label-glimmer {
+  0%, 100% {
+    opacity: .84;
+    text-shadow: 0 1px 10px rgba(24, 47, 61, .42);
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 16px rgba(255, 255, 255, .42), 0 2px 14px rgba(24, 47, 61, .48);
+    transform: translateY(-2px);
+  }
+}
+@keyframes moon-label-line {
+  0%, 100% { opacity: .24; transform: scaleX(.28); }
+  50% { opacity: .68; transform: scaleX(.62); }
+}
+.moon-hotspot-name {
+  animation: moon-label-glimmer 5.8s ease-in-out infinite;
+}
+.moon-hotspot:nth-of-type(2n) .moon-hotspot-name { animation-delay: -1.7s; }
+.moon-hotspot:nth-of-type(3n) .moon-hotspot-name { animation-delay: -3.1s; }
+.moon-hotspot-name::after {
+  transform-origin: center;
+  animation: moon-label-line 6.5s ease-in-out infinite;
+}
+.moon-hotspot:hover .moon-hotspot-name,
+.moon-hotspot:focus-visible .moon-hotspot-name,
+.moon-hotspot:active .moon-hotspot-name,
+.moon-hotspot.is-active .moon-hotspot-name {
+  animation: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .moon-hotspot {
+    transition: background .35s ease, transform .35s cubic-bezier(.2,.8,.2,1), filter .35s ease;
+  }
+  .moon-hotspot:hover {
+    filter: drop-shadow(0 0 12px rgba(239, 245, 246, .34));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moon-hotspot-name,
+  .moon-hotspot-name::after {
+    animation: none !important;
+  }
+}
