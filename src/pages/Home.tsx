@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useThemeStore } from "../stores/themeStore";
 import "./home-scene.css";
@@ -97,7 +97,6 @@ export function Home() {
     suppressClick.current = false;
     if (event.pointerType === "mouse" && event.button === 0) {
       dragState.current = { pointerId: event.pointerId, x: event.clientX, scrollLeft: event.currentTarget.scrollLeft, moved: false };
-      event.currentTarget.setPointerCapture(event.pointerId);
     }
   };
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -112,7 +111,6 @@ export function Home() {
     if (drag && drag.pointerId === event.pointerId) {
       suppressClick.current = drag.moved;
       dragState.current = null;
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     } else if (pointerStart.current) {
       const dx = Math.abs(event.clientX - pointerStart.current.x);
       const dy = Math.abs(event.clientY - pointerStart.current.y);
