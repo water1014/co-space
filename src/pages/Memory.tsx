@@ -27,6 +27,7 @@ export function Memory() {
   const [showComposer, setShowComposer] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [actionError, setActionError] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
   useEffect(() => {
     const candidate = initialDay && /^\d{4}-\d{2}-\d{2}$/.test(initialDay) ? new Date(initialDay + "T12:00:00") : null;
     if (!candidate || dayKey(candidate) !== initialDay) return;
@@ -55,7 +56,7 @@ export function Memory() {
   const selectDay = (key: string) => { setSelectedDay(key); setSearchParams({ day: key }, { replace: true }); const [y, m] = key.split("-").map(Number); setMonth(new Date(y, m - 1, 1)); };
   const moveDay = (delta: number) => { const [y,m,d] = selectedDay.split("-").map(Number); const next = new Date(y,m-1,d+delta); selectDay(dayKey(next)); };
   const jumpToday = () => selectDay(dayKey(new Date()));
-  const openEntry = (entry: MemoryEntry) => { setOpened(entry); setDraft(entry.text); setActionError(""); };
+  const openEntry = (entry: MemoryEntry) => { setOpened(entry); setDraft(entry.text); setActionError(""); setConfirmDelete(false); };
   const runMemoryAction = async (key: string, action: () => Promise<void>, onSuccess?: () => void) => {
     setBusyAction(key);
     setActionError("");
@@ -100,7 +101,7 @@ export function Memory() {
       {view === "index" ? <button className="ma-compose" onClick={() => setShowComposer(true)}><span>＋</span> 写下一段记忆</button> : <p className="ma-collection-note">在时日笺中，点亮记录旁的 ✧，便能把它收进这本私人选集。</p>}
     </section>
     <footer className="ma-footer"><span>EVERY DAY LEAVES A TRACE</span><span>镜花水月 · 私人记忆档案</span></footer>
-    <Sheet open={Boolean(opened)} onClose={() => setOpened(null)} title="时日笺" panelClassName="memory-mirror-sheet">{opened && <div className="ma-detail">{actionError && <p className="ma-action-error" role="alert">{actionError}</p>}<p className="ma-eyebrow">{new Date(opened.createdAt).toLocaleString("zh-CN", { dateStyle: "long", timeStyle: "short" })}</p><textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={7} maxLength={5000} /><div className="ma-detail-actions"><button disabled={!draft.trim() || busyAction !== null} onClick={() => void saveOpenedMemory()}>{busyAction === "edit" ? "正在保存…" : "保存修改"}</button><button disabled={busyAction !== null} onClick={() => void runMemoryAction("detail-pin", () => togglePin(opened.id), () => setOpened(null))}>{opened.pinned ? "取消珍藏" : "珍藏这段"}</button><button className="danger" disabled={busyAction !== null} onClick={() => void deleteOpenedMemory()}>删除</button></div></div>}</Sheet>
+    <Sheet open={Boolean(opened)} onClose={() => setOpened(null)} title="时日笺" panelClassName="memory-mirror-sheet">{opened && <div className="ma-detail">{actionError && <p className="ma-action-error" role="alert">{actionError}</p>}<p className="ma-eyebrow">{new Date(opened.createdAt).toLocaleString("zh-CN", { dateStyle: "long", timeStyle: "short" })}</p><textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={7} maxLength={5000} /><div className="ma-detail-actions"><button disabled={!draft.trim() || busyAction !== null} onClick={() => void saveOpenedMemory()}>{busyAction === "edit" ? "正在保存…" : "保存修改"}</button><button disabled={busyAction !== null} onClick={() => void runMemoryAction("detail-pin", () => togglePin(opened.id), () => setOpened(null))}>{opened.pinned ? "取消珍藏" : "珍藏这段"}</button><button className="danger" disabled={busyAction !== null} onClick={() => setConfirmDelete((value) => !value)}>删除</button></div>{confirmDelete && <div className="ma-delete-confirm" role="alertdialog" aria-labelledby="ma-delete-title"><strong id="ma-delete-title">确定要删除这段记忆吗？</strong><p>删除后，这段记录将从藏忆阁中移除。</p><div><button type="button" disabled={busyAction !== null} onClick={() => setConfirmDelete(false)}>再想一想</button><button type="button" className="danger" disabled={busyAction !== null} onClick={() => void deleteOpenedMemory()}>{busyAction === "delete" ? "正在删除…" : "确认删除"}</button></div></div></div>}</Sheet>
     <Sheet open={showComposer} onClose={() => setShowComposer(false)} title="写下一段记忆" panelClassName="memory-mirror-sheet"><div className="ma-detail">{actionError && <p className="ma-action-error" role="alert">{actionError}</p>}<p className="ma-eyebrow">A SMALL NOTE TO KEEP</p><div className="ma-compose-date"><span>写入日期</span><strong>{selectedDay}</strong><button onClick={jumpToday}>改为今天</button></div><textarea value={newText} onChange={(e) => setNewText(e.target.value)} rows={6} maxLength={5000} placeholder="今天有什么想留下？" /><div className="ma-detail-actions"><button disabled={!newText.trim() || busyAction !== null} onClick={() => void saveNewMemory()}>{busyAction === "create" ? "正在收入…" : "收入记忆"}</button></div></div></Sheet>
   </main>;
 }
