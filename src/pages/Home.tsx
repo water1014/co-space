@@ -33,6 +33,7 @@ export function Home() {
   const track = useRef<HTMLDivElement>(null);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const suppressClick = useRef(false);
+  const dragState = useRef<{ pointerId: number; x: number; scrollLeft: number; moved: boolean } | null>(null);
 
   useEffect(() => {
     const el = track.current;
@@ -46,12 +47,36 @@ export function Home() {
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     pointerStart.current = { x: event.clientX, y: event.clientY };
     suppressClick.current = false;
+    if (event.pointerType === "mouse" && event.button === 0) {
+      dragState.current = {
+        pointerId: event.pointerId,
+        x: event.clientX,
+        scrollLeft: event.currentTarget.scrollLeft,
+        moved: false,
+      };
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+  };
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragState.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const dx = event.clientX - drag.x;
+    if (Math.abs(dx) > 4) drag.moved = true;
+    if (drag.moved) event.currentTarget.scrollLeft = drag.scrollLeft - dx;
   };
   const onPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!pointerStart.current) return;
-    const dx = Math.abs(event.clientX - pointerStart.current.x);
-    const dy = Math.abs(event.clientY - pointerStart.current.y);
-    suppressClick.current = dx > 12 && dx > dy;
+    const drag = dragState.current;
+    if (drag && drag.pointerId === event.pointerId) {
+      suppressClick.current = drag.moved;
+      dragState.current = null;
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+    } else if (pointerStart.current) {
+      const dx = Math.abs(event.clientX - pointerStart.current.x);
+      const dy = Math.abs(event.clientY - pointerStart.current.y);
+      suppressClick.current = dx > 12 && dx > dy;
+    }
     pointerStart.current = null;
   };
 
@@ -65,8 +90,18 @@ export function Home() {
         aria-label="镜花水月地图，左右滑动探索地点"
         onScroll={(event) => { savedScrollLeft = event.currentTarget.scrollLeft; }}
         onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={() => { pointerStart.current = null; }}
+        onPointerCancel={() => { pointerStart.current = null; dragState.current = null; }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            event.currentTarget.scrollBy({ left: event.currentTarget.clientWidth * 0.72, behavior: "smooth" });
+          } else if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            event.currentTarget.scrollBy({ left: -event.currentTarget.clientWidth * 0.72, behavior: "smooth" });
+          }
+        }}
       >
         <div className="moon-scene">
           <img
