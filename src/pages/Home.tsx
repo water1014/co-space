@@ -66,7 +66,7 @@ export function Home() {
               key={door.title}
               to={door.to}
               className={`moon-hotspot ${active === door.title ? "is-active" : ""}`}
-              style={{ left: door.x + "%", top: door.y + "%" }}
+              style={{ left: (14.375 + door.x * 0.7125) + "%", top: door.y + "%" }}
               onFocus={() => setActive(door.title)}
               onBlur={() => setActive(null)}
               onMouseEnter={() => setActive(door.title)}
