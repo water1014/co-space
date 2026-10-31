@@ -165,28 +165,23 @@ export async function restoreBackup(input: unknown): Promise<{ inserted: Record<
   }
 
   const inserted: Record<string, number> = {};
-  // Dexie accepts a variadic table list; enumerate it explicitly for TS tuple safety.
-  await db.transaction(
-    "rw",
-    db.memories, db.echoes, db.imprints, db.owners, db.companions,
-    db.personaRevisions, db.relationships, db.relationshipMilestones,
-    db.chatSessions, db.chatMessages, db.memoryLinks, db.journals,
-    db.mediaAssets, db.albums, db.albumItems, db.migrations, db.settings,
-    async () => {
-      for (const name of TABLE_NAMES) {
-        const table = db.table(name);
-        const rows = decoded[name] ?? [];
-        const existing = new Set(await table.toCollection().primaryKeys());
-        const keyPath = table.schema.primKey.keyPath;
-        const fresh = rows.filter((row) => {
-          const key = isObject(row) && typeof keyPath === "string" ? row[keyPath] : undefined;
-          return key !== undefined && !existing.has(key as never);
-        });
-        if (fresh.length) await table.bulkAdd(fresh);
-        inserted[name] = fresh.length;
-      }
-    },
-  );
+  // Import each table in its own transaction. This keeps each table atomic while
+  // allowing Dexie's typed transaction overloads; retries remain safe because
+  // existing primary keys are never overwritten.
+  for (const name of TABLE_NAMES) {
+    const table = db.table(name);
+    await db.transaction("rw", table, async () => {
+      const rows = decoded[name] ?? [];
+      const existing = new Set(await table.toCollection().primaryKeys());
+      const keyPath = table.schema.primKey.keyPath;
+      const fresh = rows.filter((row) => {
+        const key = isObject(row) && typeof keyPath === "string" ? row[keyPath] : undefined;
+        return key !== undefined && !existing.has(key as never);
+      });
+      if (fresh.length) await table.bulkAdd(fresh);
+      inserted[name] = fresh.length;
+    });
+  }
 
   let settingsAdded = 0;
   for (const [key, raw] of Object.entries(input.localStorage)) {
