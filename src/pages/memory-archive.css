@@ -176,3 +176,14 @@
 [data-theme="night"] .ma-collection-note{border-left-color:rgba(153,190,207,.5);background:linear-gradient(90deg,rgba(105,153,174,.12),transparent)}
 
 .ma-search-clear{flex:0 0 auto;padding:4px 7px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.24);color:var(--ink-faint);font-size:10px}.ma-detail-actions button:disabled{opacity:.42;cursor:not-allowed}.ma-detail textarea{width:100%;max-width:100%;box-sizing:border-box;resize:vertical;line-height:1.9}
+
+
+/* Editorial date chapters for the private collection */
+.ma-entry-date-divider{grid-column:1/-1;display:flex;align-items:center;gap:9px;margin:0 0 10px;color:var(--ink-faint);font:11px/1.5 var(--f-serif,serif);letter-spacing:.08em}
+.ma-entry-date-divider i{width:5px;height:5px;flex:none;border:1px solid #86adbf;border-radius:50%;box-shadow:0 0 0 3px rgba(134,173,191,.12)}
+.ma-entry-date-divider small{margin-left:auto;color:var(--ink-ghost);font:7px Georgia,serif;letter-spacing:.18em}
+.ma-entry-featured{padding-top:19px;padding-bottom:24px;background:linear-gradient(112deg,rgba(225,240,246,.56),rgba(255,255,255,.35) 72%);box-shadow:inset 3px 0 rgba(125,171,191,.62),inset 0 1px rgba(255,255,255,.8),0 16px 32px -28px rgba(54,112,138,.5)}
+.ma-entry-featured .ma-entry-body>p{font-size:18px;line-height:2}
+.ma-entry-featured .ma-entry-rail span{color:var(--accent-deep)}
+[data-theme="night"] .ma-entry-featured{background:linear-gradient(112deg,rgba(67,102,120,.58),rgba(34,56,68,.52) 72%);box-shadow:inset 3px 0 rgba(143,187,205,.55),inset 0 1px rgba(235,247,251,.08),0 16px 32px -28px rgba(0,0,0,.7)}
+@media(max-width:420px){.ma-entry-featured .ma-entry-body>p{font-size:17px}}
