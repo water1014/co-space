@@ -41,17 +41,16 @@ export function Home() {
         <div>
           <p className="moon-kicker">A PRIVATE WORLD FOR TWO</p>
           <h1>镜花水月</h1>
-          <p className="moon-motto">以镜为界，          <div className="moon-artwork" aria-hidden="true">
-            <img
-              className="moon-artwork-image"
-              src={theme === "night" ? nightArtwork : dayArtwork}
-              alt=""
-              draggable={false}
-            />
-          </div>cle cx="20" cy="-90" r="17"/><circle cx="90" cy="-100" r="19"/><circle cx="58" cy="-120" r="16"/></g>
-            </g>
-            <g fill="#f5f2e9" opacity=".22"><path d="M0 0H1600V12H0Z"/><path d="M0 565Q800 520 1600 565V580Q800 540 0 580Z"/></g>
-          </svg>
+          <p className="moon-motto">以镜为界，以花为念，以水为时，以月为家。</p>
+        </div>
+        <div className="moon-days"><span>相伴</span><strong>{days}</strong><span>天</span></div>
+      </header>
+
+      <div className="moon-scene-viewport" ref={track} aria-label="月庭全景，可左右滑动探索">
+        <div className="moon-scene">
+          <div className="moon-artwork" aria-hidden="true">
+            <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
+          </div>
 
           {doors.map((door) => (
             <Link key={door.title} to={door.to} className={`moon-hotspot ${active === door.title ? "is-active" : ""}`} style={{ left: door.x + "%", top: door.y + "%" }} onFocus={() => setActive(door.title)} onBlur={() => setActive(null)} onMouseEnter={() => setActive(door.title)} onMouseLeave={() => setActive(null)} onTouchStart={() => setActive(door.title)} aria-label={`进入${door.title}`}>
