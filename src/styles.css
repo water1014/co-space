@@ -4533,3 +4533,90 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
 [data-theme="night"] .partner-archive .archive-fields input,[data-theme="night"] .partner-archive .archive-date-control input,[data-theme="night"] .partner-archive .archive-milestone-form input{color:#e4e8e8}
 [data-theme="night"] .partner-archive .archive-persona-fields textarea,[data-theme="night"] .partner-archive .archive-milestone-form textarea{background:rgba(23,33,38,.72);color:#e4e8e8}
 [data-theme="night"] .partner-archive .archive-button{background:rgba(170,154,123,.14);color:#d6c7a7}
+
+
+/* ===== 月下人 · 手机端重新排版 ===== */
+@media (max-width: 640px) {
+  .partner-archive,
+  .partner-archive * { box-sizing: border-box; }
+  .partner-archive { width:100%; min-width:0; overflow-x:clip; }
+  .partner-archive .archive-topbar {
+    display:grid; grid-template-columns:auto minmax(0,1fr) auto;
+    gap:9px; padding:14px 16px 0; align-items:center;
+  }
+  .partner-archive .archive-wordmark {
+    min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    text-align:center; font-size:7px; letter-spacing:.07em;
+  }
+  .partner-archive .archive-index { white-space:nowrap; font-size:7px; }
+  .partner-archive .archive-wrap { width:100%; max-width:none; padding-left:17px; padding-right:17px; }
+  .partner-archive .archive-heading {
+    display:flex; align-items:center; gap:12px; padding:29px 0 22px;
+  }
+  .partner-archive .archive-heading>div:first-child { min-width:0; flex:1; }
+  .partner-archive .archive-kicker { max-width:250px; font-size:8px; line-height:1.6; letter-spacing:.1em; }
+  .partner-archive .archive-heading h1 { font-size:clamp(29px,9vw,38px); letter-spacing:.14em; }
+  .partner-archive .archive-lede { max-width:245px; font-size:11px; line-height:1.8; }
+  .partner-archive .archive-seal { flex:0 0 52px; width:52px; height:52px; font-size:18px; }
+  .partner-archive .archive-identity { display:flex; flex-direction:column; min-width:0; }
+  .partner-archive .archive-identity-art { min-height:190px; width:100%; }
+  .partner-archive .archive-identity-content { min-width:0; padding:20px 17px 22px; }
+  .partner-archive .archive-section-meta { gap:8px; font-size:8px; letter-spacing:.08em; }
+  .partner-archive .archive-section-meta span:last-child { text-align:right; }
+  .partner-archive .archive-identity-content h2 { font-size:25px; overflow-wrap:anywhere; }
+  .partner-archive .archive-fields { display:grid; grid-template-columns:minmax(0,1fr); gap:13px; }
+  .partner-archive .archive-fields label,
+  .partner-archive .archive-date-control label,
+  .partner-archive .archive-milestone-form label { display:block; min-width:0; font-size:10px; }
+  .partner-archive .archive-fields input,
+  .partner-archive .archive-date-control input,
+  .partner-archive .archive-milestone-form input,
+  .partner-archive .archive-persona-fields textarea,
+  .partner-archive .archive-milestone-form textarea {
+    display:block; width:100%; max-width:100%; min-width:0; font-size:16px;
+  }
+  .partner-archive .archive-button,
+  .partner-archive .archive-text-button { min-height:43px; max-width:100%; }
+  .partner-archive .archive-time {
+    display:grid; grid-template-columns:minmax(0,1fr); gap:17px;
+    margin-top:28px; padding:21px 0; min-width:0;
+  }
+  .partner-archive .archive-time-copy { grid-column:auto; min-width:0; }
+  .partner-archive .archive-time-copy h2 { font-size:25px; }
+  .partner-archive .archive-counter { display:flex; align-items:center; gap:14px; min-width:0; }
+  .partner-archive .archive-counter strong { font-size:58px; line-height:1; }
+  .partner-archive .archive-counter span { font-size:9px; line-height:1.5; }
+  .partner-archive .archive-date-control { min-width:0; width:100%; padding:15px 0 0; border-left:0; border-top:1px solid var(--archive-rule); }
+  .partner-archive .archive-date-control p { font-size:10px; line-height:1.7; }
+  .partner-archive .archive-persona { min-width:0; margin-top:28px; padding:21px 16px; }
+  .partner-archive .archive-persona-heading h2,
+  .partner-archive .archive-milestone-intro h2 { font-size:25px; }
+  .partner-archive .archive-persona-heading>p { font-size:11px; line-height:1.8; }
+  .partner-archive .archive-persona-fields { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+  .partner-archive .archive-persona-fields label { min-width:0; font-size:12px; }
+  .partner-archive .archive-persona-fields textarea { min-height:88px; padding:12px; line-height:1.75; }
+  .partner-archive .archive-persona-foot { display:flex; flex-direction:column; align-items:stretch; gap:14px; }
+  .partner-archive .archive-persona-foot p { font-size:10px; line-height:1.7; }
+  .partner-archive .archive-persona-foot .archive-button { width:100%; white-space:normal; }
+  .partner-archive .archive-milestones { display:grid; grid-template-columns:minmax(0,1fr); gap:24px; margin-top:32px; min-width:0; }
+  .partner-archive .archive-milestone-intro,
+  .partner-archive .archive-milestone-list { min-width:0; width:100%; }
+  .partner-archive .archive-milestone-form { display:grid; grid-template-columns:minmax(0,1fr); gap:8px; }
+  .partner-archive .archive-milestone-form label { margin-top:8px; }
+  .partner-archive .archive-milestone-form textarea { min-height:76px; padding:11px; }
+  .partner-archive .archive-milestone-form .archive-text-button { justify-self:start; }
+  .partner-archive .archive-milestone-list article { grid-template-columns:25px minmax(0,1fr) 22px; gap:9px; }
+  .partner-archive .archive-milestone-list article>div { min-width:0; overflow-wrap:anywhere; }
+  .partner-archive .archive-milestone-list h3 { font-size:16px; }
+  .partner-archive .archive-milestone-list article p { overflow-wrap:anywhere; }
+  .partner-archive .archive-footer { gap:8px; font-size:8px; letter-spacing:.08em; text-align:center; }
+  .partner-archive .archive-footer p { font-size:10px; }
+}
+@media (max-width: 380px) {
+  .partner-archive .archive-topbar { grid-template-columns:auto minmax(0,1fr); }
+  .partner-archive .archive-index { display:none; }
+  .partner-archive .archive-wordmark { text-align:right; }
+  .partner-archive .archive-wrap { padding-left:14px; padding-right:14px; }
+  .partner-archive .archive-identity-content { padding-left:14px; padding-right:14px; }
+  .partner-archive .archive-persona { padding-left:13px; padding-right:13px; }
+}
