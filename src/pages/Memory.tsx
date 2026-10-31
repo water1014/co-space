@@ -15,8 +15,10 @@ export function Memory() {
   const [searchParams] = useSearchParams();
   const memories = useMemoryStore((s) => s.memories);
   const loading = useMemoryStore((s) => s.loading);
-  const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-  const [selectedDay, setSelectedDay] = useState(() => searchParams.get("day") || dayKey(new Date()));
+  const initialDay = searchParams.get("day");
+  const parsedInitialDay = initialDay && /^\d{4}-\d{2}-\d{2}$/.test(initialDay) ? new Date(`${initialDay}T12:00:00`) : new Date();
+  const [month, setMonth] = useState(() => new Date(parsedInitialDay.getFullYear(), parsedInitialDay.getMonth(), 1));
+  const [selectedDay, setSelectedDay] = useState(() => dayKey(parsedInitialDay));
   const [view, setView] = useState<"saved" | "index">("index");
   const [query, setQuery] = useState("");
   const [opened, setOpened] = useState<MemoryEntry | null>(null);
@@ -42,6 +44,7 @@ export function Memory() {
       .sort((a, b) => b.createdAt - a.createdAt);
   }, [memories, query, selectedDay, view]);
   const moveMonth = (delta: number) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
+  const selectDay = (key: string) => { setSelectedDay(key); const [y, m] = key.split("-").map(Number); setMonth(new Date(y, m - 1, 1)); };
   const openEntry = (entry: MemoryEntry) => { setOpened(entry); setDraft(entry.text); };
 
   return <main className="memory-archive-page">
@@ -56,7 +59,7 @@ export function Memory() {
       <div className="ma-section-head"><div><span className="ma-eyebrow">BROWSE BY DATE</span><h2>日历索引</h2></div><div className="ma-month-control"><button aria-label="上个月" onClick={() => moveMonth(-1)}>‹</button><strong>{monthLabel}</strong><button aria-label="下个月" onClick={() => moveMonth(1)}>›</button></div></div>
       <div className="ma-calendar">{["日","一","二","三","四","五","六"].map((d) => <span className="ma-weekday" key={d}>{d}</span>)}
         {Array.from({ length: firstWeekday }, (_, i) => <span className="ma-day-empty" key={`blank-${i}`} />)}
-        {Array.from({ length: daysInMonth }, (_, i) => { const day = i + 1; const key = dayKey(new Date(month.getFullYear(), month.getMonth(), day)); const count = counts.get(key) ?? 0; return <button key={key} className={`ma-day ${selectedDay === key ? "selected" : ""} ${count ? "has-memory" : ""}`} onClick={() => setSelectedDay(key)}><span>{day}</span>{count > 0 && <i aria-label={`${count} 条记忆`} />}</button>; })}
+        {Array.from({ length: daysInMonth }, (_, i) => { const day = i + 1; const key = dayKey(new Date(month.getFullYear(), month.getMonth(), day)); const count = counts.get(key) ?? 0; return <button key={key} className={`ma-day ${selectedDay === key ? "selected" : ""} ${count ? "has-memory" : ""}`} onClick={() => selectDay(key)}><span>{day}</span>{count > 0 && <i aria-label={`${count} 条记忆`} />}</button>; })}
       </div>
       <div className="ma-calendar-foot"><span><i /> 有记忆的日子</span><span>已选 {selectedDay} · {counts.get(selectedDay) ?? 0} 条记忆</span></div>
     </section>
