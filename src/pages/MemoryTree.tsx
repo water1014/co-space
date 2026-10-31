@@ -15,11 +15,12 @@ export function MemoryTree() {
   const navigate = useNavigate();
   const years = useMemo(() => [...new Set(memories.map(m => new Date(m.createdAt).getFullYear()))].sort((a,b)=>b-a), [memories]);
   const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
   const records = useMemo(() => {
     const grouped = new Map<string, MemoryEntry[]>();
-    memories.filter(m => new Date(m.createdAt).getFullYear() === year).forEach(m => { const k=entryDay(m); grouped.set(k,[...(grouped.get(k)||[]),m]); });
+    memories.filter(m => { const d = new Date(m.createdAt); return d.getFullYear() === year && d.getMonth() + 1 === month; }).forEach(m => { const k=entryDay(m); grouped.set(k,[...(grouped.get(k)||[]),m]); });
     return [...grouped.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([day, entries])=>({day,count:entries.length,text:entries.map(m=>m.text).join(" · "),createdAt:entries[0]?.createdAt ?? Date.now()}));
-  }, [memories, year]);
+  }, [memories, year, month]);
   useEffect(() => {
     const send = () => frame.current?.contentWindow?.postMessage({type:"mirror-memory-data",records},window.location.origin);
     const onMessage = (e: MessageEvent) => { if(e.origin!==window.location.origin)return; if(e.data?.type==="mirror-memory-ready")send(); if(e.data?.type==="mirror-memory-open" && typeof e.data.day==="string")navigate(`/memory?day=${e.data.day}`); };
@@ -28,8 +29,8 @@ export function MemoryTree() {
   return <main className="memory-tree-page">
     <header className="mt-topline"><BackButton /><span>JING HUA SHUI YUE <i>/</i> YEARLY MEMORY</span><small>03 — 03</small></header>
     <section className="mt-heading"><div><p className="mt-eyebrow">A YEAR, HELD IN BRANCHES</p><h1>时日树<span>。</span></h1><p>让走过的日子，在枝头留下回响。</p></div><div className="mt-seal">忆<small>YEARBOOK</small></div></section>
-    <div className="mt-toolbar"><div><span className="mt-eyebrow">YOUR MEMORY GARDEN</span><strong>{year}<small> 年</small></strong></div><label>回望年份<select value={year} onChange={e=>setYear(Number(e.target.value))}>{[...new Set([new Date().getFullYear(),...years])].sort((a,b)=>b-a).map(y=><option key={y} value={y}>{y} 年</option>)}</select></label></div>
-    <section className="mt-tree-shell"><div className="mt-tree-caption">✧　THE TREE OF DAYS　✧</div><iframe ref={frame} title="镜花水月年度记忆树" src="/co-space/vendor/sealed-days/index.html" className="mt-original-tree" loading="eager" /><p className="mt-hint">轻触枝头的记忆挂签，回到那一天</p></section>
-    <footer className="mt-foot"><span>{records.length} 个有记忆的日子</span><span>{records.reduce((n,r)=>n+r.count,0)} 段记忆 · {year}</span></footer>
+    <div className="mt-toolbar"><div><span className="mt-eyebrow">YOUR MEMORY GARDEN</span><strong>{year}<small> 年 · {String(month).padStart(2,"0")} 月</small></strong></div><div className="mt-period-controls"><label>年份<select value={year} onChange={e=>setYear(Number(e.target.value))}>{[...new Set([new Date().getFullYear(),...years])].sort((a,b)=>b-a).map(y=><option key={y} value={y}>{y} 年</option>)}</select></label><label>月份<select value={month} onChange={e=>setMonth(Number(e.target.value))}>{Array.from({length:12},(_,i)=>i+1).map(m=><option key={m} value={m}>{m} 月</option>)}</select></label></div></div>
+    <section className="mt-tree-shell"><div className="mt-tree-caption">✧　THE TREE OF DAYS　✧</div><iframe ref={frame} title="镜花水月年度记忆树" src="/co-space/vendor/sealed-days/index.html" className="mt-original-tree" loading="eager" /><p className="mt-hint">{year} 年 {month} 月 · 轻触枝头的记忆挂签，回到那一天</p></section>
+    <footer className="mt-foot"><span>{records.length} 个有记忆的日子</span><span>{records.reduce((n,r)=>n+r.count,0)} 段记忆 · {year} 年 {month} 月</span></footer>
   </main>;
 }
