@@ -6,3 +6,12 @@
 
 /* Keep the original wide tree artwork intact on narrow phones; scroll the scene, not the whole page. */
 .mt-tree-shell{min-width:0;overflow:hidden}.mt-original-tree{max-width:none}@media(max-width:520px){.mt-tree-shell{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:rgba(128,171,190,.45) transparent;-webkit-overflow-scrolling:touch}.mt-original-tree{width:720px;max-width:none;height:760px;min-height:760px}.mt-tree-caption,.mt-hint{position:sticky;left:0;width:calc(100vw - 64px);max-width:720px}.mt-foot{flex-wrap:wrap}}
+
+
+/* The iframe reports its natural document height; this is a safe first-paint fallback. */
+.mt-original-tree{min-height:760px}
+@media(max-width:520px){
+  .mt-tree-shell{overscroll-behavior-x:contain;scroll-behavior:smooth;touch-action:pan-x pan-y}
+  .mt-original-tree{width:720px;max-width:none;height:760px;min-height:760px}
+}
+@media(prefers-reduced-motion:reduce){.mt-tree-shell{scroll-behavior:auto}}
