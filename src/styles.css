@@ -4242,3 +4242,127 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
   body:has(.moon-home-immersive) nav[aria-label="主导航"] a,
   body:has(.moon-home-immersive) nav[aria-label="主导航"] a::after {transition:none!important}
 }
+
+
+/* ===== 月下人：与月庭同源的镜海蓝玻璃语言 ===== */
+.partner-page {
+  isolation:isolate;
+  color:var(--ink);
+  background:
+    radial-gradient(ellipse at 92% 4%, rgba(111,166,202,.16), transparent 38%),
+    radial-gradient(ellipse at 4% 42%, rgba(120,157,190,.10), transparent 34%);
+}
+.partner-page::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  pointer-events:none;
+  opacity:.62;
+  background-image:
+    linear-gradient(115deg,transparent 0 48%,rgba(139,177,205,.12) 48.15%,transparent 48.3%),
+    radial-gradient(circle at 86% 15%,transparent 0 74px,rgba(126,166,196,.16) 75px,transparent 76px),
+    radial-gradient(circle at 86% 15%,transparent 0 92px,rgba(126,166,196,.09) 93px,transparent 94px);
+}
+.partner-page .partner-profile,
+.partner-page .partner-date-card {
+  border-color:color-mix(in srgb,var(--glass-border) 76%,rgba(117,164,197,.42));
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.36),rgba(255,255,255,.08) 44%,rgba(127,169,198,.09)),
+    var(--glass-bg);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  backdrop-filter:blur(22px) saturate(145%);
+  box-shadow:
+    0 18px 46px -32px rgba(25,67,101,.34),
+    inset 0 1px 0 rgba(255,255,255,.58),
+    inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.partner-page .partner-date-card {
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.28),rgba(255,255,255,.055) 52%,rgba(112,161,196,.12)),
+    var(--glass-bg);
+}
+.partner-page .partner-profile-glow {
+  background:radial-gradient(circle,rgba(126,181,216,.28),rgba(126,181,216,0) 70%);
+  filter:blur(4px);
+}
+.partner-page .partner-orbit {
+  border:1px solid rgba(130,174,204,.18);
+  background:radial-gradient(circle,rgba(130,174,204,.07),transparent 68%);
+  box-shadow:0 0 0 18px rgba(130,174,204,.025),0 0 0 38px rgba(130,174,204,.018);
+}
+.partner-page .partner-moon {
+  border:1px solid rgba(164,198,220,.5);
+  background:
+    radial-gradient(circle at 34% 28%,rgba(255,255,255,.95),rgba(210,229,241,.65) 36%,rgba(117,159,190,.35) 72%,rgba(67,111,145,.18));
+  box-shadow:0 8px 26px rgba(53,103,139,.18),inset 0 1px 8px rgba(255,255,255,.75);
+}
+.partner-page .partner-rule {
+  background:linear-gradient(90deg,transparent,rgba(118,163,194,.48) 18%,rgba(118,163,194,.22) 82%,transparent);
+}
+.partner-page .page-head-title {
+  font-family:"Noto Serif SC","Songti SC","STSong",serif;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-shadow:0 2px 18px rgba(106,153,184,.18);
+}
+.partner-page .page-head-sub {
+  letter-spacing:.12em;
+}
+.partner-page .serif-display {
+  font-family:"Cormorant Garamond","Noto Serif SC",serif;
+  font-variant-numeric:lining-nums tabular-nums;
+  letter-spacing:.025em;
+}
+.partner-page .ghost-input {
+  transition:border-color .25s ease,background-color .25s ease,box-shadow .25s ease;
+}
+.partner-page .ghost-input:focus {
+  border-color:rgba(101,151,186,.72);
+  background:rgba(130,174,204,.055);
+  box-shadow:0 5px 18px -14px rgba(57,112,151,.6);
+}
+.partner-page button {
+  transition:transform .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease;
+}
+.partner-page button:not(:disabled):active {transform:scale(.985)}
+.partner-page section button:not(:disabled):not([aria-label]) {
+  border-color:rgba(119,163,193,.38);
+  background:linear-gradient(110deg,rgba(255,255,255,.34),rgba(122,169,201,.12));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.48),0 7px 20px -17px rgba(35,83,119,.6);
+}
+.partner-page section button:not(:disabled):hover {
+  border-color:rgba(104,157,192,.72);
+  background:linear-gradient(110deg,rgba(255,255,255,.5),rgba(122,169,201,.2));
+}
+[data-theme="night"] .partner-page {
+  background:
+    radial-gradient(ellipse at 92% 4%,rgba(81,135,174,.18),transparent 40%),
+    radial-gradient(ellipse at 5% 46%,rgba(67,111,151,.12),transparent 36%);
+}
+[data-theme="night"] .partner-page .partner-profile,
+[data-theme="night"] .partner-page .partner-date-card {
+  border-color:rgba(151,184,207,.19);
+  background:
+    linear-gradient(145deg,rgba(136,171,197,.13),rgba(26,48,67,.18) 48%,rgba(65,111,145,.12)),
+    rgba(13,28,43,.56);
+  box-shadow:0 20px 48px -32px rgba(0,0,0,.72),inset 0 1px 0 rgba(224,240,250,.12);
+}
+[data-theme="night"] .partner-page .partner-rule {
+  background:linear-gradient(90deg,transparent,rgba(147,184,210,.38) 18%,rgba(147,184,210,.16) 82%,transparent);
+}
+[data-theme="night"] .partner-page .partner-moon {
+  border-color:rgba(161,196,220,.3);
+  background:radial-gradient(circle at 34% 26%,rgba(216,234,245,.82),rgba(99,143,174,.55) 46%,rgba(28,62,88,.7));
+}
+[data-theme="night"] .partner-page .ghost-input:focus {
+  background:rgba(115,164,197,.09);
+  border-color:rgba(137,183,211,.62);
+}
+@media(max-width:480px) {
+  .partner-page {padding-left:17px;padding-right:17px}
+  .partner-page .partner-profile,.partner-page .partner-date-card {border-radius:25px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .partner-page button,.partner-page .ghost-input {transition:none}
+}
