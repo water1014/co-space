@@ -23,7 +23,6 @@ const timestampToDate = (value: number | null) => value ? new Date(value).toISOS
 export function Partner() {
   const legacySelfName = useBoundaryStore((s) => s.selfName);
   const legacySetSelfName = useBoundaryStore((s) => s.setSelfName);
-  const legacyAnniversary = useLifeStore((s) => s.anniversary);
   const legacySetAnniversary = useLifeStore((s) => s.setAnniversary);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
