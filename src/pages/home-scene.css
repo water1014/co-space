@@ -1,14 +1,14 @@
 /* The Moon Garden artwork itself reaches every edge: no frame, panel or page chrome. */
-html:has(.moon-world-map),body:has(.moon-world-map),#root:has(.moon-world-map){width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:transparent}
+html:has(.moon-world-map),body:has(.moon-world-map),#root:has(.moon-world-map){width:100%;height:100%;min-height:100%;margin:0;padding:0;overflow:hidden;background:transparent!important}
 body:has(.moon-world-map){background:transparent!important}
 body:has(.moon-world-map) .pocket-shell,
 body:has(.moon-world-map) .pocket-shell>div,
 body:has(.moon-world-map) main:has(.moon-world-map){width:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;filter:none!important;background:transparent!important;overflow:hidden!important}
-.moon-home.immersive-moon.moon-world-map{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;min-height:0;margin:0;padding:0;overflow:hidden;background:transparent}
+.moon-home.immersive-moon.moon-world-map{position:fixed!important;inset:0!important;z-index:0;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important;background-image:none!important}
 .moon-scene-viewport{position:absolute;inset:0;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;scroll-behavior:smooth;outline:none;border:0;border-radius:0;box-shadow:none;background:transparent}
 .moon-scene-viewport::-webkit-scrollbar{display:none}\n.moon-scene-viewport{cursor:grab;user-select:none;-webkit-user-select:none}\n.moon-scene-viewport:active{cursor:grabbing}\n.moon-map-place,.moon-map-place *{user-select:none;-webkit-user-select:none}
-.moon-scene{position:relative;width:max(100vw,177.7778dvh);height:100%;min-height:100%;isolation:isolate;overflow:hidden}
-.moon-artwork-image{position:absolute;inset:0;z-index:-1;display:block;width:100%;height:100%;object-fit:fill;user-select:none;pointer-events:none;-webkit-user-drag:none}
+.moon-scene{position:relative;width:max(100vw,177.7778dvh);height:100%;min-height:100%;isolation:isolate;overflow:hidden;background:transparent!important}
+.moon-artwork-image{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%;max-width:none;object-fit:fill;object-position:center;user-select:none;pointer-events:none;-webkit-user-drag:none}
 .moon-map-trail,.moon-map-compass{display:none}
 .moon-map-place{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:8px 5px;color:#24445b;text-decoration:none;transform:translate(-50%,-50%);-webkit-tap-highlight-color:transparent;transition:transform .28s ease,opacity .28s ease,filter .28s ease}
 .moon-map-place.is-right{transform:translate(-85%,-50%)}
@@ -27,3 +27,21 @@ body:has(.moon-world-map) main:has(.moon-world-map){width:100%!important;max-wid
  .moon-map-label{font-size:15px;letter-spacing:.14em}
 }
 @media(prefers-reduced-motion:reduce){.moon-scene-viewport,.moon-map-place{scroll-behavior:auto;transition:none}}
+
+/* Full-bleed correction: never reveal a dark shell above or below the panorama. */
+html:has(.moon-world-map),body:has(.moon-world-map),#root:has(.moon-world-map),
+body:has(.moon-world-map) .moon-garden-shell,
+body:has(.moon-world-map) .pocket-shell,
+body:has(.moon-world-map) .pocket-shell>div,
+body:has(.moon-world-map) .scroll-area,
+body:has(.moon-world-map) main:has(.moon-world-map){
+  background:transparent!important;
+  background-image:none!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.moon-world-map .moon-scene-viewport{background:transparent!important}
+.moon-world-map .moon-scene{background:transparent!important}
+.moon-world-map .moon-artwork-image{z-index:0!important}
+.moon-world-map .moon-map-place{z-index:2!important}
