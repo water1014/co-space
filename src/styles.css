@@ -5057,3 +5057,80 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
 @media(prefers-reduced-motion:reduce) {
   .glass,.glass-hi,.glass-flat,.glass-solid,.card { transition:none !important; }
 }
+
+
+/* ===== 参考图统一校色：珍珠灰白 / 墨黑银灰 ===== */
+:root,
+[data-theme="day"] {
+  --bg:#f3f3f5;
+  --bg-deep:#eceef1;
+  --surface:rgba(255,255,255,.92);
+  --surface-2:#f7f7f8;
+  --ink:#25262b;
+  --ink-soft:#73757d;
+  --ink-faint:#a0a2aa;
+  --ink-ghost:#c5c7cd;
+  --line:rgba(45,47,54,.085);
+  --line-strong:rgba(45,47,54,.16);
+  --accent:#858b96;
+  --accent-deep:#626a76;
+  --accent-soft:rgba(116,124,138,.13);
+  --accent-ink:#fff;
+  --danger:#a66e72;
+  --peer-bubble:rgba(255,255,255,.72);
+  --peer-bubble-ink:#292a30;
+  --mine-bubble:#e5e6e9;
+  --mine-bubble-ink:#25262b;
+  --primary:#e4e5e9;
+  --on-ink:#fff;
+  --tint-rgb:37,38,43;
+  --shadow-card:0 2px 8px rgba(38,42,50,.045);
+  --shadow-float:0 14px 36px -20px rgba(38,42,50,.24);
+  --shadow-bar:0 -1px 0 rgba(45,47,54,.07);
+  --f-display:"EB Garamond","Noto Serif SC","Songti SC",serif;
+  --f-serif:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+[data-theme="night"] {
+  --bg:#09090b;
+  --bg-deep:#050506;
+  --surface:#19191d;
+  --surface-2:#222227;
+  --ink:#ededf0;
+  --ink-soft:rgba(237,237,240,.68);
+  --ink-faint:rgba(237,237,240,.43);
+  --ink-ghost:rgba(237,237,240,.23);
+  --line:rgba(225,226,232,.10);
+  --line-strong:rgba(225,226,232,.18);
+  --accent:#aeb1ba;
+  --accent-deep:#c5c7ce;
+  --accent-soft:rgba(190,193,202,.14);
+  --accent-ink:#101014;
+  --danger:#c28b90;
+  --peer-bubble:#202025;
+  --peer-bubble-ink:#ededf0;
+  --mine-bubble:#d9d9de;
+  --mine-bubble-ink:#17171b;
+  --primary:#303036;
+  --on-ink:#111115;
+  --tint-rgb:237,237,240;
+  --shadow-card:0 2px 10px rgba(0,0,0,.38);
+  --shadow-float:0 16px 42px -20px rgba(0,0,0,.78);
+  --shadow-bar:0 -1px 0 rgba(225,226,232,.08);
+  --f-display:"EB Garamond","Noto Serif SC","Songti SC",serif;
+  --f-serif:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.app-bg {
+  background:
+    radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.92) 0%,transparent 43%),
+    radial-gradient(ellipse at 84% 42%,rgba(211,215,222,.34) 0%,transparent 46%),
+    linear-gradient(145deg,#f8f8fa 0%,#eef0f3 54%,#f5f5f7 100%);
+}
+[data-theme="night"] .app-bg {
+  background:
+    radial-gradient(ellipse at 16% 18%,rgba(110,112,122,.12) 0%,transparent 38%),
+    radial-gradient(ellipse at 86% 72%,rgba(78,80,90,.10) 0%,transparent 44%),
+    linear-gradient(160deg,#08080a 0%,#111115 58%,#070709 100%);
+}
+[data-theme="night"] .app-bg .app-wall { filter:brightness(.34) grayscale(.42) !important; }
