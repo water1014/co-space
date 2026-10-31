@@ -4072,3 +4072,35 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a span {font:10px/1.5
 @media (prefers-reduced-motion:reduce) {
   .moon-home-immersive *, .moon-home-immersive *::before {animation:none!important;transition:none!important}
 }
+
+
+/* 第三轮：手机端只保留画面探索，不出现操作提示 */
+@media (max-width:767px) {
+  .moon-home-immersive .moon-scene-viewport {
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    overscroll-behavior-y:none;
+    touch-action:pan-x pan-y;
+    scroll-behavior:smooth;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    scroll-snap-type:none;
+  }
+  .moon-home-immersive .moon-scene-viewport::-webkit-scrollbar {display:none;width:0;height:0}
+  .moon-home-immersive .moon-scene {
+    width:max(100vw,177.7778svh)!important;
+    height:100%!important;
+    min-height:100%!important;
+  }
+  .moon-home-immersive .moon-artwork-image {
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+    object-position:center center!important;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .moon-mobile-swipe {display:none!important}
+}
