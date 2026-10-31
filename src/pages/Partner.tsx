@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { BackButton } from "../components/ui/BackButton";
 import { useBoundaryStore } from "../stores/boundaryStore";
 import { useLifeStore } from "../stores/lifeStore";
