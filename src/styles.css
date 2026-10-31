@@ -4865,3 +4865,92 @@ body:has(.moon-home-immersive) nav[aria-label="主导航"] a:hover {
     transition: background .28s ease, border-color .28s ease, box-shadow .28s ease, transform .28s ease;
   }
 }
+
+
+/* ===== 藏忆阁 · 私人记忆档案 ===== */
+.memory-editorial-head { position:relative; }
+.memory-editorial-head:after {
+  content:""; display:block; height:1px; margin-top:18px;
+  background:linear-gradient(90deg,var(--line-strong),var(--line),transparent);
+}
+.memory-title-row { min-height:94px; }
+.memory-editorial-title {
+  font-family:var(--f-serif);
+  font-weight:500;
+  letter-spacing:.12em;
+}
+.memory-index-mark {
+  position:relative; display:flex; flex:0 0 58px; width:58px; height:58px;
+  align-items:center; justify-content:center;
+  border:1px solid rgba(120,149,168,.22); border-radius:50%;
+  color:var(--accent-deep); font-family:var(--f-serif); font-size:25px;
+  box-shadow:inset 0 0 0 4px rgba(120,149,168,.045),0 4px 14px -12px rgba(62,86,104,.28);
+}
+.memory-index-mark span {
+  position:absolute; right:5px; top:3px; font-family:serif; font-size:11px;
+  color:var(--ink-faint);
+}
+.memory-editorial-tabs { padding:4px; border:1px solid var(--line); border-radius:16px; background:rgba(255,255,255,.32); }
+.memory-editorial-tabs button {
+  min-height:36px; border-radius:12px; transition:background .2s ease,box-shadow .2s ease;
+}
+.memory-editorial-tabs button[class*="border-[var(--accent-deep)]"] {
+  background:rgba(255,255,255,.82);
+  box-shadow:0 3px 10px -8px rgba(49,76,94,.38),inset 0 1px 0 rgba(255,255,255,.95);
+}
+.memory-ledger-intro {
+  border-radius:19px;
+  background:
+    radial-gradient(70% 90% at 100% 0%,rgba(197,216,229,.20),transparent 72%),
+    linear-gradient(145deg,rgba(255,255,255,.78),rgba(255,255,255,.56));
+}
+.memory-ledger-count strong {
+  color:var(--ink); font-family:var(--f-serif); font-size:42px;
+  font-weight:500; line-height:.95; letter-spacing:.02em;
+  font-variant-numeric:lining-nums;
+}
+.memory-ledger-count span {
+  padding-bottom:2px; color:var(--ink-faint); font-size:10px; line-height:1.55; letter-spacing:.08em;
+}
+.memory-ledger-rule {
+  height:1px;
+  background:linear-gradient(90deg,var(--line-strong),rgba(120,149,168,.12),transparent);
+}
+.memory-type-tile {
+  border-color:rgba(120,149,168,.13);
+  background:rgba(255,255,255,.30);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.48);
+}
+.memory-type-tile:active { transform:translateY(1px); }
+.memory-type-tile[class*="border-[var(--accent-deep)]"] {
+  background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(245,249,252,.78));
+  box-shadow:0 5px 16px -13px rgba(52,78,96,.36),inset 0 1px 0 rgba(255,255,255,.95);
+}
+.memory-entry {
+  position:relative; overflow:hidden; border-radius:17px;
+  background:linear-gradient(145deg,rgba(255,255,255,.76),rgba(255,255,255,.54));
+  border-color:rgba(255,255,255,.78);
+  box-shadow:0 5px 18px -16px rgba(47,73,91,.28),inset 0 1px 0 rgba(255,255,255,.88);
+}
+.memory-entry:before {
+  content:""; position:absolute; left:0; top:14px; bottom:14px; width:2px;
+  background:linear-gradient(180deg,rgba(120,149,168,.10),rgba(120,149,168,.42),rgba(120,149,168,.08));
+  border-radius:2px;
+}
+.memory-entry:active { transform:scale(.994); }
+[data-theme="night"] .memory-editorial-tabs { background:rgba(29,44,54,.42); }
+[data-theme="night"] .memory-editorial-tabs button[class*="border-[var(--accent-deep)]"] {
+  background:rgba(66,88,101,.56);
+  box-shadow:inset 0 1px 0 rgba(231,242,248,.10);
+}
+[data-theme="night"] .memory-ledger-intro,
+[data-theme="night"] .memory-entry {
+  background:linear-gradient(145deg,rgba(44,63,75,.78),rgba(31,48,59,.68));
+  border-color:rgba(222,237,245,.12);
+}
+[data-theme="night"] .memory-type-tile { background:rgba(38,57,68,.46); border-color:rgba(222,237,245,.10); }
+[data-theme="night"] .memory-type-tile[class*="border-[var(--accent-deep)]"] { background:rgba(65,87,100,.62); }
+@media (max-width:380px) {
+  .memory-index-mark { flex-basis:48px; width:48px; height:48px; font-size:22px; }
+  .memory-ledger-intro { padding:13px; }
+}
