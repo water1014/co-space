@@ -15,19 +15,17 @@ type Door = { id: string; title: string; note: string; to: string; x: number; y:
 
 // 日夜保持同一套五空间职责；坐标后续可依据原画中的真实物件精调。
 const dayDoors: Door[] = [
-  { id: "chat", title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 17, y: 47 },
-  { id: "memory", title: "藏忆阁", note: "把一起走过的时光收好", to: "/memory", x: 36, y: 69 },
-  { id: "partner", title: "月下人", note: "认识那个与你相伴的人", to: "/partner", x: 57, y: 39 },
-  { id: "mit", title: "镜心", note: "布置属于自己的小天地", to: "/mit", x: 77, y: 66 },
-  { id: "home", title: "月庭", note: "回到我们的生活场景", to: "/", x: 91, y: 43 },
+  { id: "chat", title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 18, y: 47 },
+  { id: "memory", title: "藏忆阁", note: "把一起走过的时光收好", to: "/memory", x: 40, y: 69 },
+  { id: "partner", title: "月下人", note: "认识那个与你相伴的人", to: "/partner", x: 64, y: 39 },
+  { id: "mit", title: "镜心", note: "布置属于自己的小天地", to: "/mit", x: 86, y: 66 },
 ];
 
 const nightDoors: Door[] = [
-  { id: "memory", title: "藏忆阁", note: "把一起走过的时光收好", to: "/memory", x: 14, y: 64 },
-  { id: "chat", title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 34, y: 40 },
-  { id: "partner", title: "月下人", note: "认识那个与你相伴的人", to: "/partner", x: 56, y: 67 },
-  { id: "mit", title: "镜心", note: "布置属于自己的小天地", to: "/mit", x: 76, y: 42 },
-  { id: "home", title: "月庭", note: "回到我们的生活场景", to: "/", x: 91, y: 66 },
+  { id: "memory", title: "藏忆阁", note: "把一起走过的时光收好", to: "/memory", x: 16, y: 64 },
+  { id: "chat", title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 39, y: 40 },
+  { id: "partner", title: "月下人", note: "认识那个与你相伴的人", to: "/partner", x: 64, y: 67 },
+  { id: "mit", title: "镜心", note: "布置属于自己的小天地", to: "/mit", x: 86, y: 42 },
 ];
 
 export function Home() {
