@@ -192,3 +192,13 @@
 .ma-action-error{margin:0 0 14px;padding:11px 13px;border:1px solid rgba(174,126,111,.28);border-left:2px solid rgba(174,126,111,.72);border-radius:2px 10px 10px 2px;background:rgba(190,145,127,.08);color:var(--ink-soft);font-size:11px;line-height:1.8}
 [data-theme="night"] .ma-action-error{border-color:rgba(207,160,141,.28);border-left-color:rgba(207,160,141,.68);background:rgba(170,119,99,.1);color:#e4d8d2}
 .ma-pin:disabled,.ma-detail-actions button:disabled{opacity:.45;cursor:wait}
+
+
+.ma-delete-confirm{margin-top:14px;padding:15px;border:1px solid rgba(174,126,111,.3);border-left:2px solid rgba(174,126,111,.7);border-radius:3px 12px 12px 3px;background:rgba(190,145,127,.08)}
+.ma-delete-confirm strong{display:block;color:var(--ink-soft);font:500 14px/1.7 var(--f-serif,serif);letter-spacing:.04em}
+.ma-delete-confirm p{margin:5px 0 13px;color:var(--ink-faint);font-size:11px;line-height:1.8}
+.ma-delete-confirm>div{display:flex;justify-content:flex-end;gap:8px}
+.ma-delete-confirm button{min-height:36px;padding:0 13px;border:1px solid var(--line-strong);border-radius:18px;background:rgba(255,255,255,.3);color:var(--ink-soft);font-size:11px}
+.ma-delete-confirm button.danger{border-color:rgba(174,126,111,.42);background:rgba(174,126,111,.12);color:#986d60}
+[data-theme="night"] .ma-delete-confirm{border-color:rgba(207,160,141,.25);border-left-color:rgba(207,160,141,.62);background:rgba(170,119,99,.1)}
+[data-theme="night"] .ma-delete-confirm button.danger{color:#e0b8a9}
