@@ -45,3 +45,28 @@ body:has(.moon-world-map) main:has(.moon-world-map){
 .moon-world-map .moon-scene{background:transparent!important}
 .moon-world-map .moon-artwork-image{z-index:0!important}
 .moon-world-map .moon-map-place{z-index:2!important}
+
+/* The panorama is the entire surface. Crop any contain-letterboxing instead of
+   showing the old scene's dark fallback background above or below it. */
+.moon-world-map,
+.moon-world-map .moon-scene-viewport,
+.moon-world-map .moon-scene {
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+.moon-world-map .moon-scene {
+  width: max(100vw, 177.7778dvh) !important;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+.moon-world-map .moon-artwork-image {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
