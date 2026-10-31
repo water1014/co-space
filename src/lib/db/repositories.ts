@@ -142,3 +142,61 @@ export async function ensurePrimaryIdentity(input: {
     },
   );
 }
+
+
+/** Append a persona revision without mutating the previous revision. */
+export async function appendPersonaRevision(input: {
+  companionId: string;
+  personality: string;
+  speakingStyle: string;
+  values: string[];
+  boundaries: string[];
+}): Promise<PersonaRevisionRecord> {
+  const now = Date.now();
+  return db.transaction("rw", db.companions, db.personaRevisions, async () => {
+    const companion = await db.companions.get(input.companionId);
+    if (!companion) throw new Error("伴侣档案尚未初始化");
+    const previous = await db.personaRevisions.get(companion.currentPersonaRevisionId);
+    const version = (previous?.version ?? 0) + 1;
+    const revision: PersonaRevisionRecord = {
+      id: `persona:${input.companionId}:v${version}:${now}`,
+      companionId: input.companionId,
+      version,
+      personality: input.personality.trim(),
+      speakingStyle: input.speakingStyle.trim(),
+      values: input.values.map((v) => v.trim()).filter(Boolean),
+      boundaries: input.boundaries.map((v) => v.trim()).filter(Boolean),
+      sourceProjectIds: [],
+      createdAt: now,
+      updatedAt: now,
+      schemaVersion: 1,
+    };
+    await db.personaRevisions.add(revision);
+    await db.companions.update(input.companionId, {
+      currentPersonaRevisionId: revision.id,
+      updatedAt: now,
+    });
+    return revision;
+  });
+}
+
+/** Save a selected avatar as a Blob asset; the previous asset is kept intact. */
+export async function saveCompanionAvatar(input: {
+  companionId: string;
+  blob: Blob;
+  mimeType: string;
+}): Promise<string> {
+  const now = Date.now();
+  const assetId = `avatar:${input.companionId}:${now}`;
+  await db.transaction("rw", db.mediaAssets, db.companions, async () => {
+    const companion = await db.companions.get(input.companionId);
+    if (!companion) throw new Error("伴侣档案尚未初始化");
+    await db.mediaAssets.add({
+      id: assetId, blob: input.blob, mimeType: input.mimeType,
+      size: input.blob.size, caption: "伴侣头像", createdAt: now,
+      updatedAt: now, schemaVersion: 1,
+    });
+    await db.companions.update(input.companionId, { avatarAssetId: assetId, updatedAt: now });
+  });
+  return assetId;
+}
