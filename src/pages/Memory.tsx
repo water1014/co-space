@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { BackButton } from "../components/ui/BackButton";
 import { Sheet } from "../components/ui/kit";
 import { useMemoryStore } from "../stores/memoryStore";
@@ -12,13 +13,10 @@ const entryDay = (entry: MemoryEntry) => dayKey(new Date(entry.createdAt));
 
 export function Memory() {
   const memories = useMemoryStore((s) => s.memories);
-  const treeFrame = useRef<HTMLIFrameElement>(null);
-  const treeRecords = useMemo(() => { const grouped = new Map<string, MemoryEntry[]>(); memories.forEach((m) => { const key = entryDay(m); grouped.set(key, [...(grouped.get(key) ?? []), m]); }); return [...grouped.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([day, entries]) => ({ day, count: entries.length, text: entries.map((m) => m.text).join(" · "), createdAt: entries[0]?.createdAt ?? Date.now() })); }, [memories]);
-  useEffect(() => { const send = () => treeFrame.current?.contentWindow?.postMessage({ type: "mirror-memory-data", records: treeRecords }, window.location.origin); const onMessage = (event: MessageEvent) => { if (event.origin !== window.location.origin) return; if (event.data?.type === "mirror-memory-ready") send(); if (event.data?.type === "mirror-memory-open" && typeof event.data.day === "string") setSelectedDay(event.data.day); }; window.addEventListener("message", onMessage); send(); return () => window.removeEventListener("message", onMessage); }, [treeRecords]);
   const loading = useMemoryStore((s) => s.loading);
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selectedDay, setSelectedDay] = useState(dayKey(new Date()));
-  const [view, setView] = useState<"tree" | "saved" | "index">("tree");
+  const [view, setView] = useState<"saved" | "index">("index");
   const [query, setQuery] = useState("");
   const [opened, setOpened] = useState<MemoryEntry | null>(null);
   const [draft, setDraft] = useState("");
@@ -38,11 +36,10 @@ export function Memory() {
   }, [memories]);
   const visible = useMemo(() => {
     const q = query.trim().toLocaleLowerCase();
-    return memories.filter((m) => view === "saved" ? m.pinned : view === "index" ? true : entryDay(m) === selectedDay)
+    return memories.filter((m) => view === "saved" ? m.pinned : true)
       .filter((m) => !q || m.text.toLocaleLowerCase().includes(q) || m.tags.some((tag) => tag.toLocaleLowerCase().includes(q)))
       .sort((a, b) => b.createdAt - a.createdAt);
-  }, [memories, query, selectedDay, view]);
-  const selectedDate = new Date(`${selectedDay}T12:00:00`);
+  }, [memories, query, view]);
   const moveMonth = (delta: number) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
   const openEntry = (entry: MemoryEntry) => { setOpened(entry); setDraft(entry.text); };
 
@@ -50,24 +47,23 @@ export function Memory() {
     <header className="ma-topline"><BackButton /><span>JING HUA SHUI YUE <i>/</i> MEMORY ATLAS</span><span className="ma-top-index">03 — 12</span></header>
     <section className="ma-heading"><div><p className="ma-eyebrow">A MAP OF THE DAYS WE KEEP</p><h1>藏忆阁<span>。</span></h1><p className="ma-subtitle">把走过的日子，慢慢收进时间里。</p></div><div className="ma-seal" aria-hidden="true"><span>忆</span><small>MEMORY</small></div></section>
     <nav className="ma-nav" aria-label="记忆档案分类">
-      <button className={view === "tree" ? "active" : ""} onClick={() => setView("tree")}><b>01</b> 时日树</button>
+      <button className={view === "index" ? "active" : ""} onClick={() => setView("index")}><b>01</b> 时日笺</button>
       <button className={view === "saved" ? "active" : ""} onClick={() => setView("saved")}><b>02</b> 珍藏页</button>
-      <button className={view === "index" ? "active" : ""} onClick={() => setView("index")}><b>03</b> 记忆索引</button>
+      <Link className="ma-tree-link" to="/memory/tree"><b>03</b> 时日树 ↗</Link>
     </nav>
-    {view === "tree" && <section className="ma-calendar-section">
+    <section className="ma-calendar-section">
       <div className="ma-section-head"><div><span className="ma-eyebrow">THE MEMORY TREE</span><h2>时日树</h2></div><div className="ma-month-control"><button aria-label="上个月" onClick={() => moveMonth(-1)}>‹</button><strong>{monthLabel}</strong><button aria-label="下个月" onClick={() => moveMonth(1)}>›</button></div></div>
-      <div className="ma-tree-stage ma-original-tree-stage"><iframe title="老师原版封存记忆树" src="/co-space/vendor/sealed-days/index.html" ref={treeFrame} className="ma-original-tree-frame" loading="eager" /></div>
       <div className="ma-calendar">{["日","一","二","三","四","五","六"].map((d) => <span className="ma-weekday" key={d}>{d}</span>)}
         {Array.from({ length: firstWeekday }, (_, i) => <span className="ma-day-empty" key={`blank-${i}`} />)}
         {Array.from({ length: daysInMonth }, (_, i) => { const day = i + 1; const key = dayKey(new Date(month.getFullYear(), month.getMonth(), day)); const count = counts.get(key) ?? 0; return <button key={key} className={`ma-day ${selectedDay === key ? "selected" : ""} ${count ? "has-memory" : ""}`} onClick={() => setSelectedDay(key)}><span>{day}</span>{count > 0 && <i aria-label={`${count} 条记忆`} />}</button>; })}
       </div>
       <div className="ma-calendar-foot"><span><i /> 有记忆的日子</span><span>{memories.length} 条记录 · {counts.size} 个日子</span></div>
-    </section>}
+    </section>
     <section className="ma-records">
-      <div className="ma-record-heading"><div><span className="ma-eyebrow">{view === "tree" ? "A DAY IN YOUR STORY" : view === "saved" ? "KEPT CLOSE, KEPT SAFE" : "FIND A THREAD"}</span><h2>{view === "tree" ? <>{selectedDate.getMonth() + 1}月{selectedDate.getDate()}日 <small>· 当日笺</small></> : view === "saved" ? "珍藏的片段" : "记忆索引"}</h2></div><span className="ma-record-count">{visible.length.toString().padStart(2, "0")} <small>ENTRIES</small></span></div>
+      <div className="ma-record-heading"><div><span className="ma-eyebrow">{view === "saved" ? "KEPT CLOSE, KEPT SAFE" : "A DAY IN YOUR STORY"}</span><h2>{view === "saved" ? "珍藏的片段" : "日常记忆"}</h2></div><span className="ma-record-count">{visible.length.toString().padStart(2, "0")} <small>ENTRIES</small></span></div>
       <label className="ma-search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索文字、标签与片段…" /><kbd>SEARCH</kbd></label>
       <div className="ma-entry-list">{visible.map((entry, index) => <article className="ma-entry" key={entry.id}><div className="ma-entry-rail"><span>{String(index + 1).padStart(2, "0")}</span><i /></div><button className="ma-entry-body" onClick={() => openEntry(entry)}><div className="ma-entry-meta"><span>{new Date(entry.createdAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</span><span>{entry.pinned ? "✦ 已珍藏" : entry.kind === "todo" ? "待完成" : entry.kind === "feel" ? "心绪" : "记忆"}</span></div><p>{entry.text}</p>{entry.tags.length > 0 && <div className="ma-tags">{entry.tags.slice(0, 4).map((tag) => <span key={tag}>#{tag}</span>)}</div>}</button><button className={`ma-pin ${entry.pinned ? "is-pinned" : ""}`} aria-label={entry.pinned ? "取消珍藏" : "加入珍藏"} onClick={() => void togglePin(entry.id)}>✧</button></article>)}
-        {!visible.length && <div className="ma-empty"><span>◌</span><strong>{loading ? "正在整理记忆…" : "这一天暂时空白"}</strong><p>{view === "tree" ? "留白也是时间的一部分。你可以在这里写下一段记忆。" : "试试其他关键词，或把值得留下的片段标记为珍藏。"}</p></div>}
+        {!visible.length && <div className="ma-empty"><span>◌</span><strong>{loading ? "正在整理记忆…" : "这一天暂时空白"}</strong><p>{view === "saved" ? "试试其他关键词，或把值得留下的片段标记为珍藏。" : "留白也是时间的一部分。你可以在这里写下一段记忆。"}</p></div>}
       </div>
       <button className="ma-compose" onClick={() => setShowComposer(true)}><span>＋</span> 写下一段记忆</button>
     </section>
