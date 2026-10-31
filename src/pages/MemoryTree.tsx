@@ -14,6 +14,7 @@ export function MemoryTree() {
   const frame = useRef<HTMLIFrameElement>(null);
   const navigate = useNavigate();
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [openedDay, setOpenedDay] = useState<string | null>(null);
   const years = useMemo(() => [...new Set(memories.map(m => new Date(m.createdAt).getFullYear()))].sort((a,b)=>b-a), [memories]);
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -30,10 +31,12 @@ export function MemoryTree() {
       if(e.origin!==window.location.origin || e.source!==frame.current?.contentWindow)return;
       if(e.data?.type==="mirror-memory-ready")send();
       if(e.data?.type==="mirror-memory-height" && typeof e.data.height==="number" && Number.isFinite(e.data.height)){frame.current.style.height=`${Math.max(720,Math.min(2400,Math.ceil(e.data.height)))}px`;}
-      if(e.data?.type==="mirror-memory-open" && typeof e.data.day==="string" && /^\d{4}-\d{2}-\d{2}$/.test(e.data.day) && dayKey(new Date(e.data.day+"T12:00:00"))===e.data.day)navigate(`/memory?day=${e.data.day}`);
+      if(e.data?.type==="mirror-memory-open" && typeof e.data.day==="string" && /^\d{4}-\d{2}-\d{2}$/.test(e.data.day) && dayKey(new Date(e.data.day+"T12:00:00"))===e.data.day)setOpenedDay(e.data.day);
     };
     window.addEventListener("message",onMessage); send(); return ()=>window.removeEventListener("message",onMessage);
   }, [records,navigate]);
+  const openedEntries = openedDay ? memories.filter((entry) => entryDay(entry) === openedDay).sort((a,b) => a.createdAt - b.createdAt) : [];
+  const closeMemory = () => setOpenedDay(null);
   return <main className="memory-tree-page">
     <div className="mt-floating-nav"><BackButton /><button className="mt-tools-trigger" type="button" aria-label="打开时日树工具" aria-expanded={toolsOpen} onClick={()=>setToolsOpen(v=>!v)}><span></span><span></span><span></span></button></div>
     {toolsOpen && <aside className="mt-tools-panel" aria-label="时日树辅助工具">
@@ -48,5 +51,15 @@ export function MemoryTree() {
     <section className="mt-tree-shell" aria-label="完整时日树">
       <iframe ref={frame} title="镜花水月年度记忆树" src="/co-space/vendor/sealed-days/index.html" className="mt-original-tree" loading="eager" />
     </section>
+    {openedDay && <div className="mt-memory-reveal" role="dialog" aria-modal="true" aria-label={`${openedDay} 的记忆`} onMouseDown={(event) => { if (event.target === event.currentTarget) closeMemory(); }}>
+      <section className="mt-memory-sheet">
+        <div className="mt-memory-sheet-top"><span>JING HUA SHUI YUE <i>/</i> MEMORY NOTE</span><button type="button" onClick={closeMemory} aria-label="关闭记忆">×</button></div>
+        <p className="mt-memory-kicker">A DAY PRESERVED IN TIME</p>
+        <h2>{new Date(`${openedDay}T12:00:00`).toLocaleDateString("zh-CN", {year:"numeric",month:"long",day:"numeric",weekday:"long"})}</h2>
+        <div className="mt-memory-rule"><span>{String(openedEntries.length).padStart(2,"0")} ENTRIES</span><i /></div>
+        <div className="mt-memory-list">{openedEntries.length ? openedEntries.map((entry,index) => <article className="mt-memory-entry" key={entry.id}><div className="mt-memory-entry-meta"><span>{String(index+1).padStart(2,"0")}</span><time>{new Date(entry.createdAt).toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"})}</time><span>{entry.pinned ? "✧ 已珍藏" : entry.kind === "feel" ? "心绪" : entry.kind === "todo" ? "待完成" : "记忆"}</span></div><p>{entry.text}</p>{entry.tags.length > 0 && <div className="mt-memory-tags">{entry.tags.map(tag => <span key={tag}>#{tag}</span>)}</div>}</article>) : <p className="mt-memory-empty">这一天暂时没有可显示的记忆。</p>}</div>
+        <div className="mt-memory-bottom"><span>EVERY DAY LEAVES A TRACE</span><button type="button" onClick={() => { navigate(`/memory?day=${openedDay}`); closeMemory(); }}>打开完整档案 ↗</button></div>
+      </section>
+    </div>}
   </main>;
 }
