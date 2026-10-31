@@ -84,3 +84,5 @@
 .ma-original-tree-stage{padding:0;overflow:hidden;border:0;border-radius:0;background:transparent;box-shadow:none}
 .ma-original-tree-frame{display:block;width:100%;height: min(760px, 188vw);min-height:620px;border:0;background:transparent}
 @media(max-width:380px){.ma-original-tree-frame{height:700px;min-height:700px}}
+
+.ma-nav .ma-tree-link{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:11px 5px;border:1px solid transparent;border-radius:13px;color:var(--ink-faint);font-size:12px;white-space:nowrap;text-decoration:none}.ma-nav .ma-tree-link b{color:var(--ink-ghost);font:9px Georgia,serif}.ma-nav .ma-tree-link:active{background:rgba(174,207,222,.18)}
