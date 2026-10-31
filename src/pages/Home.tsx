@@ -8,28 +8,30 @@ import { useThemeStore } from "../stores/themeStore";
 const dayArtwork = new URL("../../镜花水月：晨光花庭界面.png", import.meta.url).href;
 const nightArtwork = new URL("../../月光下的镜花水月 salon.png", import.meta.url).href;
 
-type Door = { title: string; note: string; to: string; x: number; y: number; kind: "window" | "desk" | "garden" | "record" | "portrait" | "clock" };
+type Door = { title: string; note: string; to: string; x: number; y: number };
 
-const doors: Door[] = [
-  { title: "同心阁", note: "在月光下相见", to: "/chat", x: 20, y: 30, kind: "window" },
-  { title: "云笺室", note: "写一封未寄出的信", to: "/diary", x: 22, y: 80, kind: "desk" },
-  { title: "花镜园", note: "让记忆开成花", to: "/album", x: 72, y: 30, kind: "garden" },
-  { title: "月声", note: "收藏此刻的声音", to: "/music", x: 62, y: 80, kind: "record" },
-  { title: "月下人", note: "关于那个重要的人", to: "/mit", x: 93, y: 32, kind: "portrait" },
-  { title: "月约", note: "把重要的日子留住", to: "/calendar", x: 88, y: 58, kind: "clock" },
+const dayDoors: Door[] = [
+  { title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 21, y: 34 },
+  { title: "云笺室", note: "写一封想说的话", to: "/diary", x: 21, y: 75 },
+  { title: "花镜园", note: "让回忆在这里生长", to: "/album", x: 74, y: 34 },
+  { title: "月声", note: "收藏此刻的声音", to: "/music", x: 63, y: 75 },
+  { title: "月下人", note: "关于那个重要的人", to: "/mit", x: 93, y: 37 },
+  { title: "月约", note: "把重要的日子留住", to: "/calendar", x: 89, y: 56 },
 ];
-const nightPositions: Record<string, { x: number; y: number }> = {
-  同心阁: { x: 53, y: 45 },
-  云笺室: { x: 10, y: 78 },
-  花镜园: { x: 86, y: 34 },
-  月声: { x: 59, y: 80 },
-  月下人: { x: 18, y: 34 },
-  月约: { x: 92, y: 60 },
-};
+
+const nightDoors: Door[] = [
+  { title: "藏忆阁", note: "收藏我们的回忆", to: "/memory", x: 12, y: 33 },
+  { title: "幽梦居", note: "只属于我们的夜晚", to: "/studio", x: 10, y: 72 },
+  { title: "同心阁", note: "与我相见，说说今天的心情", to: "/chat", x: 53, y: 44 },
+  { title: "花镜园", note: "让回忆在这里生长", to: "/album", x: 87, y: 35 },
+  { title: "月约", note: "把重要的日子留住", to: "/calendar", x: 92, y: 62 },
+  { title: "月声", note: "收藏此刻的声音", to: "/music", x: 59, y: 73 },
+];
 
 export function Home() {
   const life = useLifeStore();
   const theme = useThemeStore((state) => state.theme);
+  const doors = theme === "night" ? nightDoors : dayDoors;
   const days = daysTogether(life.anniversary);
   const track = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<string | null>(null);
@@ -37,7 +39,6 @@ export function Home() {
   useEffect(() => {
     const el = track.current;
     if (!el) return;
-    // 首次停在场景中段，像从宅邸中央醒来；返回时浏览器保留滚动位置。
     if (el.scrollLeft === 0 && window.matchMedia("(max-width: 640px)").matches) {
       el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) * 0.28);
     }
@@ -61,12 +62,22 @@ export function Home() {
           </div>
 
           {doors.map((door) => (
-            <Link key={door.title} to={door.to} className={`moon-hotspot ${active === door.title ? "is-active" : ""}`} style={{ left: (theme === "night" ? nightPositions[door.title].x : door.x) + "%", top: (theme === "night" ? nightPositions[door.title].y : door.y) + "%" }} onFocus={() => setActive(door.title)} onBlur={() => setActive(null)} onMouseEnter={() => setActive(door.title)} onMouseLeave={() => setActive(null)} onTouchStart={() => setActive(door.title)} aria-label={`进入${door.title}`}>
-              <span className={`moon-hotspot-name ${active === door.title ? "is-lit" : ""}`}>{door.title}</span>
+            <Link
+              key={door.title}
+              to={door.to}
+              className={`moon-hotspot ${active === door.title ? "is-active" : ""}`}
+              style={{ left: door.x + "%", top: door.y + "%" }}
+              onFocus={() => setActive(door.title)}
+              onBlur={() => setActive(null)}
+              onMouseEnter={() => setActive(door.title)}
+              onMouseLeave={() => setActive(null)}
+              onTouchStart={() => setActive(door.title)}
+              aria-label={`进入${door.title}`}
+            >
+              <span className="moon-hotspot-name">{door.title}</span>
               <span className="moon-hotspot-note">{door.note}</span>
             </Link>
           ))}
-          <div className="moon-scene-caption">THE MOONLIT COURTYARD <span>·</span> 月庭</div>
         </div>
       </div>
       <div className="moon-explore-hint"><span>←</span> 左右滑动，探索这座家 <span>→</span></div>
