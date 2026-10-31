@@ -40,7 +40,7 @@ export function Home() {
     const el = track.current;
     if (!el) return;
     if (el.scrollLeft === 0 && window.matchMedia("(max-width: 640px)").matches) {
-      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) * 0.28);
+      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) * 0.5);
     }
   }, []);
 
@@ -58,7 +58,6 @@ export function Home() {
       <div className="moon-scene-viewport" ref={track} aria-label="月庭全景，可左右滑动探索">
         <div className="moon-scene">
           <div className="moon-artwork" aria-hidden="true">
-            <img className="moon-artwork-backdrop" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
             <img className="moon-artwork-image" src={theme === "night" ? nightArtwork : dayArtwork} alt="" draggable={false} />
           </div>
 
