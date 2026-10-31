@@ -1,528 +1,74 @@
-import { useEffect, useMemo, useState } from "react";
-import { imprintStyle } from "../components/chat/parts";
-import { Sheet } from "../components/ui/kit";
+import { useMemo, useState } from "react";
 import { BackButton } from "../components/ui/BackButton";
-import { IconCheck, IconClose, IconSearch } from "../components/ui/icons";
+import { Sheet } from "../components/ui/kit";
 import { useMemoryStore } from "../stores/memoryStore";
-import { useProjectsStore } from "../stores/projectsStore";
-import { useText } from "../lib/content/useText";
-import { formatClock, formatDate } from "../lib/utils/id";
-import {
-  MEMORY_DECAY_LABEL,
-  type MemoryDecay,
-  type MemoryEntry,
-} from "../types";
+import type { MemoryEntry } from "../types";
+import "./memory-archive.css";
 
-type Tab = "library" | "echo" | "imprint";
-
-const TABS: { key: Tab; label: string }[] = [
-  { key: "library", label: "记忆库" },
-  { key: "echo", label: "回声" },
-  { key: "imprint", label: "印记" },
-];
+const MONTHS = ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
+const pad = (n: number) => String(n).padStart(2, "0");
+const dayKey = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+const entryDay = (entry: MemoryEntry) => dayKey(new Date(entry.createdAt));
 
 export function Memory() {
-  const [tab, setTab] = useState<Tab>("library");
-  const t = useText();
-
-  return (
-    <div className="memory-page relative flex h-full flex-col overflow-hidden">
-      {/* 页头：‹ Memory / Things I remember. + 绿点 */}
-      <header className="memory-editorial-head px-5 pt-6">
-        <div className="flex items-center gap-2">
-          <BackButton className="mt-1.5" />
-          <span className="editorial-kicker">JING HUA SHUI YUE / PRIVATE ARCHIVE</span>
-          <span className="ml-auto editorial-meta">02 — 05</span>
-        </div>
-        <div className="memory-title-row mt-5 flex items-end justify-between gap-3">
-          <div className="min-w-0">
-            <p className="editorial-kicker">A QUIET PLACE FOR WHAT REMAINS</p>
-            <h1 className="page-head-title memory-editorial-title mt-1 text-[34px] leading-none text-ink">{t.pages.memory.title}</h1>
-            <p className="page-head-sub mt-2 text-[12px]">{t.pages.memory.sub}</p>
-          </div>
-          <span className="memory-index-mark" aria-hidden="true">忆<span>✳</span></span>
-        </div>
-
-        {/* 三 Tab */}
-        <div className="memory-editorial-tabs mt-5 flex items-center gap-2">
-          {TABS.map((t) => {
-            const on = t.key === tab;
-            return (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`press flex-1 rounded-full border py-1.5 text-[13px] ${
-                  on
-                    ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
-                    : "border-transparent text-ink-faint"
-                }`}
-              >
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
-      </header>
-
-      <div className="mt-3 min-h-0 flex-1">
-        {tab === "library" && <LibraryTab />}
-        {tab === "echo" && <EchoTab />}
-        {tab === "imprint" && <ImprintTab />}
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- 记忆库 ---------------- */
-
-type LibFilter = "all" | "pinned" | "feel" | "open" | "done";
-type LibType = "memories" | "letters" | "anchors";
-
-function LibraryTab() {
   const memories = useMemoryStore((s) => s.memories);
-  const [type, setType] = useState<LibType>("memories");
-  const [filter, setFilter] = useState<LibFilter>("all");
+  const loading = useMemoryStore((s) => s.loading);
+  const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [selectedDay, setSelectedDay] = useState(dayKey(new Date()));
+  const [view, setView] = useState<"tree" | "saved" | "index">("tree");
   const [query, setQuery] = useState("");
-  const [editing, setEditing] = useState<string | null>(null);
-
-  const solidified = memories.filter((m) => m.weight > 0.7).length;
-  const dynamic = memories.length - solidified;
-
-  const list = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return memories.filter((m) => {
-      if (q && !m.text.toLowerCase().includes(q)) return false;
-      if (type === "letters") return m.kind === "feel";
-      if (type === "anchors") return m.pinned;
-      if (filter === "pinned") return m.pinned;
-      if (filter === "feel") return m.kind === "feel";
-      if (filter === "open") return m.kind === "todo" && !m.resolved;
-      if (filter === "done") return m.resolved;
-      return true;
-    });
-  }, [memories, type, filter, query]);
-
-  const current = memories.find((m) => m.id === editing);
-
-  return (
-    <div className="flex h-full flex-col">
-      <div className="scroll-area min-h-0 flex-1 px-5 pb-28">
-        <section className="memory-ledger-intro editorial-sheet mt-2 px-4 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <span className="editorial-kicker">THE MEMORY LEDGER</span>
-            <span className="editorial-meta">NO. 01 / COLLECTION</span>
-          </div>
-          <div className="memory-ledger-count mt-3 flex items-end gap-2">
-            <strong>{String(memories.length).padStart(2, "0")}</strong>
-            <span>份记忆<br/>被妥善收藏</span>
-          </div>
-          <div className="memory-ledger-rule mt-3" />
-          <div className="mt-2 flex items-center justify-between text-[10px] text-ink-faint">
-            <span>固化 {solidified} · 动态 {dynamic}</span>
-            <span>每一段经历，都有回声</span>
-          </div>
-        </section>
-
-        {/* 类型卡 */}
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {[
-            ["memories", "记忆", "Memories"],
-            ["letters", "信", "Letters"],
-            ["anchors", "锚点", "Anchors"],
-          ].map(([k, zh, en]) => (
-            <button
-              key={k}
-              onClick={() => setType(k as LibType)}
-              className={`memory-type-tile press rounded-2xl border py-3 text-center ${
-                type === k
-                  ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
-                  : "border-[var(--line)] text-ink-soft"
-              }`}
-            >
-              <p className="text-[15px]">{zh}</p>
-              <p className="page-head-sub mt-0.5 text-[10.5px]">{en}</p>
-            </button>
-          ))}
-        </div>
-
-        {/* 搜索 */}
-        <label className="mt-3 flex items-center gap-2 rounded-xl bg-[var(--glass-hi)] px-3 py-2.5">
-          <IconSearch width={15} height={15} className="text-ink-faint" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="search memories..."
-            className="ghost-input w-full bg-transparent text-[13px] text-ink"
-          />
-        </label>
-
-        {/* 筛选 chips */}
-        <div className="scroll-area mt-3 flex gap-2 overflow-x-auto">
-          {[
-            ["all", "全部"],
-            ["pinned", "📌 钉选"],
-            ["feel", "💧 Feel"],
-            ["open", "⚡ 未解决"],
-            ["done", "🌿 已消"],
-          ].map(([k, label]) => (
-            <button
-              key={k}
-              onClick={() => setFilter(k as LibFilter)}
-              className={`press flex-none rounded-full border px-3 py-1 text-[12px] ${
-                filter === k
-                  ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
-                  : "border-[var(--line)] text-ink-faint"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* 排序 */}
-        <div className="mt-3 flex items-center justify-between text-[11.5px] text-ink-faint">
-          <span>🕐 综合分优先</span>
-          <span>按综合衰减分排列</span>
-        </div>
-
-        {/* 记忆卡 */}
-        <div className="mt-2 space-y-3">
-          {list.slice(0, 40).map((m) => (
-            <button
-              key={m.id}
-              onClick={() => setEditing(m.id)}
-              className="memory-entry editorial-sheet press block w-full rounded-2xl px-3.5 py-3 text-left"
-            >
-              <div className="flex items-center gap-1.5 text-[10px] text-ink-faint">
-                <span className="rounded bg-[var(--glass-solid)] px-1.5 py-0.5 tracking-[0.12em]">
-                  {m.pinned ? "PERMANENT" : m.kind === "todo" ? "PENDING" : m.kind === "feel" ? "FEEL" : "FACT"}
-                </span>
-                {m.pinned && <span>📌</span>}
-                {m.kind === "todo" && <span>⚡</span>}
-                <span className="num ml-1">{Math.round(m.weight * 999)}</span>
-                <span className="num ml-auto">{formatDate(m.createdAt)}</span>
-              </div>
-              <p className="mt-1.5 line-clamp-2 text-[14px] leading-[1.65] text-ink">
-                {m.text}
-              </p>
-              <p className="num mt-1 text-[10px] tracking-[0.2em] text-ink-faint/60">
-                ●●●●●●●●●●
-              </p>
-              {m.tags.length > 0 && (
-                <div className="mt-1.5 flex flex-wrap gap-1">
-                  {m.tags.slice(0, 4).map((t) => (
-                    <span
-                      key={t}
-                      className="rounded border border-[var(--line)] px-1.5 text-[10px] text-ink-faint"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </button>
-          ))}
-          {list.length === 0 && (
-            <p className="py-8 text-center text-[12.5px] text-ink-faint">没有匹配的记忆。</p>
-          )}
-        </div>
-        <p className="mt-4 text-center text-[10.5px] text-ink-faint/70">
-          {list.length} 条
-        </p>
-      </div>
-
-      <EditSheet current={current} onClose={() => setEditing(null)} />
-    </div>
-  );
-}
-
-/* ---------------- 回声 ---------------- */
-
-type EchoFilter = "all" | "todo" | "pinned" | "done" | "old";
-
-function EchoTab() {
-  const memories = useMemoryStore((s) => s.memories);
-  const echoes = useMemoryStore((s) => s.echoes);
-  const projects = useProjectsStore((s) => s.projects);
-  const [filter, setFilter] = useState<EchoFilter>("all");
-  const [editing, setEditing] = useState<string | null>(null);
-
-  const normal = memories.filter((m) => m.kind !== "todo" && !m.pinned).length;
-  const todo = memories.filter((m) => m.kind === "todo" && !m.resolved).length;
-  const done = memories.filter((m) => m.resolved).length;
-
-  const list = useMemo(() => {
-    return memories.filter((m) => {
-      if (filter === "todo") return m.kind === "todo" && !m.resolved;
-      if (filter === "pinned") return m.pinned;
-      if (filter === "done") return m.resolved;
-      if (filter === "old") return m.weight < 0.3;
-      return true;
-    });
-  }, [memories, filter]);
-
-  const current = memories.find((m) => m.id === editing);
-
-  return (
-    <div className="flex h-full flex-col">
-      <div className="scroll-area min-h-0 flex-1 px-5 pb-28">
-        <p className="text-[12px] text-ink-faint">
-          {echoes.length} echoes · 平常 {normal} 待兑现 {todo} 已兑现 {done} 过时 0 归档 0
-        </p>
-        <p className="mt-0.5 text-right text-[11px] text-ink-faint">
-          今日流转:兑现 1 · 覆盖 2 · 归档 0
-        </p>
-
-        {/* 项目 pills */}
-        <div className="scroll-area mt-3 flex gap-2 overflow-x-auto">
-          {projects.slice(0, 3).map((p, i) => (
-            <span
-              key={p.id}
-              className={`flex-none rounded-full border px-3 py-1 text-[12px] ${
-                i === 0
-                  ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
-                  : "border-[var(--line)] text-ink-faint"
-              }`}
-            >
-              {p.name} · {Math.round(memories.length / (i + 2))}
-            </span>
-          ))}
-        </div>
-
-        {/* 情景 / 档案卡 */}
-        <div className="mt-2 flex gap-2">
-          <span className="rounded-full border border-[var(--line)] px-3 py-1 text-[12px] text-ink-soft">
-            情景记忆
-          </span>
-          <span className="rounded-full border border-[var(--line)] px-3 py-1 text-[12px] text-ink-soft">
-            📁 档案卡 · {memories.length}
-          </span>
-        </div>
-
-        {/* 状态 chips */}
-        <div className="scroll-area mt-2 flex gap-2 overflow-x-auto">
-          {[
-            ["all", "全部"],
-            ["todo", "🏛 待兑现"],
-            ["pinned", "📌 钉住"],
-            ["done", "✓ 已兑现"],
-            ["old", "🗄 过时"],
-          ].map(([k, label]) => (
-            <button
-              key={k}
-              onClick={() => setFilter(k as EchoFilter)}
-              className={`press flex-none rounded-full border px-3 py-1 text-[12px] ${
-                filter === k
-                  ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
-                  : "border-[var(--line)] text-ink-faint"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-3 flex items-center justify-between text-[11.5px] text-ink-faint">
-          <span>🕐 最新优先</span>
-        </div>
-
-        <div className="mt-2 space-y-2.5">
-          {list.slice(0, 40).map((m) => (
-            <button
-              key={m.id}
-              onClick={() => setEditing(m.id)}
-              className="press block w-full rounded-2xl bg-[var(--glass-hi)] px-3.5 py-3 text-left"
-            >
-              <div className="flex items-center gap-2 text-[10.5px] text-ink-faint">
-                <span>{m.decay === "slow" ? "慢忘" : "平常"}</span>
-                <span className="num ml-auto">{formatDate(m.createdAt)}</span>
-                <span>· 第四个家</span>
-              </div>
-              <p className="mt-1 line-clamp-3 text-[13px] leading-[1.8] text-ink-soft">
-                {m.text}
-              </p>
-            </button>
-          ))}
-          {list.length === 0 && (
-            <p className="py-8 text-center text-[12.5px] text-ink-faint">这一类还没有。</p>
-          )}
-        </div>
-      </div>
-
-      <EditSheet current={current} onClose={() => setEditing(null)} />
-    </div>
-  );
-}
-
-/* ---------------- 印记 ---------------- */
-
-function ImprintTab() {
-  const imprints = useMemoryStore((s) => s.imprints);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const current = imprints.find((i) => i.id === openId);
-
-  return (
-    <>
-      <div className="scroll-area h-full px-5 pb-28">
-        <p className="text-[12px] text-ink-faint">
-          {imprints.length} 个印记 · 他在整理记忆时留下的
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          {imprints.map((im) => (
-            <button
-              key={im.id}
-              onClick={() => setOpenId(im.id)}
-              className="press text-left"
-            >
-              <div
-                className="grain-self relative w-full overflow-hidden rounded-[18px] border border-[var(--line)]"
-                style={{ ...imprintStyle(im.seed), height: 150 }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              </div>
-              <p className="mt-1.5 text-[13px] text-ink">{im.title}</p>
-              <p className="text-[10.5px] text-ink-faint">
-                {formatDate(im.at)} · 第四个家
-              </p>
-            </button>
-          ))}
-        </div>
-        {imprints.length === 0 && (
-          <p className="py-12 text-center text-[12.5px] text-ink-faint">还没有印记。</p>
-        )}
-      </div>
-
-      <Sheet open={Boolean(current)} onClose={() => setOpenId(null)} title={current?.title} panelClassName="memory-mirror-sheet">
-        {current && (
-          <div>
-            <div
-              className="grain-self w-full rounded-2xl border border-[var(--line)]"
-              style={{ ...imprintStyle(current.seed), height: 280 }}
-            />
-            <p className="mt-4 text-[14px] leading-[1.95] text-ink">「{current.prompt}」</p>
-            <p className="mt-1 text-[11px] text-ink-faint">{formatDate(current.at)} 留下的。</p>
-          </div>
-        )}
-      </Sheet>
-    </>
-  );
-}
-
-/* ---------------- 记忆编辑底板 ---------------- */
-
-function EditSheet({
-  current,
-  onClose,
-}: {
-  current?: MemoryEntry;
-  onClose: () => void;
-}) {
+  const [opened, setOpened] = useState<MemoryEntry | null>(null);
   const [draft, setDraft] = useState("");
-  const [status, setStatus] = useState<"normal" | "todo" | "done" | "old" | "archived">("normal");
-  const [decay, setDecay] = useState<MemoryDecay>("natural");
+  const [newText, setNewText] = useState("");
+  const [showComposer, setShowComposer] = useState(false);
+  const createMemory = useMemoryStore((s) => s.createMemory);
+  const patchMemory = useMemoryStore((s) => s.patchMemory);
+  const removeMemory = useMemoryStore((s) => s.removeMemory);
+  const togglePin = useMemoryStore((s) => s.togglePin);
+  const monthLabel = `${month.getFullYear()}年 · ${MONTHS[month.getMonth()]}`;
+  const firstWeekday = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
+  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const counts = useMemo(() => {
+    const map = new Map<string, number>();
+    memories.forEach((m) => map.set(entryDay(m), (map.get(entryDay(m)) ?? 0) + 1));
+    return map;
+  }, [memories]);
+  const visible = useMemo(() => {
+    const q = query.trim().toLocaleLowerCase();
+    return memories.filter((m) => view === "saved" ? m.pinned : view === "index" ? true : entryDay(m) === selectedDay)
+      .filter((m) => !q || m.text.toLocaleLowerCase().includes(q) || m.tags.some((tag) => tag.toLocaleLowerCase().includes(q)))
+      .sort((a, b) => b.createdAt - a.createdAt);
+  }, [memories, query, selectedDay, view]);
+  const selectedDate = new Date(`${selectedDay}T12:00:00`);
+  const moveMonth = (delta: number) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
+  const openEntry = (entry: MemoryEntry) => { setOpened(entry); setDraft(entry.text); };
 
-  useEffect(() => {
-    if (!current) return;
-    setDraft(current.text);
-    setStatus(current.resolved ? "done" : current.kind === "todo" ? "todo" : "normal");
-    setDecay(current.decay ?? "natural");
-  }, [current]);
-
-  return (
-    <Sheet open={Boolean(current)} onClose={onClose} title="这一条" panelClassName="memory-mirror-sheet">
-      {current && (
-        <div>
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            rows={6}
-            className="w-full resize-none rounded-xl bg-[var(--glass-hi)] p-3 text-[13.5px] leading-[1.9] text-ink"
-          />
-          <div className="mt-3 flex gap-3">
-            <button
-              onClick={() => {
-                void useMemoryStore.getState().patchMemory(current.id, {
-                  text: draft.trim(),
-                  decay,
-                  pinned: status === "normal" ? false : current.pinned,
-                  kind: status === "todo" ? "todo" : "fact",
-                  resolved: status === "done",
-                });
-                onClose();
-              }}
-              className="press rounded-full border border-[var(--line-strong)] px-4 py-1.5 text-[12.5px] text-ink"
-            >
-              保存文字
-            </button>
-            <button
-              onClick={() => {
-                void useMemoryStore.getState().removeMemory(current.id);
-                onClose();
-              }}
-              className="press rounded-full border border-[var(--accent-deep)] px-4 py-1.5 text-[12.5px] text-[var(--accent-deep)]"
-            >
-              删掉
-            </button>
-          </div>
-
-          <p className="mt-4 text-[11.5px] text-ink-faint">状态</p>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {[
-              ["normal", "平常"],
-              ["todo", "待兑现"],
-              ["done", "已兑现"],
-              ["old", "已过时"],
-              ["archived", "归档"],
-            ].map(([k, label]) => (
-              <button
-                key={k}
-                onClick={() => setStatus(k as typeof status)}
-                className={`press rounded-full border px-3 py-1 text-[12px] ${
-                  status === k
-                    ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
-                    : "border-[var(--line)] text-ink-faint"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <p className="mt-3 text-[11.5px] text-ink-faint">留存</p>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {(["natural", "slow"] as MemoryDecay[]).map((d) => (
-              <button
-                key={d}
-                onClick={() => setDecay(d)}
-                className={`press rounded-full border px-3 py-1 text-[12px] ${
-                  decay === d
-                    ? "border-[var(--accent-deep)] text-[var(--accent-deep)]"
-                    : "border-[var(--line)] text-ink-faint"
-                }`}
-              >
-                {MEMORY_DECAY_LABEL[d]}
-              </button>
-            ))}
-            <button
-              onClick={() => {
-                void useMemoryStore.getState().patchMemory(current.id, { pinned: true });
-                onClose();
-              }}
-              className="press rounded-full border border-[var(--line)] px-3 py-1 text-[12px] text-ink-faint"
-            >
-              📌 钉住
-            </button>
-          </div>
-
-          <div className="mt-4 flex items-center gap-2 border-t border-[var(--line)] pt-3 text-[10.5px] text-ink-faint">
-            <IconCheck width={11} height={11} className="text-[var(--accent)]" />
-            {formatClock(current.updatedAt)} 改过
-            <button onClick={onClose} className="press ml-auto flex items-center gap-1">
-              <IconClose width={11} height={11} /> 收起
-            </button>
-          </div>
-        </div>
-      )}
-    </Sheet>
-  );
+  return <main className="memory-archive-page">
+    <header className="ma-topline"><BackButton /><span>JING HUA SHUI YUE <i>/</i> MEMORY ATLAS</span><span className="ma-top-index">03 — 12</span></header>
+    <section className="ma-heading"><div><p className="ma-eyebrow">A MAP OF THE DAYS WE KEEP</p><h1>藏忆阁<span>。</span></h1><p className="ma-subtitle">把走过的日子，慢慢收进时间里。</p></div><div className="ma-seal" aria-hidden="true"><span>忆</span><small>MEMORY</small></div></section>
+    <nav className="ma-nav" aria-label="记忆档案分类">
+      <button className={view === "tree" ? "active" : ""} onClick={() => setView("tree")}><b>01</b> 时日树</button>
+      <button className={view === "saved" ? "active" : ""} onClick={() => setView("saved")}><b>02</b> 珍藏页</button>
+      <button className={view === "index" ? "active" : ""} onClick={() => setView("index")}><b>03</b> 记忆索引</button>
+    </nav>
+    {view === "tree" && <section className="ma-calendar-section">
+      <div className="ma-section-head"><div><span className="ma-eyebrow">THE MEMORY TREE</span><h2>时日树</h2></div><div className="ma-month-control"><button aria-label="上个月" onClick={() => moveMonth(-1)}>‹</button><strong>{monthLabel}</strong><button aria-label="下个月" onClick={() => moveMonth(1)}>›</button></div></div>
+      <div className="ma-calendar">{["日","一","二","三","四","五","六"].map((d) => <span className="ma-weekday" key={d}>{d}</span>)}
+        {Array.from({ length: firstWeekday }, (_, i) => <span className="ma-day-empty" key={`blank-${i}`} />)}
+        {Array.from({ length: daysInMonth }, (_, i) => { const day = i + 1; const key = dayKey(new Date(month.getFullYear(), month.getMonth(), day)); const count = counts.get(key) ?? 0; return <button key={key} className={`ma-day ${selectedDay === key ? "selected" : ""} ${count ? "has-memory" : ""}`} onClick={() => setSelectedDay(key)}><span>{day}</span>{count > 0 && <i aria-label={`${count} 条记忆`} />}</button>; })}
+      </div>
+      <div className="ma-calendar-foot"><span><i /> 有记忆的日子</span><span>{memories.length} 条记录 · {counts.size} 个日子</span></div>
+    </section>}
+    <section className="ma-records">
+      <div className="ma-record-heading"><div><span className="ma-eyebrow">{view === "tree" ? "A DAY IN YOUR STORY" : view === "saved" ? "KEPT CLOSE, KEPT SAFE" : "FIND A THREAD"}</span><h2>{view === "tree" ? <>{selectedDate.getMonth() + 1}月{selectedDate.getDate()}日 <small>· 当日笺</small></> : view === "saved" ? "珍藏的片段" : "记忆索引"}</h2></div><span className="ma-record-count">{visible.length.toString().padStart(2, "0")} <small>ENTRIES</small></span></div>
+      <label className="ma-search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索文字、标签与片段…" /><kbd>SEARCH</kbd></label>
+      <div className="ma-entry-list">{visible.map((entry, index) => <article className="ma-entry" key={entry.id}><div className="ma-entry-rail"><span>{String(index + 1).padStart(2, "0")}</span><i /></div><button className="ma-entry-body" onClick={() => openEntry(entry)}><div className="ma-entry-meta"><span>{new Date(entry.createdAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</span><span>{entry.pinned ? "✦ 已珍藏" : entry.kind === "todo" ? "待完成" : entry.kind === "feel" ? "心绪" : "记忆"}</span></div><p>{entry.text}</p>{entry.tags.length > 0 && <div className="ma-tags">{entry.tags.slice(0, 4).map((tag) => <span key={tag}>#{tag}</span>)}</div>}</button><button className={`ma-pin ${entry.pinned ? "is-pinned" : ""}`} aria-label={entry.pinned ? "取消珍藏" : "加入珍藏"} onClick={() => void togglePin(entry.id)}>✧</button></article>)}
+        {!visible.length && <div className="ma-empty"><span>◌</span><strong>{loading ? "正在整理记忆…" : "这一天暂时空白"}</strong><p>{view === "tree" ? "留白也是时间的一部分。你可以在这里写下一段记忆。" : "试试其他关键词，或把值得留下的片段标记为珍藏。"}</p></div>}
+      </div>
+      <button className="ma-compose" onClick={() => setShowComposer(true)}><span>＋</span> 写下一段记忆</button>
+    </section>
+    <footer className="ma-footer"><span>EVERY DAY LEAVES A TRACE</span><span>镜花水月 · 私人记忆档案</span></footer>
+    <Sheet open={Boolean(opened)} onClose={() => setOpened(null)} title="时日笺" panelClassName="memory-mirror-sheet">{opened && <div className="ma-detail"><p className="ma-eyebrow">{new Date(opened.createdAt).toLocaleString("zh-CN", { dateStyle: "long", timeStyle: "short" })}</p><textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={7} /><div className="ma-detail-actions"><button onClick={() => { void patchMemory(opened.id, { text: draft.trim() }); setOpened(null); }}>保存修改</button><button onClick={() => { void togglePin(opened.id); setOpened(null); }}>{opened.pinned ? "取消珍藏" : "珍藏这段"}</button><button className="danger" onClick={() => { void removeMemory(opened.id); setOpened(null); }}>删除</button></div></div>}</Sheet>
+    <Sheet open={showComposer} onClose={() => setShowComposer(false)} title="写下一段记忆" panelClassName="memory-mirror-sheet"><div className="ma-detail"><p className="ma-eyebrow">A SMALL NOTE TO KEEP</p><textarea value={newText} onChange={(e) => setNewText(e.target.value)} rows={6} placeholder="今天有什么想留下？" /><div className="ma-detail-actions"><button disabled={!newText.trim()} onClick={() => { void createMemory(newText); setNewText(""); setShowComposer(false); }}>收入记忆</button></div></div></Sheet>
+  </main>;
 }
