@@ -46,12 +46,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       <BackgroundLayer />
 
       <div className="pocket-shell relative flex h-full w-full justify-center">
-        <div className="relative flex h-full w-full max-w-[600px] flex-col">
+        <div className={`relative flex h-full w-full ${location.pathname === "/" ? "max-w-none" : "max-w-[600px]"} flex-col`}>
           <main
             key={location.pathname}
             ref={mainRef}
             onScroll={onScroll}
-            className={`scroll-area min-h-0 flex-1 pb-24 ${dir}`}
+            className={`scroll-area min-h-0 flex-1 ${location.pathname === "/" ? "pb-0 overflow-hidden" : "pb-24"} ${dir}`}
           >
             {children}
           </main>
