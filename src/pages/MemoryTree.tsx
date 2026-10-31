@@ -25,7 +25,7 @@ export function MemoryTree() {
   }, [memories, year, month]);
   useEffect(() => {
     const send = () => frame.current?.contentWindow?.postMessage({type:"mirror-memory-data",records},window.location.origin);
-    const onMessage = (e: MessageEvent) => { if(e.origin!==window.location.origin || e.source!==frame.current?.contentWindow)return; if(e.data?.type==="mirror-memory-ready")send(); if(e.data?.type==="mirror-memory-open" && typeof e.data.day==="string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(e.data.day) && dayKey(new Date(e.data.day+"T12:00:00"))===e.data.day)navigate(`/memory?day=${e.data.day}`); };
+    const onMessage = (e: MessageEvent) => { if(e.origin!==window.location.origin || e.source!==frame.current?.contentWindow)return; if(e.data?.type==="mirror-memory-ready")send(); if(e.data?.type==="mirror-memory-open" && typeof e.data.day==="string" && /^\d{4}-\d{2}-\d{2}$/.test(e.data.day) && dayKey(new Date(e.data.day+"T12:00:00"))===e.data.day)navigate(`/memory?day=${e.data.day}`); };
     window.addEventListener("message",onMessage); send(); return ()=>window.removeEventListener("message",onMessage);
   }, [records,navigate]);
   return <main className="memory-tree-page">
