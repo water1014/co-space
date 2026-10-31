@@ -3,3 +3,6 @@
 
 .mt-month-jump{display:flex;align-items:center;gap:5px;margin-left:auto}.mt-month-jump button{min-width:30px;height:29px;padding:0 9px;border:1px solid var(--line-strong);border-radius:18px;background:rgba(255,255,255,.22);color:var(--accent-deep);font:12px var(--f-serif,serif)}.mt-month-jump button:first-child,.mt-month-jump button:last-child{font:20px/1 Georgia,serif}.mt-month-jump button:active{background:rgba(150,192,210,.28);transform:scale(.96)}.mt-hint{min-height:20px;padding:0 8px}
 @media(max-width:380px){.mt-month-jump{width:100%;justify-content:flex-end}.mt-month-jump button{min-width:34px}}
+
+/* Keep the original wide tree artwork intact on narrow phones; scroll the scene, not the whole page. */
+.mt-tree-shell{min-width:0;overflow:hidden}.mt-original-tree{max-width:none}@media(max-width:520px){.mt-tree-shell{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:rgba(128,171,190,.45) transparent;-webkit-overflow-scrolling:touch}.mt-original-tree{width:720px;max-width:none;height:760px;min-height:760px}.mt-tree-caption,.mt-hint{position:sticky;left:0;width:calc(100vw - 64px);max-width:720px}.mt-foot{flex-wrap:wrap}}
