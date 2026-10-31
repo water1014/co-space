@@ -3225,3 +3225,33 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[role="tab"]:
 @media (prefers-reduced-motion:reduce) {
   .moon-hotspot-note { transition:none; }
 }
+
+
+/* 月庭：全景位置指示与日夜原画柔和交替 */
+.moon-panorama-progress {
+  width:min(240px,42vw);
+  height:2px;
+  margin:3px auto 0;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(143,170,189,.22);
+}
+.moon-panorama-progress span {
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,rgba(143,170,189,.55),rgba(198,173,131,.92));
+  box-shadow:0 0 8px rgba(198,173,131,.25);
+  transition:width .18s ease-out;
+}
+.moon-artwork-image {
+  animation:moon-artwork-arrive .85s ease both;
+}
+@keyframes moon-artwork-arrive {
+  from { opacity:.72; filter:brightness(.96); }
+  to { opacity:1; filter:brightness(1); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .moon-artwork-image { animation:none; }
+  .moon-panorama-progress span { transition:none; }
+}
