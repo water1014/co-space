@@ -325,3 +325,92 @@
  .mt-memory-bottom{align-items:flex-end;flex-direction:column;margin-top:75px}
 }
 @media(prefers-reduced-motion:reduce){.mt-memory-reveal{animation:none}}
+
+
+/* Quiet editorial finish: rely on paper, type and spacing rather than decorative drawings. */
+.mt-memory-reveal{
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(218,226,222,.24),transparent 42%),
+    #fbfbfa;
+}
+.mt-memory-reveal::before{
+  opacity:.22;
+  background:
+    linear-gradient(90deg,transparent 0,rgba(104,117,110,.035) 50%,transparent 100%),
+    repeating-linear-gradient(0deg,rgba(72,80,74,.012) 0,rgba(72,80,74,.012) 1px,transparent 1px,transparent 5px);
+}
+.mt-memory-masthead{
+  position:relative;
+  text-align:center;
+  padding-top:clamp(62px,11vh,104px);
+}
+.mt-memory-masthead::before{
+  content:"";
+  display:block;
+  width:42px;
+  height:1px;
+  margin:0 auto 26px;
+  background:linear-gradient(90deg,transparent,#aab5ad,transparent);
+}
+.mt-memory-script{
+  margin:0;
+  color:#242923;
+  font-family:"Cormorant Garamond","Baskerville","Times New Roman",serif;
+  font-style:italic;
+  font-weight:500;
+  font-size:clamp(42px,9vw,72px);
+  line-height:1.08;
+  letter-spacing:-.045em;
+}
+.mt-memory-subtitle{
+  margin-top:19px;
+  color:#81877f;
+  letter-spacing:.34em;
+  font-size:12px;
+}
+.mt-memory-summary{
+  margin-top:23px;
+  color:#969991;
+  font-size:11px;
+  letter-spacing:.12em;
+}
+.mt-memory-time-rail{
+  margin-top:35px;
+  border-bottom-color:rgba(107,119,108,.17);
+}
+.mt-memory-time-rail button{
+  min-height:32px;
+  padding:5px 0;
+  font-variant-numeric:tabular-nums;
+}
+.mt-memory-entry{
+  scroll-margin-top:24px;
+}
+.mt-memory-entry-meta{
+  letter-spacing:.06em;
+}
+.mt-memory-entry-meta strong{
+  font-weight:500;
+}
+.mt-memory-entry p{
+  line-height:2.12;
+  letter-spacing:.025em;
+}
+.mt-memory-status{
+  border-color:rgba(107,119,108,.17);
+  color:#81877f;
+}
+.mt-memory-bottom{
+  margin-top:clamp(54px,10vh,92px);
+}
+@media(max-width:520px){
+  .mt-memory-masthead{padding-top:clamp(58px,10vh,88px)}
+  .mt-memory-script{font-size:clamp(42px,11vw,58px)}
+  .mt-memory-time-rail{margin-top:29px}
+  .mt-memory-entry p{line-height:2.08}
+}
+[data-theme=night] .mt-memory-reveal{
+  background:radial-gradient(ellipse at 50% 0%,rgba(105,132,119,.12),transparent 42%),#111b23;
+}
+[data-theme=night] .mt-memory-masthead::before{background:linear-gradient(90deg,transparent,#758b82,transparent)}
+[data-theme=night] .mt-memory-script{color:#e4e9e4}
