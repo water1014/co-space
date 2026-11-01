@@ -267,20 +267,20 @@ export function Album() {
                     <button
                       key={p.id}
                       onClick={() => setOpenId(p.id)}
-                      className="press flex items-center gap-3 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-2 text-left"
+                      className="album-list-entry press flex items-center gap-3 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-2 text-left"
                     >
                       <img
                         src={p.dataUrl}
                         alt={p.caption || "照片"}
-                        className="h-14 w-14 flex-none rounded-[10px] object-cover"
+                        className="album-list-image h-14 w-14 flex-none rounded-[10px] object-cover"
                         loading="lazy"
                       />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[13px] text-ink">
                           {p.caption || "没有写说明"}
                         </span>
-                        <span className="num mt-1 block text-[10.5px] text-ink-faint">
-                          {stamp(p.at).slice(11)}
+                        <span className="album-list-date num mt-1 block text-[9px] text-ink-faint">
+                          {stamp(p.at)}
                         </span>
                       </span>
                       <IconChevron width={14} height={14} className="text-ink-ghost" />
