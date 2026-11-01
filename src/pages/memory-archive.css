@@ -294,3 +294,122 @@
 [data-theme="night"] .ma-detail-actions button.danger{border-color:rgba(207,160,141,.25);background:rgba(170,119,99,.1);color:#e0b8a9}
 @media(max-width:420px){.memory-mirror-sheet .scroll-area:has(.ma-reading-text){padding-left:18px;padding-right:18px}.ma-reading-text{min-height:130px;padding:21px 17px}.ma-detail-actions{gap:7px}.ma-detail-actions button{min-height:40px;padding:0 11px}}
 @media(prefers-reduced-transparency:reduce){.ma-reading-text,.ma-detail-actions button{background:var(--surface);box-shadow:none}}
+
+
+/* Memory archive — align the index with the quiet Dear Memories reading sheet. */
+.memory-archive-page{
+  background:
+    radial-gradient(ellipse at 88% 0%,rgba(190,207,198,.13),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.22),transparent 48%);
+}
+.ma-topline{letter-spacing:.2em}
+.ma-heading{
+  padding-top:clamp(28px,7vh,54px);
+  padding-bottom:27px;
+  border-bottom-color:rgba(105,123,113,.2);
+}
+.ma-heading h1{
+  font-size:clamp(38px,9vw,50px);
+  letter-spacing:.17em;
+}
+.ma-heading h1 span{color:#9aada1}
+.ma-seal{
+  border-color:rgba(133,157,143,.3);
+  box-shadow:inset 0 0 0 5px rgba(147,174,157,.055);
+  color:#718879;
+}
+.ma-nav{
+  gap:0;
+  padding:14px 0 17px;
+  border-bottom-color:rgba(105,123,113,.17);
+}
+.ma-nav button,.ma-nav .ma-tree-link{
+  border-radius:0;
+  border-bottom:1px solid transparent;
+  background:transparent;
+  box-shadow:none;
+}
+.ma-nav button.active,.ma-nav .ma-tree-link{
+  border-color:rgba(105,123,113,.24);
+  background:transparent;
+  color:var(--ink);
+}
+.ma-calendar-section{padding-top:27px}
+.ma-day{border-radius:50%;font-variant-numeric:tabular-nums}
+.ma-day.selected{
+  background:rgba(193,211,198,.3);
+  border:1px solid rgba(120,151,130,.42);
+  color:#4e6b58;
+  box-shadow:none;
+}
+.ma-day.has-memory:not(.selected){background:rgba(188,208,194,.13)}
+.ma-day i{background:#8ca895}
+.ma-search{
+  border-radius:2px;
+  border-width:0 0 1px;
+  padding:12px 2px;
+  background:transparent;
+}
+.ma-entry{
+  grid-template-columns:30px minmax(0,1fr) 25px;
+  gap:11px;
+  padding:18px 0;
+  border-bottom-color:rgba(105,123,113,.16);
+}
+.ma-entry-rail{font-variant-numeric:tabular-nums}
+.ma-entry-rail i{border-color:#9aafa0}
+.ma-entry-body>p{
+  font-size:14px;
+  line-height:2.05;
+  letter-spacing:.015em;
+}
+.ma-tags{gap:10px}
+.ma-tags span{color:#829889}
+.ma-pin{font-size:16px}
+.ma-compose{
+  border-radius:2px;
+  border-width:1px 0;
+  background:transparent;
+  box-shadow:none;
+  color:#607e6b;
+}
+.ma-footer{border-top-color:rgba(105,123,113,.17)}
+[data-theme="night"] .ma-day.selected{
+  background:rgba(105,139,119,.22);
+  border-color:rgba(163,193,171,.4);
+  color:#dce9df;
+}
+[data-theme="night"] .ma-day.has-memory:not(.selected){background:rgba(132,171,146,.12)}
+[data-theme="night"] .ma-compose{color:#bdd2c4}
+@media(max-width:520px){
+  .memory-archive-page{padding:16px 19px 30px}
+  .ma-heading{padding-top:32px}
+  .ma-nav{padding-top:12px}
+  .ma-entry{grid-template-columns:25px minmax(0,1fr) 22px;gap:8px}
+}
+
+
+/* Waterlight palette refinement — archive chapters stay quiet, but no longer drift sage-green. */
+.memory-archive-page{background:radial-gradient(ellipse at 88% 0%,rgba(165,204,221,.15),transparent 34%),linear-gradient(180deg,rgba(255,255,255,.22),transparent 48%)}
+.ma-heading{border-bottom-color:rgba(112,157,179,.22)}
+.ma-heading h1 span{color:#8eb8ca}
+.ma-seal{border-color:rgba(126,174,194,.34);box-shadow:inset 0 0 0 5px rgba(147,190,207,.07);color:#719db2}
+.ma-nav{border-bottom-color:rgba(112,157,179,.2)}
+.ma-nav button.active,.ma-nav .ma-tree-link{border-color:rgba(112,157,179,.28)}
+.ma-day.selected{background:rgba(177,213,229,.28);border-color:rgba(112,163,187,.48);color:#496d80}
+.ma-day.has-memory:not(.selected){background:rgba(174,211,228,.16)}
+.ma-day i{background:#8eb8ca}
+.ma-entry{border-bottom-color:rgba(112,157,179,.18)}
+.ma-entry-rail i{border-color:#8eb8ca}
+.ma-tags span{color:#789fb2}
+.ma-compose{color:#587f94}
+.ma-collection-kicker i{color:#8eb8ca}
+.ma-collection-title h2 span{color:#8eb8ca}
+.ma-collection-index{border-color:rgba(126,174,194,.34);background:linear-gradient(145deg,rgba(255,255,255,.52),rgba(189,219,230,.2));box-shadow:inset 0 1px rgba(255,255,255,.84)}
+.ma-entry-date-divider i{border-color:#86adbf;box-shadow:0 0 0 3px rgba(134,173,191,.12)}
+[data-theme="night"] .ma-day.selected{background:rgba(100,154,179,.22);border-color:rgba(157,194,210,.42);color:#dcecf2}
+[data-theme="night"] .ma-day.has-memory:not(.selected){background:rgba(111,164,188,.14)}
+[data-theme="night"] .ma-compose{color:#bdd8e3}
+[data-theme="night"] .ma-collection-index{background:linear-gradient(145deg,rgba(72,105,123,.45),rgba(35,57,69,.52));border-color:rgba(153,190,207,.25)}
+[data-theme="night"] .ma-collection-index strong{color:#e0edf2}
+@media(prefers-reduced-transparency:reduce){.ma-collection-index{background:var(--surface);box-shadow:none}}

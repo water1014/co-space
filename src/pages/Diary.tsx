@@ -15,6 +15,7 @@ import { Calendar, dayKey } from "../components/home/Calendar";
 import { Reader } from "../components/diary/Reader";
 import { useDiaryStore, replyToQuote } from "../stores/diaryStore";
 import { useText } from "../lib/content/useText";
+import "./diary-editorial.css";
 import type { DiaryEntry } from "../types";
 
 const MOODS = ["平静", "温和", "低电量", "专注"];
@@ -326,7 +327,6 @@ export function Diary() {
       {openEntry && (
         <EntryReader
           entry={openEntry}
-          index={sorted.findIndex((x) => x.id === openEntry.id)}
           onClose={() => setOpenId(null)}
           onEdit={() => {
             const d = openEntry.date;
@@ -448,7 +448,7 @@ function DiaryCard({
             {MON_EN[d.getMonth()]}
           </span>
         </div>
-        <PlantMark i={index} />
+        <span className="diary-card-index"><small>NO.</small><b>{String(index + 1).padStart(2, "0")}</b></span>
       </div>
 
       <p className="mt-1 text-[10.5px] text-ink-ghost">
@@ -476,13 +476,11 @@ function DiaryCard({
 
 function EntryReader({
   entry,
-  index,
   onClose,
   onEdit,
   onDelete,
 }: {
   entry: DiaryEntry;
-  index: number;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -518,7 +516,7 @@ function EntryReader({
                   {MON_EN[d.getMonth()]}
                 </span>
               </div>
-              <PlantMark i={Math.max(index, 0)} size={56} />
+              <span className="diary-reader-mark"><small>DAY</small><b>{String(d.getDate()).padStart(2, "0")}</b><i>{MON_EN[d.getMonth()]}</i></span>
             </div>
 
             <p className="mt-3 text-[11px] text-ink-ghost">
@@ -633,54 +631,6 @@ function WriteSheet({
         <IconCheck width={14} height={14} /> 存到这一天
       </button>
     </Sheet>
-  );
-}
-
-/* ---------------- 小图 ---------------- */
-
-/** 卡片右下角那朵花：1 线宽的手绘感，只做呼吸感。 */
-function PlantMark({ i, size = 38 }: { i: number; size?: number }) {
-  const kind = i % 3;
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="0.9"
-      strokeLinecap="round"
-      className="plant-mark flex-none"
-      aria-hidden
-    >
-      {kind === 0 && (
-        <g transform="translate(24 21)">
-          {[0, 60, 120, 180, 240, 300].map((a) => (
-            <ellipse key={a} rx="3.6" ry="8.4" transform={`rotate(${a}) translate(0 -8.2)`} />
-          ))}
-          <circle r="2.3" />
-          <path d="M0 10v11" />
-          <path d="M0 21c3.4 0 5.6-2 6-4.4" />
-        </g>
-      )}
-      {kind === 1 && (
-        <g>
-          <path d="M14 11c0 10 4 14.5 10 14.5S34 21 34 11" />
-          <path d="M19 9.5c1.4 3.2 2.9 4.6 5 4.6s3.6-1.4 5-4.6" />
-          <path d="M24 25.5V40" />
-          <path d="M24 32c-3.6 0-6-2.2-6.6-5.4" />
-          <path d="M24 36c3.2 0 5.4-1.8 6-4.4" />
-        </g>
-      )}
-      {kind === 2 && (
-        <g>
-          <path d="M24 42V11" />
-          <path d="M24 23c-7 0-10.5-4.4-10.5-10.5C20.5 12.5 24 17 24 23Z" />
-          <path d="M24 31c7 0 10.5-4.4 10.5-10.5C27.5 20.5 24 25 24 31Z" />
-          <circle cx="24" cy="9.5" r="1.6" />
-        </g>
-      )}
-    </svg>
   );
 }
 
