@@ -12,101 +12,95 @@
 
 :root,
 [data-theme="day"] {
-  /* 底：暖白，不是 Canoe 的冷灰白 */
-  --bg: #fbf7f4;
-  --bg-deep: #f4eeea;
-  --surface: #ffffff;
-  --surface-2: #f6f1ed; /* 暖灰填充面 */
+  /* 月白典藏：冷净纸白、雾蓝墨色与银蓝作为全站基础色 */
+  --bg: #f4f8fb;
+  --bg-deep: #edf3f7;
+  --surface: #fbfdff;
+  --surface-2: #eaf1f6;
 
-  /* 暖墨色与三级灰 */
-  --ink: #221c18;
-  --ink-soft: #6f655e;
-  --ink-faint: #9a8f86;
-  --ink-ghost: #c2b6ad;
+  --ink: #243746;
+  --ink-soft: #607587;
+  --ink-faint: #8da1b1;
+  --ink-ghost: #b8c6d0;
 
-  /* 发丝线：暖调 */
-  --line: rgba(40, 30, 28, 0.08);
-  --line-strong: rgba(40, 30, 28, 0.15);
+  --line: rgba(75, 108, 133, 0.10);
+  --line-strong: rgba(75, 108, 133, 0.18);
 
-  /* 品牌色：呼应「红线」主题的柔绯红，全站记忆点 */
-  --accent: #e2605f;
-  --accent-deep: #c24a48;
-  --accent-soft: rgba(226, 96, 95, 0.12);
+  --accent: #789bb8;
+  --accent-deep: #587d9c;
+  --accent-soft: rgba(120, 155, 184, 0.15);
   --accent-ink: #ffffff;
-  --danger: #e2605f;
+  --danger: #c87979;
 
-  /* 气泡 */
-  --peer-bubble: #f6f1ed;
-  --peer-bubble-ink: #221c18;
-  --mine-bubble: #1c1714;
+  --peer-bubble: #eaf1f6;
+  --peer-bubble-ink: #243746;
+  --mine-bubble: #6689a8;
   --mine-bubble-ink: #ffffff;
 
-  --primary: #e7ded8;
+  --primary: #dce8f0;
   --on-ink: #ffffff;
-  --tint-rgb: 34, 28, 24;
+  --tint-rgb: 36, 55, 70;
 
-  --shadow-card: 0 1px 2px rgba(40, 30, 28, 0.05);
-  --shadow-float: 0 8px 28px -10px rgba(40, 30, 28, 0.18);
-  --shadow-bar: 0 -1px 0 rgba(40, 30, 28, 0.06);
-  --shadow-glass: 0 12px 32px -16px rgba(40, 30, 28, 0.28);
+  --shadow-card: 0 1px 2px rgba(48, 76, 98, 0.05);
+  --shadow-float: 0 8px 28px -10px rgba(48, 76, 98, 0.18);
+  --shadow-bar: 0 -1px 0 rgba(75, 108, 133, 0.08);
+  --shadow-glass: 0 12px 32px -16px rgba(48, 76, 98, 0.22);
 
-  /* 磨砂玻璃容器：更实一点，透出的杂色更少，材质更干净 */
-  --glass-bg: rgba(255, 255, 255, 0.62);
-  --glass-bg-strong: rgba(255, 255, 255, 0.76);
-  --glass-border: rgba(255, 255, 255, 0.65);
-  --glass-sheen: rgba(255, 255, 255, 0.5);
-  --glass-blur: 20px;
+  /* 轻薄磨砂：保留内容清晰度，不用厚重模糊堆质感 */
+  --glass-bg: rgba(250, 253, 255, 0.66);
+  --glass-bg-strong: rgba(250, 253, 255, 0.84);
+  --glass-border: rgba(255, 255, 255, 0.78);
+  --glass-sheen: rgba(255, 255, 255, 0.58);
+  --glass-blur: 16px;
 
-  --f-display: "Noto Sans SC", -apple-system, BlinkMacSystemFont,
-    "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
-  --f-serif: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "PingFang SC",
-    "Microsoft YaHei", sans-serif;
-  --f-sans: var(--f-display);
+  --f-display: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+  --f-serif: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --f-sans: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
 
   color-scheme: light;
 }
 
-/* 夜间不是反色，是另一套：黑底 + 抬起的灰面 + 发丝线 */
+/* 夜间：深海蓝与银雾，不做简单反色 */
 [data-theme="night"] {
-  --bg: #14110f;
-  --bg-deep: #0c0a08;
-  --surface: #1e1a17;
-  --surface-2: #28231f;
+  --bg: #101d29;
+  --bg-deep: #0b1620;
+  --surface: #192a39;
+  --surface-2: #223748;
 
-  --ink: #f6f0eb;
-  --ink-soft: rgba(246, 240, 235, 0.66);
-  --ink-faint: rgba(246, 240, 235, 0.42);
-  --ink-ghost: rgba(246, 240, 235, 0.24);
+  --ink: #edf4f8;
+  --ink-soft: rgba(230, 240, 247, 0.72);
+  --ink-faint: rgba(210, 226, 237, 0.48);
+  --ink-ghost: rgba(196, 215, 229, 0.28);
 
-  --line: rgba(255, 240, 232, 0.09);
-  --line-strong: rgba(255, 240, 232, 0.16);
+  --line: rgba(207, 227, 240, 0.10);
+  --line-strong: rgba(207, 227, 240, 0.18);
 
-  --accent: #f0807a;
-  --accent-deep: #e2605f;
-  --accent-soft: rgba(240, 128, 122, 0.16);
-  --accent-ink: #2a0f0d;
-  --danger: #f0807a;
+  --accent: #91b3cf;
+  --accent-deep: #7095b5;
+  --accent-soft: rgba(145, 179, 207, 0.17);
+  --accent-ink: #102131;
+  --danger: #d48a8a;
 
-  --peer-bubble: #28231f;
-  --peer-bubble-ink: #f6f0eb;
-  --mine-bubble: #f6f0eb;
-  --mine-bubble-ink: #14110f;
+  --peer-bubble: #263c4e;
+  --peer-bubble-ink: #edf4f8;
+  --mine-bubble: #b8d0e2;
+  --mine-bubble-ink: #142432;
 
-  --primary: #342d28;
-  --on-ink: #14110f;
-  --tint-rgb: 246, 240, 235;
+  --primary: #30495d;
+  --on-ink: #102131;
+  --tint-rgb: 237, 244, 248;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-float: 0 10px 30px -12px rgba(0, 0, 0, 0.7);
-  --shadow-bar: 0 -1px 0 rgba(255, 240, 232, 0.07);
-  --shadow-glass: 0 16px 36px -16px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.34);
+  --shadow-float: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
+  --shadow-bar: 0 -1px 0 rgba(207, 227, 240, 0.08);
+  --shadow-glass: 0 16px 36px -16px rgba(0, 0, 0, 0.52);
 
-  /* 磨砂玻璃容器（夜间：深色半透明，柔光透出更克制） */
-  --glass-bg: rgba(38, 32, 28, 0.56);
-  --glass-bg-strong: rgba(40, 34, 30, 0.72);
-  --glass-border: rgba(255, 240, 232, 0.12);
-  --glass-sheen: rgba(255, 240, 232, 0.07);
-  --glass-blur: 20px;
+  --glass-bg: rgba(27, 47, 64, 0.62);
+  --glass-bg-strong: rgba(31, 53, 71, 0.82);
+  --glass-border: rgba(203, 224, 239, 0.14);
+  --glass-sheen: rgba(230, 242, 250, 0.07);
+  --glass-blur: 16px;
 
   color-scheme: dark;
 }
@@ -119,7 +113,7 @@
   --glass-hi: var(--glass-bg-strong);
   --glass-solid: var(--glass-bg-strong);
   --glass-soft: var(--glass-bg);
-  --sheen: rgba(255, 255, 255, 0.55);
+  --sheen: rgba(255, 255, 255, 0.58);
   --crimson: var(--accent);
   --crimson-deep: var(--accent-deep);
 }
@@ -185,8 +179,8 @@ body {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(58% 42% at 84% -8%, rgba(235, 205, 190, 0.5) 0%, transparent 60%),
-    radial-gradient(48% 40% at 4% 1%, rgba(226, 96, 95, 0.06) 0%, transparent 58%),
+    radial-gradient(58% 42% at 84% -8%, rgba(177, 207, 226, 0.42) 0%, transparent 60%),
+    radial-gradient(48% 40% at 4% 1%, rgba(133, 174, 202, 0.08) 0%, transparent 58%),
     var(--bg);
   overflow: hidden;
   transition: background 0.45s ease;
@@ -230,8 +224,8 @@ body {
 /* 夜间：沉底 + 单色柔光，磨砂玻璃的透彩感克制 */
 [data-theme="night"] .app-bg {
   background:
-    radial-gradient(60% 44% at 86% -8%, rgba(86, 66, 62, 0.6) 0%, transparent 60%),
-    radial-gradient(50% 42% at 6% 1%, rgba(226, 96, 95, 0.1) 0%, transparent 58%),
+    radial-gradient(60% 44% at 86% -8%, rgba(82, 125, 157, 0.34) 0%, transparent 60%),
+    radial-gradient(50% 42% at 6% 1%, rgba(112, 153, 184, 0.08) 0%, transparent 58%),
     var(--bg);
 }
 
@@ -300,8 +294,8 @@ body {
   border: 1px solid var(--line);
   border-radius: 24px;
   box-shadow:
-    0 1px 1px rgba(40, 30, 28, 0.04),
-    0 10px 26px -14px rgba(40, 30, 28, 0.2),
+    0 1px 1px rgba(48, 76, 98, 0.04),
+    0 10px 26px -14px rgba(48, 76, 98, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
   transition:
     background-color 0.3s ease,
@@ -349,8 +343,8 @@ body {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 1px 1px rgba(40, 30, 28, 0.04),
-    0 10px 22px -16px rgba(40, 30, 28, 0.35);
+    0 1px 1px rgba(48, 76, 98, 0.04),
+    0 10px 22px -16px rgba(48, 76, 98, 0.35);
 }
 
 /* 对方：更透的磨砂白，像隔着玻璃 */
@@ -358,18 +352,18 @@ body {
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow:
-    0 1px 1px rgba(40, 30, 28, 0.03),
-    0 10px 22px -18px rgba(40, 30, 28, 0.3);
+    0 1px 1px rgba(48, 76, 98, 0.03),
+    0 10px 22px -18px rgba(48, 76, 98, 0.3);
 }
 
 /* 夜间：深色磨砂，保持同样的层次差 */
 [data-theme="night"] .user-bubble {
   background: rgba(84, 75, 68, 0.92);
-  border-color: rgba(255, 240, 232, 0.11);
+  border-color: rgba(219, 236, 247, 0.11);
 }
 [data-theme="night"] .assistant-bubble {
   background: rgba(56, 49, 43, 0.78);
-  border-color: rgba(255, 240, 232, 0.08);
+  border-color: rgba(219, 236, 247, 0.08);
 }
 
 /* 输入胶囊：参考图底部那条悬浮的白胶囊 */
@@ -377,14 +371,14 @@ body {
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 1px 1px rgba(40, 30, 28, 0.04),
-    0 12px 26px -18px rgba(40, 30, 28, 0.32);
+    0 1px 1px rgba(48, 76, 98, 0.04),
+    0 12px 26px -18px rgba(48, 76, 98, 0.32);
   -webkit-backdrop-filter: blur(18px) saturate(150%);
   backdrop-filter: blur(18px) saturate(150%);
 }
 [data-theme="night"] .composer-pill {
   background: rgba(56, 49, 44, 0.9);
-  border-color: rgba(255, 240, 232, 0.1);
+  border-color: rgba(219, 236, 247, 0.1);
 }
 
 /* 顶栏圆钮：参考图左右那两颗白色小圆 */
@@ -399,13 +393,13 @@ body {
   color: var(--ink-soft);
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 6px 16px -12px rgba(40, 30, 28, 0.35);
+  box-shadow: 0 6px 16px -12px rgba(48, 76, 98, 0.35);
   -webkit-backdrop-filter: blur(14px) saturate(150%);
   backdrop-filter: blur(14px) saturate(150%);
 }
 [data-theme="night"] .chat-round {
   background: rgba(56, 49, 44, 0.75);
-  border-color: rgba(255, 240, 232, 0.1);
+  border-color: rgba(219, 236, 247, 0.1);
 }
 
 /* ---------------- 排版 ---------------- */
@@ -927,18 +921,18 @@ textarea:focus {
   border: 1px solid var(--glass-border);
   border-radius: 26px;
   box-shadow:
-    0 22px 52px -26px rgba(40, 30, 28, 0.42),
+    0 22px 52px -26px rgba(48, 76, 98, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 [data-theme="night"] .glass-cover {
   background:
-    linear-gradient(160deg, rgba(255, 240, 232, 0.06) 0%, transparent 36%) no-repeat,
+    linear-gradient(160deg, rgba(219, 236, 247, 0.06) 0%, transparent 36%) no-repeat,
     linear-gradient(180deg, rgba(226, 96, 95, 0.12), rgba(86, 66, 62, 0.05)),
     var(--glass-bg);
   box-shadow:
     0 22px 54px -24px rgba(0, 0, 0, 0.7),
-    inset 0 1px 0 rgba(255, 240, 232, 0.08);
+    inset 0 1px 0 rgba(219, 236, 247, 0.08);
 }
 
 /* 栏目眉题：编号 + 大写英文 + 右侧细线，编辑式分栏标记 */
@@ -1081,10 +1075,10 @@ textarea:focus {
     linear-gradient(165deg, var(--tile-a, #fff) 0%, var(--tile-b, #f7ece5) 100%);
   border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 1px 2px rgba(40, 30, 28, 0.06),
-    0 9px 18px -10px rgba(40, 30, 28, 0.3),
+    0 1px 2px rgba(48, 76, 98, 0.06),
+    0 9px 18px -10px rgba(48, 76, 98, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -10px 16px -12px rgba(40, 30, 28, 0.1);
+    inset 0 -10px 16px -12px rgba(48, 76, 98, 0.1);
   color: var(--ink-soft);
   transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -1107,7 +1101,7 @@ textarea:focus {
   );
   border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow:
-    0 1px 2px rgba(40, 30, 28, 0.05),
+    0 1px 2px rgba(48, 76, 98, 0.05),
     0 14px 30px -14px rgba(190, 120, 110, 0.28);
 }
 
@@ -1131,8 +1125,8 @@ textarea:focus {
   border-radius: 72px 72px 22px 22px;
   overflow: hidden;
   box-shadow:
-    0 1px 1px rgba(40, 30, 28, 0.04),
-    0 12px 28px -14px rgba(40, 30, 28, 0.24),
+    0 1px 1px rgba(48, 76, 98, 0.04),
+    0 12px 28px -14px rgba(48, 76, 98, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
@@ -1142,7 +1136,7 @@ textarea:focus {
   padding: 6px 6px 18px;
   border-radius: 8px;
   box-shadow:
-    0 6px 16px -8px rgba(40, 30, 28, 0.28),
+    0 6px 16px -8px rgba(48, 76, 98, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 .polaroid .ph {
@@ -1180,7 +1174,7 @@ textarea:focus {
 .chat-menu {
   background: color-mix(in srgb, var(--surface) 95%, transparent);
   border: 1px solid var(--line);
-  box-shadow: 0 24px 48px -26px rgba(40, 30, 28, 0.5);
+  box-shadow: 0 24px 48px -26px rgba(48, 76, 98, 0.5);
   -webkit-backdrop-filter: blur(26px) saturate(160%);
   backdrop-filter: blur(26px) saturate(160%);
 }
@@ -1189,7 +1183,7 @@ textarea:focus {
 .sheet-panel {
   background: color-mix(in srgb, var(--surface) 97%, transparent);
   border-top: 1px solid var(--glass-border);
-  box-shadow: 0 -18px 44px -24px rgba(40, 30, 28, 0.4);
+  box-shadow: 0 -18px 44px -24px rgba(48, 76, 98, 0.4);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
   backdrop-filter: blur(28px) saturate(160%);
   animation: sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -1280,7 +1274,7 @@ textarea:focus {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 22px;
-  box-shadow: 0 1px 2px rgba(40, 30, 28, 0.035);
+  box-shadow: 0 1px 2px rgba(48, 76, 98, 0.035);
 }
 
 /* 日记卡：无标题，大数字压左上，摘要三行，底部一条发丝线 */
@@ -1290,8 +1284,8 @@ textarea:focus {
   border-radius: 20px;
   padding: 17px 18px 13px;
   box-shadow:
-    0 1px 1px rgba(40, 30, 28, 0.035),
-    0 14px 30px -24px rgba(40, 30, 28, 0.38);
+    0 1px 1px rgba(48, 76, 98, 0.035),
+    0 14px 30px -24px rgba(48, 76, 98, 0.38);
   transition:
     transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.24s ease;
@@ -1326,8 +1320,8 @@ textarea:focus {
   background: var(--surface);
   border-radius: 20px;
   box-shadow:
-    0 1px 1px rgba(40, 30, 28, 0.05),
-    0 30px 60px -30px rgba(40, 30, 28, 0.45);
+    0 1px 1px rgba(48, 76, 98, 0.05),
+    0 30px 60px -30px rgba(48, 76, 98, 0.45);
 }
 [data-theme="night"] .keepsake {
   box-shadow:
@@ -1390,7 +1384,7 @@ textarea:focus {
 .sheet-solid {
   background: color-mix(in srgb, var(--surface) 98%, transparent);
   border-top: 1px solid var(--glass-border);
-  box-shadow: 0 -18px 44px -24px rgba(40, 30, 28, 0.4);
+  box-shadow: 0 -18px 44px -24px rgba(48, 76, 98, 0.4);
 }
 
 
