@@ -46,3 +46,56 @@
 [data-theme="night"] .moments-composer textarea{color:#e5eff5}
 [data-theme="night"] .moments-person-switch button.is-active{background:#789db7;color:#102131}
 @media(max-width:560px){.moments-journal{padding:12px 16px 104px}.moments-cover{min-height:220px;padding:32px 0 27px}.moments-cover h1{font-size:40px}.moments-cover-mark{right:0;top:47px;width:82px;height:82px;opacity:.72}.moments-cover-mark span{font-size:26px}.moments-cover-mark:before{inset:7px}.moments-cover-copy>p:last-child{max-width:245px;font-size:11px}.moments-compose-section,.moments-feed-section{padding:25px 0 0}.moments-composer{padding:15px}.moments-post{grid-template-columns:30px minmax(0,1fr);gap:10px;padding:19px 0}.moments-section-title h2{font-size:20px}}
+
+
+/* Re-art direction: an open journal spread with one strong focal point. */
+.moments-journal{
+  width:100%;max-width:1180px;margin-inline:auto;
+  padding:clamp(20px,4vw,54px) clamp(22px,6vw,86px) 72px;
+  background:
+    radial-gradient(ellipse at 83% 9%,rgba(163,197,213,.2),transparent 28%),
+    linear-gradient(180deg,rgba(250,253,254,.82),rgba(241,247,249,.28) 62%,transparent);
+}
+.moments-masthead{min-height:42px;letter-spacing:.24em}
+.moments-cover{
+  min-height:clamp(320px,38vw,470px);
+  display:flex;align-items:center;
+  padding:clamp(50px,8vw,104px) 5% 66px;
+  border-bottom:1px solid rgba(103,146,169,.22);
+  position:relative;isolation:isolate;overflow:hidden;
+}
+.moments-cover:after{
+  content:"";position:absolute;z-index:-1;right:9%;top:50%;transform:translateY(-50%);
+  width:clamp(210px,30vw,360px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 33% 25%,rgba(255,255,255,.98),transparent 24%),radial-gradient(circle at 65% 64%,rgba(83,120,141,.19),transparent 18%),radial-gradient(circle at 42% 43%,#f4f8f9 0%,#d8e5ea 48%,#aec4cf 69%,#e4edf0 74%);
+  box-shadow:inset -20px -22px 40px rgba(69,105,123,.12),0 28px 65px rgba(59,95,116,.13);
+}
+.moments-cover-copy{position:relative;z-index:1;max-width:610px}
+.moments-cover h1{font-size:clamp(58px,9vw,100px);line-height:1.08;letter-spacing:.16em}
+.moments-cover-copy>p:last-child{max-width:390px;font-size:13px;line-height:2.2}
+.moments-cover-mark{width:clamp(82px,10vw,126px);height:clamp(82px,10vw,126px);right:4%;top:12%;opacity:.7}
+.moments-compose-section,.moments-feed-section{padding:clamp(32px,4vw,54px) 5% 0}
+.moments-section-title{margin-bottom:22px}
+.moments-section-title h2{font-size:clamp(24px,3vw,34px)}
+.moments-composer{padding:clamp(20px,3vw,34px);border-radius:2px;box-shadow:0 24px 60px -42px rgba(45,84,108,.3)}
+.moments-composer textarea{min-height:112px;font-size:14px}
+.moments-compose-foot button{padding:12px 20px;letter-spacing:.12em}
+.moments-feed{margin-top:8px}
+.moments-post{grid-template-columns:58px minmax(0,1fr);gap:22px;padding:30px 5px}
+.moments-post-text{font-size:15px;line-height:2.2;max-width:720px}
+.moments-post-head strong{font-size:12px}
+.moments-avatar{width:40px;height:40px}
+.moments-footer{padding-top:30px;margin-top:46px;letter-spacing:.18em}
+[data-theme="night"] .moments-journal{background:radial-gradient(ellipse at 83% 8%,rgba(83,126,150,.2),transparent 32%),linear-gradient(180deg,#172b3a,#112330 68%,#142735);border-color:rgba(170,204,220,.16)}
+[data-theme="night"] .moments-cover:after{opacity:.38;filter:brightness(.72)}
+@media(max-width:560px){
+ .moments-journal{padding:12px 18px 108px}
+ .moments-cover{min-height:295px;padding:46px 0 54px}
+ .moments-cover h1{font-size:clamp(48px,14vw,64px);letter-spacing:.12em}
+ .moments-cover:after{width:190px;right:-42px;top:48%;opacity:.58}
+ .moments-cover-mark{right:2px;top:22px}
+ .moments-cover-copy>p:last-child{max-width:255px}
+ .moments-compose-section,.moments-feed-section{padding:30px 0 0}
+ .moments-post{grid-template-columns:30px minmax(0,1fr);gap:12px;padding:22px 0}
+ .moments-post-text{font-size:14px}
+}
