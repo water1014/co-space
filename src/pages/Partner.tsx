@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BackButton } from "../components/ui/BackButton";
+import "./partner-editorial.css";
 import { useBoundaryStore } from "../stores/boundaryStore";
 import { useLifeStore } from "../stores/lifeStore";
 import { daysTogether } from "../lib/life/derive";

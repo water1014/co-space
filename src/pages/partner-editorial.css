@@ -1,0 +1,182 @@
+/* Moonlit companion archive — cool paper, mist-blue ink, restrained glass. */
+.partner-archive{
+  --archive-ink:#294253;
+  --archive-muted:#8197a6;
+  --archive-blue:#789db7;
+  --archive-rule:rgba(112,157,179,.22);
+  background:
+    radial-gradient(ellipse at 88% 4%,rgba(169,205,224,.42),transparent 32%),
+    radial-gradient(ellipse at 4% 28%,rgba(211,229,239,.38),transparent 36%),
+    linear-gradient(180deg,#f7fafc 0%,#f2f7fa 48%,#edf3f7 100%);
+  color:var(--archive-ink);
+}
+.partner-archive .archive-atmosphere{
+  opacity:.48;
+  background-image:
+    radial-gradient(circle at 88% 7%,transparent 0 82px,rgba(119,162,183,.2) 83px,transparent 84px),
+    radial-gradient(circle at 88% 7%,transparent 0 108px,rgba(119,162,183,.11) 109px,transparent 110px),
+    linear-gradient(115deg,transparent 0 49.9%,rgba(119,162,183,.07) 50%,transparent 50.1%);
+}
+.partner-archive .archive-wordmark i,
+.partner-archive .archive-heading h1 span,
+.partner-archive .archive-persona-heading h2 span{color:#83a9c0}
+.partner-archive .archive-kicker,
+.partner-archive .archive-section-meta,
+.partner-archive .archive-eyebrow{color:#83a5b9}
+.partner-archive .archive-heading{border-color:rgba(119,162,183,.24)}
+.partner-archive .archive-heading h1,
+.partner-archive .archive-identity-content h2,
+.partner-archive .archive-time-copy h2,
+.partner-archive .archive-persona-heading h2,
+.partner-archive .archive-milestone-intro h2,
+.partner-archive .archive-milestone-list h3{color:#294253}
+.partner-archive .archive-lede,
+.partner-archive .archive-time-note,
+.partner-archive .archive-milestone-intro>p{color:#7f95a4}
+.partner-archive .archive-seal{
+  border-color:rgba(119,162,183,.38);color:#789db7;
+  box-shadow:inset 0 0 0 5px rgba(255,255,255,.55);
+}
+.partner-archive .archive-seal:before{border-color:rgba(119,162,183,.2)}
+.partner-archive .archive-identity{
+  background:rgba(250,253,255,.82);
+  border:1px solid rgba(255,255,255,.96);
+  box-shadow:0 24px 65px -48px rgba(48,91,112,.28),0 1px 0 rgba(135,171,192,.13);
+}
+.partner-archive .archive-identity-art{
+  background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.96),transparent 59%),linear-gradient(145deg,#edf5f9,#dceaf2);
+  border-color:rgba(119,162,183,.18);
+}
+.partner-archive .archive-identity-art:before{border-color:rgba(119,162,183,.24)}
+.partner-archive .archive-identity-art:after{border-color:rgba(119,162,183,.13)}
+.partner-archive .archive-portrait{
+  background:linear-gradient(145deg,#fff,#e5f0f6 55%,#c8dce8);
+  box-shadow:0 18px 38px -23px rgba(48,91,112,.36),0 0 0 1px rgba(255,255,255,.85);
+}
+.partner-archive .archive-portrait>span{background:linear-gradient(145deg,#fff,#dceaf2);color:#789db7}
+.partner-archive .archive-upload{background:#789db7;box-shadow:0 4px 12px rgba(48,91,112,.2)}
+.partner-archive .archive-art-caption{color:#83a5b9}
+.partner-archive .archive-section-meta{border-color:rgba(119,162,183,.2)}
+.partner-archive .archive-identity-content h2 small{color:#8da4b2}
+.partner-archive .archive-fields label,
+.partner-archive .archive-date-control label,
+.partner-archive .archive-milestone-form label{color:#7891a2}
+.partner-archive .archive-fields input,
+.partner-archive .archive-date-control input,
+.partner-archive .archive-milestone-form input{
+  color:#294253;border-color:rgba(119,162,183,.25);
+}
+.partner-archive .archive-fields input:focus,
+.partner-archive .archive-date-control input:focus,
+.partner-archive .archive-milestone-form input:focus{border-color:#729bb6}
+.partner-archive .archive-button{
+  border:1px solid rgba(104,148,177,.48);
+  background:linear-gradient(110deg,#fff,rgba(220,236,245,.78));
+  color:#557991;
+  box-shadow:0 8px 22px -17px rgba(48,91,112,.38),inset 0 1px 0 #fff;
+}
+.partner-archive .archive-button:hover{background:#fff;border-color:#789db7}
+.partner-archive .archive-time{border-color:rgba(119,162,183,.22)}
+.partner-archive .archive-counter{color:#7198b2}
+.partner-archive .archive-counter strong{font-size:clamp(54px,8vw,76px);font-weight:300}
+.partner-archive .archive-counter span{color:#8da5b4}
+.partner-archive .archive-date-control{border-color:rgba(119,162,183,.22)}
+.partner-archive .archive-text-button{color:#648ba5}
+.partner-archive .archive-persona{
+  background:rgba(250,253,255,.72);
+  border-top:1px solid rgba(255,255,255,.96);
+  border-bottom:1px solid rgba(119,162,183,.2);
+  box-shadow:0 16px 45px -42px rgba(48,91,112,.24);
+}
+.partner-archive .archive-persona-heading>p{color:#7f95a4}
+.partner-archive .archive-persona-fields label{color:#526e81}
+.partner-archive .archive-persona-fields label span{color:#8eafc3}
+.partner-archive .archive-persona-fields textarea,
+.partner-archive .archive-milestone-form textarea{
+  border-color:rgba(119,162,183,.22);
+  background:rgba(246,251,253,.88);
+  color:#294253;border-radius:2px;
+}
+.partner-archive .archive-persona-fields textarea:focus,
+.partner-archive .archive-milestone-form textarea:focus{border-color:rgba(104,153,181,.68);background:#fff}
+.partner-archive .archive-persona-foot{border-color:rgba(119,162,183,.2)}
+.partner-archive .archive-persona-foot p{color:#879ba8}
+.partner-archive .archive-milestone-list{border-color:rgba(119,162,183,.22)}
+.partner-archive .archive-milestone-list article{border-color:rgba(119,162,183,.18)}
+.partner-archive .archive-storyline:before{background:linear-gradient(180deg,rgba(126,170,193,.12),rgba(126,170,193,.55) 18%,rgba(126,170,193,.28) 82%,transparent)}
+.partner-archive .archive-story:before{border-color:#83a9c0;background:#f8fcfe;box-shadow:0 0 0 4px rgba(131,169,192,.1)}
+.partner-archive .archive-story-index{color:#8baabd}
+.partner-archive .archive-story-date strong{color:#7198b2}
+.partner-archive .archive-story-date span{color:#8299a8}
+.partner-archive .archive-story-kind{color:#86a9bc}
+.partner-archive .archive-story-content h3{color:#294253}
+.partner-archive .archive-story-content p{color:#7f95a4}
+.partner-archive .archive-story-content time{color:#91a7b5}
+.partner-archive .archive-story>button{color:#91a7b5}
+.partner-archive .archive-empty{color:#8eafc3}
+.partner-archive .archive-footer{border-color:rgba(119,162,183,.2);color:#8299a8}
+.partner-archive .archive-footer i{color:#83a9c0}
+.partner-archive .archive-footer p{color:#8b9eaa}
+.partner-archive .archive-feedback{border-left-color:#83a9c0;background:rgba(250,253,255,.84);color:#557991}
+.partner-archive .archive-feedback.is-error{border-left-color:#c98282;color:#a15e5e}
+.partner-archive .archive-button:focus-visible,
+.partner-archive .archive-text-button:focus-visible,
+.partner-archive .archive-upload:focus-within,
+.partner-archive input:focus-visible,
+.partner-archive textarea:focus-visible{outline:2px solid rgba(111,166,190,.72);outline-offset:3px}
+[data-theme="night"] .partner-archive{
+  --archive-ink:#e1edf4;--archive-muted:#9bb5c6;--archive-rule:rgba(157,194,210,.18);
+  background:
+    radial-gradient(ellipse at 84% 5%,rgba(82,128,157,.24),transparent 34%),
+    linear-gradient(180deg,#172a3a,#122333 58%,#192d3d);
+  color:#dce8ef;
+}
+[data-theme="night"] .partner-archive .archive-heading h1,
+[data-theme="night"] .partner-archive .archive-identity-content h2,
+[data-theme="night"] .partner-archive .archive-time-copy h2,
+[data-theme="night"] .partner-archive .archive-persona-heading h2,
+[data-theme="night"] .partner-archive .archive-milestone-intro h2,
+[data-theme="night"] .partner-archive .archive-milestone-list h3,
+[data-theme="night"] .partner-archive .archive-story-content h3{color:#e1edf4}
+[data-theme="night"] .partner-archive .archive-identity,
+[data-theme="night"] .partner-archive .archive-persona{background:rgba(25,48,66,.78);border-color:rgba(170,202,222,.13)}
+[data-theme="night"] .partner-archive .archive-identity-art{background:radial-gradient(ellipse at 50% 40%,rgba(105,154,184,.34),transparent 58%),linear-gradient(145deg,rgba(45,75,96,.9),rgba(27,51,70,.7))}
+[data-theme="night"] .partner-archive .archive-fields input,
+[data-theme="night"] .partner-archive .archive-date-control input,
+[data-theme="night"] .partner-archive .archive-milestone-form input{color:#e1edf4;border-color:rgba(157,194,210,.2)}
+[data-theme="night"] .partner-archive .archive-persona-fields textarea,
+[data-theme="night"] .partner-archive .archive-milestone-form textarea{background:rgba(12,28,42,.58);border-color:rgba(151,184,205,.2);color:#e1edf4}
+[data-theme="night"] .partner-archive .archive-button{background:rgba(100,148,178,.18);color:#c9e0ed;border-color:rgba(157,194,210,.25)}
+[data-theme="night"] .partner-archive .archive-story:before{background:#20384a;border-color:#91b7cf}
+[data-theme="night"] .partner-archive .archive-story-date strong{color:#a6c6da}
+[data-theme="night"] .partner-archive .archive-story-date span,
+[data-theme="night"] .partner-archive .archive-story-content p,
+[data-theme="night"] .partner-archive .archive-story-content time{color:#9bb5c6}
+[data-theme="night"] .partner-archive .archive-feedback{background:rgba(25,48,66,.88);color:#c9e0ed}
+@media(max-width:640px){
+  .partner-archive .archive-wrap{padding-left:18px;padding-right:18px}
+  .partner-archive .archive-heading{gap:14px;padding-top:30px}
+  .partner-archive .archive-seal{flex:none}
+  .partner-archive .archive-identity{grid-template-columns:1fr}
+  .partner-archive .archive-identity-art{min-height:208px}
+  .partner-archive .archive-time{grid-template-columns:1fr 1fr;gap:14px}
+  .partner-archive .archive-date-control{padding-left:12px}
+  .partner-archive .archive-persona-fields{gap:16px}
+  .partner-archive .archive-milestones{gap:22px}
+  .partner-archive .archive-story{grid-template-columns:26px 56px minmax(0,1fr) 20px;gap:9px}
+  .partner-archive .archive-storyline:before{left:45px}
+  .partner-archive .archive-story:before{left:40px}
+  .partner-archive .archive-story-date strong{font-size:30px}
+}
+@media(max-width:360px){
+  .partner-archive .archive-wordmark{font-size:7px;letter-spacing:.08em}
+  .partner-archive .archive-index{font-size:7px}
+  .partner-archive .archive-seal{width:48px;height:48px;font-size:17px}
+  .partner-archive .archive-counter strong{font-size:46px}
+}
+@media(prefers-reduced-transparency:reduce){
+  .partner-archive .archive-identity,.partner-archive .archive-persona{background:var(--surface);backdrop-filter:none;box-shadow:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .partner-archive *,.partner-archive *:before,.partner-archive *:after{transition:none!important}
+}
