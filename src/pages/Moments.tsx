@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconChevron, IconHeart, IconImages } from "../components/ui/icons";
 import { useText } from "../lib/content/useText";
+import "./moments-editorial.css";
 
 type Post = {
   id: string;
@@ -53,24 +54,24 @@ export function Moments() {
 
   return (
     <div className="moments-page px-5 pt-6 pb-10">
-      <div className="flex items-start gap-2 pb-2 pt-1">
+      <div className="moments-heading flex items-start gap-2 pb-2 pt-1">
         <button onClick={() => navigate(-1)} aria-label="返回" className="press mt-2 text-ink-faint">
           <IconChevron width={16} height={16} className="rotate-180" />
         </button>
         <div>
-          <h1 className="page-head-title text-[30px] leading-none text-ink">朋友圈</h1>
-          <p className="page-head-sub mt-1 text-[12.5px]">情侣动态广场 · 记录日常</p>
+          <h1 className="moments-title page-head-title text-[30px] leading-none text-ink">朋友圈</h1>
+          <p className="moments-subtitle page-head-sub mt-1 text-[12.5px]">情侣动态广场 · 记录日常</p>
         </div>
       </div>
 
       {/* 发布器 */}
-      <div className="card mt-5 rounded-3xl p-4">
+      <div className="moments-composer mt-5 p-4">
         <div className="flex gap-2">
           {(["wan", "yan"] as const).map((w) => (
             <button
               key={w}
               onClick={() => setWho(w)}
-              className={`tap rounded-full px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
+              className={`moments-person tap px-3 py-1.5 text-[12.5px] font-medium transition-colors ${
                 who === w
                   ? "bg-[var(--accent)] text-white"
                   : "bg-[var(--surface-2)] text-ink-soft"
@@ -85,9 +86,9 @@ export function Moments() {
           onChange={(e) => setDraft(e.target.value)}
           placeholder="分享此刻的一点小事…"
           rows={2}
-          className="ghost-input mt-3 w-full resize-none bg-transparent text-[14.5px] leading-[1.7] text-ink"
+          className="moments-draft ghost-input mt-3 w-full resize-none bg-transparent text-[14.5px] leading-[1.7] text-ink"
         />
-        <div className="mt-2 flex items-center justify-between border-t border-[var(--line)] pt-2.5">
+        <div className="moments-compose-foot mt-2 flex items-center justify-between border-t border-[var(--line)] pt-2.5">
           <span className="text-[12px] text-ink-ghost">
             <IconImages width={15} height={15} className="mr-1 inline" />
             图片（即将支持）
@@ -103,12 +104,12 @@ export function Moments() {
       </div>
 
       {/* 动态流 */}
-      <div className="mt-4 space-y-3">
+      <div className="moments-feed mt-6">
         {posts.map((p) => (
-          <div key={p.id} className="card rounded-3xl p-4">
-            <div className="flex items-center gap-2.5">
+          <article key={p.id} className="moments-post">
+            <div className="moments-post-head flex items-center gap-2.5">
               <span
-                className={`flex h-9 w-9 items-center justify-center rounded-full text-[14px] font-semibold ${
+                className={`moments-avatar flex h-9 w-9 items-center justify-center rounded-full text-[14px] font-semibold ${
                   p.who === "yan"
                     ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white"
                     : "bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[#9c6b52]"
@@ -123,8 +124,8 @@ export function Moments() {
                 <p className="text-[11px] text-ink-faint">{ago(p.at)}</p>
               </div>
             </div>
-            <p className="mt-2.5 text-[14.5px] leading-[1.8] text-ink">{p.text}</p>
-            <div className="mt-2.5 flex items-center gap-1.5 text-ink-faint">
+            <p className="moments-post-text mt-2.5 text-[14.5px] leading-[1.8] text-ink">{p.text}</p>
+            <div className="moments-post-actions mt-2.5 flex items-center gap-1.5 text-ink-faint">
               <IconHeart width={14} height={14} />
               <span className="text-[12px]">赞</span>
             </div>
