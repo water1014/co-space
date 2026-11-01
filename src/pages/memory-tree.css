@@ -230,3 +230,98 @@
   .mt-memory-bottom{align-items:flex-start;flex-direction:column}
 }
 @media(prefers-reduced-motion:reduce){.mt-memory-reveal,.mt-memory-sheet{animation:none}}
+
+
+/* Dear Memories — visual direction rebuilt from the supplied teacher reference. */
+.mt-memory-reveal{
+  position:fixed;z-index:80;inset:0;overflow-y:auto;overscroll-behavior:contain;
+  padding:0;background:#fbfbfa;color:#272727;animation:mt-paper-arrive .24s ease-out both;
+}
+.mt-memory-reveal::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.32;
+  background:radial-gradient(ellipse at 78% 12%,rgba(188,204,190,.22),transparent 32%),
+             linear-gradient(180deg,rgba(255,255,255,.1),rgba(240,241,239,.14));
+}
+.mt-memory-sheet{
+  position:relative;z-index:1;width:min(100%,860px);min-height:100dvh;margin:0 auto;
+  padding:clamp(24px,5vw,48px) clamp(25px,5.5vw,58px) calc(42px + env(safe-area-inset-bottom));
+  border:0;border-radius:0;background:transparent;box-shadow:none;color:#292929;
+}
+.mt-memory-close{
+  position:relative;z-index:4;width:30px;height:34px;padding:0;border:0;background:transparent;
+  color:#777;font:36px/28px Georgia,serif;text-align:left;transform:scaleX(.8);
+}
+.mt-memory-ink-branch{
+  position:absolute;top:0;right:0;width:min(66vw,520px);height:250px;overflow:hidden;
+  opacity:.56;pointer-events:none;mask-image:linear-gradient(180deg,#000 55%,transparent 100%);
+}
+.mt-memory-ink-branch svg{width:100%;height:100%;overflow:visible}
+.mt-memory-ink-branch path{fill:none;stroke:#52645c;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.mt-memory-masthead{position:relative;text-align:center;padding-top:clamp(74px,13vh,132px)}
+.mt-memory-script{
+  margin:0;color:#171717;font:italic 500 clamp(39px,8.6vw,68px)/1.16 "Snell Roundhand","Segoe Script","URW Chancery L",cursive;
+  letter-spacing:-.055em;white-space:nowrap;
+}
+.mt-memory-subtitle{display:flex;align-items:center;justify-content:center;gap:17px;margin:24px auto 0;color:#858580;font:500 13px/1.7 var(--f-serif,"Noto Serif SC",serif);letter-spacing:.42em}
+.mt-memory-subtitle i{display:block;width:clamp(28px,11vw,82px);height:1px;background:linear-gradient(90deg,transparent,#c9c9c4)}
+.mt-memory-subtitle i:last-child{transform:rotate(180deg)}
+.mt-memory-summary{margin:29px 0 0;color:#888984;font:13px/1.8 Georgia,var(--f-serif,serif);letter-spacing:.13em}
+.mt-memory-time-rail{
+  display:flex;gap:clamp(18px,4.8vw,42px);align-items:center;overflow-x:auto;white-space:nowrap;
+  margin:39px -8px 30px;padding:5px 8px 12px;scrollbar-width:none;
+  border-bottom:1px solid rgba(125,125,119,.13);
+}
+.mt-memory-time-rail::-webkit-scrollbar{display:none}
+.mt-memory-time-rail button{
+  flex:none;padding:0;border:0;background:transparent;color:#aaa9a3;
+  font:italic 14px Georgia,serif;letter-spacing:.08em;
+}
+.mt-memory-time-rail button.is-first{color:#333;font-weight:600}
+.mt-memory-list{display:block;width:100%;max-width:none}
+.mt-memory-entry{
+  padding:22px 0 20px;border:0;border-bottom:1px solid rgba(115,115,108,.20);
+}
+.mt-memory-entry-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#999992;font:12px/1.6 var(--f-serif,"Noto Serif SC",serif);letter-spacing:.08em}
+.mt-memory-entry-meta strong{color:#55564f;font-size:15px;font-weight:600;letter-spacing:.08em}
+.mt-memory-entry p{
+  margin:17px 0 0;color:#383833;font:clamp(16px,4.3vw,21px)/2.08 var(--f-serif,"Noto Serif SC",serif);
+  letter-spacing:.015em;white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.mt-memory-tags{display:flex;gap:15px;flex-wrap:wrap;margin-top:12px}
+.mt-memory-tags span{padding:0;color:#999991;font:11px var(--f-serif,serif)}
+.mt-memory-status{
+  margin-top:38px;padding:15px 0;border-top:1px solid rgba(115,115,108,.20);
+  border-bottom:1px solid rgba(115,115,108,.14);color:#777870;
+  font:15px/1.8 var(--f-serif,"Noto Serif SC",serif);letter-spacing:.04em;
+}
+.mt-memory-bottom{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin-top:clamp(60px,13vh,130px);padding:0;color:#999991;font:9px Georgia,serif;letter-spacing:.15em;
+}
+.mt-memory-bottom button{
+  padding:8px 0;border:0;background:transparent;color:#33332f;
+  font:600 15px var(--f-serif,"Noto Serif SC",serif);letter-spacing:.12em;
+}
+.mt-memory-empty{padding:38px 0;color:#8e8e87;text-align:center;font:15px/2 var(--f-serif,serif)}
+[data-theme=night] .mt-memory-reveal{background:#172027;color:#e3e8e8}
+[data-theme=night] .mt-memory-script,[data-theme=night] .mt-memory-entry p{color:#e5e8e5}
+[data-theme=night] .mt-memory-subtitle,[data-theme=night] .mt-memory-summary,
+[data-theme=night] .mt-memory-time-rail button,[data-theme=night] .mt-memory-entry-meta,
+[data-theme=night] .mt-memory-status,[data-theme=night] .mt-memory-bottom{color:#aab8b8}
+[data-theme=night] .mt-memory-entry-meta strong,[data-theme=night] .mt-memory-bottom button{color:#dce4e3}
+[data-theme=night] .mt-memory-entry{border-color:rgba(220,230,228,.17)}
+[data-theme=night] .mt-memory-status{border-color:rgba(220,230,228,.18)}
+[data-theme=night] .mt-memory-ink-branch path{stroke:#a6b9ad}
+@media(max-width:520px){
+ .mt-memory-sheet{padding:18px 25px calc(35px + env(safe-area-inset-bottom))}
+ .mt-memory-ink-branch{width:78vw;height:210px;right:-14px}
+ .mt-memory-masthead{padding-top:clamp(90px,15vh,145px)}
+ .mt-memory-subtitle{gap:12px;font-size:12px;letter-spacing:.34em}
+ .mt-memory-summary{margin-top:25px;font-size:12px}
+ .mt-memory-time-rail{margin-top:34px;margin-bottom:25px;gap:25px}
+ .mt-memory-entry{padding:20px 0 18px}
+ .mt-memory-entry p{margin-top:14px;line-height:2.05}
+ .mt-memory-status{font-size:14px}
+ .mt-memory-bottom{align-items:flex-end;flex-direction:column;margin-top:75px}
+}
+@media(prefers-reduced-motion:reduce){.mt-memory-reveal{animation:none}}
