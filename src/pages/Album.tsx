@@ -5,6 +5,7 @@ import { Portal } from "../components/ui/Portal";
 import { useAlbumStore, type Photo } from "../stores/albumStore";
 import { fileToDataUrl } from "../lib/img/resize";
 import { IconImages, IconPlus, IconClose, IconChevron } from "../components/ui/icons";
+import "./album-editorial.css";
 
 const MON_FULL = [
   "January", "February", "March", "April", "May", "June",
@@ -101,6 +102,7 @@ export function Album() {
 
       {/* 标题：September | 2026 · KEEPSAKES */}
       <div className="album-heading relative px-5 pt-4">
+        <div className="album-edition-line"><span>THE KEEPSAKE JOURNAL</span><span>VOL. 01　/　PRIVATE COLLECTION</span></div>
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-start gap-2.5">
@@ -210,7 +212,9 @@ export function Album() {
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-deep)]">
               <IconImages width={25} height={25} />
             </span>
-            <span className="text-[13px]">还没有照片。放下第一张。</span>
+            <span className="album-empty-kicker">A COLLECTION BEGINS HERE</span>
+            <strong className="album-empty-title">把值得记住的，留在这里。</strong>
+            <span className="text-[12px]">添加第一张照片，开启你的私人珍藏。</span>
           </button>
         ) : visible.length === 0 ? (
           <div className="px-2 py-20 text-center">
@@ -237,6 +241,10 @@ export function Album() {
                     loading="lazy"
                   />
                 </button>
+                <figcaption className="album-photo-caption">
+                  <span>{p.caption.trim() || "未题名的瞬间"}</span>
+                  <time>{stamp(p.at).slice(0, 10)}</time>
+                </figcaption>
               </figure>
             ))}
           </div>
