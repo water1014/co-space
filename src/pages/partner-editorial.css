@@ -180,3 +180,30 @@
 @media(prefers-reduced-motion:reduce){
   .partner-archive *,.partner-archive *:before,.partner-archive *:after{transition:none!important}
 }
+
+
+/* Companion profile: turn the identity panel into a quiet portrait stage. */
+.partner-archive .archive-wrap{
+  max-width:1180px;margin-inline:auto;
+  padding-left:clamp(22px,5vw,76px);padding-right:clamp(22px,5vw,76px);
+}
+.partner-archive .archive-heading{min-height:clamp(230px,28vw,340px);align-items:center;position:relative}
+.partner-archive .archive-heading h1{font-size:clamp(48px,8vw,88px);letter-spacing:.08em}
+.partner-archive .archive-seal{width:clamp(64px,8vw,92px);height:clamp(64px,8vw,92px)}
+.partner-archive .archive-identity{
+  grid-template-columns:minmax(240px,.85fr) minmax(0,1.15fr);
+  gap:clamp(22px,4vw,54px);padding:clamp(22px,4vw,42px);
+  border-radius:3px;box-shadow:0 26px 68px -48px rgba(45,84,108,.34);
+}
+.partner-archive .archive-identity-art{min-height:clamp(260px,32vw,420px)}
+.partner-archive .archive-identity-content h2{font-size:clamp(28px,3vw,38px)}
+.partner-archive .archive-time,.partner-archive .archive-persona,.partner-archive .archive-milestones{margin-top:clamp(36px,5vw,62px)}
+.partner-archive .archive-time-copy h2,.partner-archive .archive-persona-heading h2,.partner-archive .archive-milestone-intro h2{font-size:clamp(25px,3vw,34px)}
+.partner-archive .archive-story{padding-block:24px}
+@media(max-width:640px){
+ .partner-archive .archive-wrap{padding-left:18px;padding-right:18px}
+ .partner-archive .archive-heading{min-height:230px}
+ .partner-archive .archive-heading h1{font-size:48px}
+ .partner-archive .archive-identity{grid-template-columns:1fr;padding:16px}
+ .partner-archive .archive-identity-art{min-height:240px}
+}
