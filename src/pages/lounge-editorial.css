@@ -1,0 +1,48 @@
+/* Shared rituals — quiet blue editorial room. */
+.lounge-page{
+  max-width:760px;margin:0 auto;min-height:100%;
+  background:radial-gradient(ellipse at 100% 0%,rgba(151,185,211,.15),transparent 38%);
+}
+.lounge-heading{position:relative;padding-top:clamp(26px,5vh,42px);padding-bottom:18px;border-bottom:1px solid rgba(115,145,174,.23)}
+.lounge-heading::after{content:"";position:absolute;left:0;bottom:-1px;width:48px;height:1px;background:rgba(91,132,169,.68)}
+.lounge-intro{max-width:34rem;margin-top:22px!important;padding:0 1px;color:var(--ink-soft);font-family:"Noto Serif SC",serif;letter-spacing:.035em;line-height:2!important}
+.lounge-page>div:has(> .lounge-room-card){gap:10px!important;margin-top:22px!important}
+.lounge-room-card{
+  min-width:0;gap:11px!important;padding:20px 8px 18px!important;
+  border:1px solid rgba(130,161,190,.24)!important;border-radius:3px!important;
+  background:linear-gradient(150deg,rgba(255,255,255,.82),rgba(232,241,249,.56))!important;
+  box-shadow:0 12px 30px -24px rgba(45,76,108,.26),inset 0 1px rgba(255,255,255,.9);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.lounge-room-card:active{transform:translateY(1px)}
+.lounge-room-card:focus-visible{outline:2px solid rgba(102,145,184,.48);outline-offset:3px}
+.lounge-room-card[class*="ring-2"]{border-color:rgba(102,145,184,.56)!important;box-shadow:0 10px 28px -18px rgba(66,109,151,.3),inset 0 -2px rgba(102,145,184,.5)}
+.lounge-room-icon{width:46px!important;height:46px!important;border-radius:50%!important;background:rgba(188,213,233,.28)!important;color:#6689a9!important}
+.lounge-room-card p:first-of-type{font-family:"Noto Serif SC",serif;font-weight:500!important;letter-spacing:.1em}
+.lounge-room-card p:last-of-type{font-size:10px!important;letter-spacing:.06em}
+.lounge-empty{margin-top:25px!important;font:9px Georgia,serif;letter-spacing:.2em}
+.lounge-session{
+  margin-top:22px!important;padding:20px!important;border:1px solid rgba(130,161,190,.24)!important;border-radius:3px!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.85),rgba(233,242,249,.64))!important;
+  box-shadow:0 16px 38px -28px rgba(45,76,108,.34),inset 0 1px rgba(255,255,255,.9);
+}
+.lounge-sync{border:1px solid rgba(118,157,190,.2);border-radius:2px!important;background:rgba(189,216,237,.2)!important;color:#6486a5!important;letter-spacing:.08em}
+.lounge-sync>span{background:#7eabc8!important;box-shadow:0 0 0 3px rgba(126,171,200,.12)}
+.lounge-media-icon{border:1px solid rgba(130,161,190,.2);border-radius:2px!important;background:rgba(192,216,235,.22)!important;color:#6d91b1!important}
+.lounge-progress{height:3px!important;border-radius:0!important;background:rgba(133,163,190,.16)!important}
+.lounge-progress>div{border-radius:0!important;background:linear-gradient(90deg,#a9c8dc,#6f94b4)!important}
+.lounge-play{background:linear-gradient(145deg,#85a9c8,#5f82a4)!important;box-shadow:0 8px 18px -10px rgba(63,105,146,.65)!important}
+[data-theme="night"] .lounge-page{background:radial-gradient(ellipse at 100% 0%,rgba(103,143,181,.13),transparent 40%)}
+[data-theme="night"] .lounge-heading{border-color:rgba(157,185,211,.2)}
+[data-theme="night"] .lounge-room-card,[data-theme="night"] .lounge-session{
+  border-color:rgba(157,185,211,.19)!important;
+  background:linear-gradient(145deg,rgba(35,55,75,.82),rgba(24,42,61,.76))!important;
+  box-shadow:inset 0 1px rgba(239,247,255,.05),0 14px 32px -24px rgba(0,0,0,.3);
+}
+[data-theme="night"] .lounge-room-icon,[data-theme="night"] .lounge-media-icon{background:rgba(132,169,203,.13)!important;color:#a9c6df!important;border-color:rgba(157,185,211,.16)}
+[data-theme="night"] .lounge-sync{background:rgba(132,169,203,.12)!important;color:#b6d0e5!important;border-color:rgba(157,185,211,.17)}
+[data-theme="night"] .lounge-progress{background:rgba(157,185,211,.13)!important}
+[data-theme="night"] .lounge-progress>div{background:linear-gradient(90deg,#9abbd4,#6689ad)!important}
+@media(max-width:390px){.lounge-page{padding-left:16px;padding-right:16px}.lounge-room-card{padding:16px 5px!important}.lounge-session{padding:16px!important}}
+@media(prefers-reduced-motion:reduce){.lounge-page *{transition:none!important}}
+@media(prefers-reduced-transparency:reduce){.lounge-room-card,.lounge-session{backdrop-filter:none;background:var(--surface)!important}}
