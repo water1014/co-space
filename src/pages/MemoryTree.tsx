@@ -53,12 +53,19 @@ export function MemoryTree() {
     </section>
     {openedDay && <div className="mt-memory-reveal" role="dialog" aria-modal="true" aria-label={`${openedDay} 的记忆`} onMouseDown={(event) => { if (event.target === event.currentTarget) closeMemory(); }}>
       <section className="mt-memory-sheet">
-        <div className="mt-memory-sheet-top"><span>JING HUA SHUI YUE <i>/</i> MEMORY NOTE</span><button type="button" onClick={closeMemory} aria-label="关闭记忆">×</button></div>
-        <p className="mt-memory-kicker">A DAY PRESERVED IN TIME</p>
-        <h2>{new Date(`${openedDay}T12:00:00`).toLocaleDateString("zh-CN", {year:"numeric",month:"long",day:"numeric",weekday:"long"})}</h2>
-        <div className="mt-memory-rule"><span>{String(openedEntries.length).padStart(2,"0")} ENTRIES</span><i /></div>
-        <div className="mt-memory-list">{openedEntries.length ? openedEntries.map((entry,index) => <article className="mt-memory-entry" key={entry.id}><div className="mt-memory-entry-meta"><span>{String(index+1).padStart(2,"0")}</span><time>{new Date(entry.createdAt).toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"})}</time><span>{entry.pinned ? "✧ 已珍藏" : entry.kind === "feel" ? "心绪" : entry.kind === "todo" ? "待完成" : "记忆"}</span></div><p>{entry.text}</p>{entry.tags.length > 0 && <div className="mt-memory-tags">{entry.tags.map(tag => <span key={tag}>#{tag}</span>)}</div>}</article>) : <p className="mt-memory-empty">这一天暂时没有可显示的记忆。</p>}</div>
-        <div className="mt-memory-bottom"><span>EVERY DAY LEAVES A TRACE</span><button type="button" onClick={() => { navigate(`/memory?day=${openedDay}`); closeMemory(); }}>打开完整档案 ↗</button></div>
+        <button className="mt-memory-close" type="button" onClick={closeMemory} aria-label="关闭记忆">‹</button>
+        <div className="mt-memory-ink-branch" aria-hidden="true"><svg viewBox="0 0 520 250" role="presentation"><path d="M520 0C465 28 455 82 418 113S354 157 322 250M420 112C378 83 360 57 337 18M416 115C446 91 475 80 505 73M365 160C326 143 294 139 260 145M337 18C320 9 301 7 283 9M475 80C478 50 491 28 516 12M322 250C318 217 302 195 276 178" /><path d="M337 18c-18 5-31 18-42 38M505 73c-19-8-37-7-54 1M260 145c-12-20-30-31-53-34M276 178c-19 3-34 13-47 29" /></svg></div>
+        <header className="mt-memory-masthead">
+          <p className="mt-memory-script">Dear Memories.</p>
+          <div className="mt-memory-subtitle"><i /> <span>乔木 · 记忆档案</span> <i /></div>
+          <p className="mt-memory-summary">{openedDay.replaceAll("-",".")}　·　共 {openedEntries.length} 条　·　{openedEntries.reduce((n,e)=>n+e.text.length,0).toLocaleString("zh-CN")} 字</p>
+        </header>
+        <nav className="mt-memory-time-rail" aria-label="当天记忆时间">
+          {openedEntries.map((entry,index)=><button type="button" key={entry.id} onClick={()=>document.getElementById(`mt-memory-entry-${entry.id}`)?.scrollIntoView({behavior:"smooth",block:"center"})} className={index===0?"is-first":""}>{new Date(entry.createdAt).toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",hour12:false})}</button>)}
+        </nav>
+        <div className="mt-memory-list">{openedEntries.length ? openedEntries.map((entry,index) => <article className="mt-memory-entry" id={`mt-memory-entry-${entry.id}`} key={entry.id}><div className="mt-memory-entry-meta"><strong>{index===0?"乔木":entry.kind==="feel"?"心绪":entry.kind==="todo"?"待办":"乔木"}</strong><span>第 {index+1} / {openedEntries.length} 条　·　{entry.text.length} 字</span></div><p>{entry.text}</p>{entry.tags.length > 0 && <div className="mt-memory-tags">{entry.tags.map(tag => <span key={tag}># {tag}</span>)}</div>}</article>) : <p className="mt-memory-empty">这一天暂时没有可显示的记忆。</p>}</div>
+        <div className="mt-memory-status">当下状态：历史记忆（已归档，不再变化）</div>
+        <div className="mt-memory-bottom"><span>JING HUA SHUI YUE　·　A DAY KEPT IN WATERLIGHT</span><button type="button" onClick={() => { navigate(`/memory?day=${openedDay}`); closeMemory(); }}>[ 封存这一天 ]</button></div>
       </section>
     </div>}
   </main>;
