@@ -76,19 +76,19 @@ export function Lounge() {
           <IconChevron width={17} height={17} className="rotate-180" />
         </button>
         <span>JING HUA SHUI YUE</span>
-        <span>SHARED RITUALS · 03</span>
+        <span>TOGETHER · SHARED MOMENTS</span>
       </header>
 
       <section className="lounge-intro">
-        <p className="lounge-kicker">A LITTLE TIME, JUST FOR US</p>
-        <h1>把此刻，<em>留给彼此。</em></h1>
+        <p className="lounge-kicker">TOGETHER / OUR PRIVATE SPACE</p>
+        <h1>Together<em> · 共处</em></h1>
         <p className="lounge-lede">同一页书，同一段旋律，同一场电影。让相隔的日常，在这里拥有相同的节拍。</p>
-        <div className="lounge-intro-foot"><span>共处 · 同步时光</span><span>01 — 03</span></div>
+        <div className="lounge-intro-foot"><span>共处 · 一起听、一起读、一起看</span><span>01 — 03</span></div>
       </section>
 
       <section className="lounge-room-section" aria-label="选择共处方式">
         <div className="lounge-section-heading">
-          <div><span>CHOOSE A MOMENT</span><h2>今天想一起做什么？</h2></div>
+          <div><span>THREE WAYS TO BE TOGETHER</span><h2>选择我们的共同时间</h2></div>
           <span className="lounge-heading-note">三种共享方式</span>
         </div>
         <div className="lounge-room-list">
