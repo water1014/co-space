@@ -171,6 +171,7 @@ export function Diary() {
 
       {/* 标题：Diary + 月份 + 篇数 */}
       <div className="diary-heading relative px-5 pt-7">
+        <div className="diary-edition-line"><span>THE PRIVATE JOURNAL</span><span>VOL. 01　/　A LIFE IN NOTES</span></div>
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
             <h1 className="diary-title serif-display text-[42px] leading-[0.9] text-ink">
