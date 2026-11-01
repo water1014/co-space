@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./mit-editorial.css";
 import { useNavigate } from "react-router-dom";
 import { Card, Row, SectionTitle, Switch } from "../components/ui/kit";
 import {
@@ -87,7 +88,7 @@ export function Mit() {
   const [customUrl, setCustomUrl] = useState("");
 
   return (
-    <div className="px-5 pt-6 pb-10">
+    <div className="settings-observatory px-5 pt-6 pb-10">
       {/* 页头：‹ Settings / make it yours */}
       <div className="flex items-start gap-2 pb-2 pt-1">
         <button
