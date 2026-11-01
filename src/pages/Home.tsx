@@ -67,6 +67,7 @@ export function Home() {
     const restore = () => {
       const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
       viewport.scrollLeft = max * progress;
+      viewport.style.setProperty("--panorama-progress", `${progress * 100}%`);
       setPanoramaReady(true);
     };
     restore();
@@ -127,7 +128,7 @@ export function Home() {
         role="region"
         tabIndex={0}
         aria-label="镜花水月地图，左右滑动探索地点"
-        onScroll={(event) => { const el = event.currentTarget; const max = Math.max(0, el.scrollWidth - el.clientWidth); if (max > 0) sessionStorage.setItem(PANORAMA_PROGRESS_KEY, String(el.scrollLeft / max)); }}
+        onScroll={(event) => { const el = event.currentTarget; const max = Math.max(0, el.scrollWidth - el.clientWidth); const progress = max > 0 ? el.scrollLeft / max : 0; el.style.setProperty("--panorama-progress", `${progress * 100}%`); if (max > 0) sessionStorage.setItem(PANORAMA_PROGRESS_KEY, String(progress)); }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -165,6 +166,11 @@ export function Home() {
             ))}
           </div>
         </div>
+      </div>
+      <div className="moon-panorama-guide" aria-hidden="true">
+        <span className="moon-panorama-guide-label">向右漫游 · 探索月庭</span>
+        <span className="moon-panorama-guide-en">DRAG TO EXPLORE</span>
+        <span className="moon-panorama-progress"><i /></span>
       </div>
     </main>
   );
