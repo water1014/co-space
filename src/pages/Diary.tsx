@@ -637,54 +637,6 @@ function WriteSheet({
   );
 }
 
-/* ---------------- 小图 ---------------- */
-
-/** 卡片右下角那朵花：1 线宽的手绘感，只做呼吸感。 */
-function PlantMark({ i, size = 38 }: { i: number; size?: number }) {
-  const kind = i % 3;
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="0.9"
-      strokeLinecap="round"
-      className="plant-mark flex-none"
-      aria-hidden
-    >
-      {kind === 0 && (
-        <g transform="translate(24 21)">
-          {[0, 60, 120, 180, 240, 300].map((a) => (
-            <ellipse key={a} rx="3.6" ry="8.4" transform={`rotate(${a}) translate(0 -8.2)`} />
-          ))}
-          <circle r="2.3" />
-          <path d="M0 10v11" />
-          <path d="M0 21c3.4 0 5.6-2 6-4.4" />
-        </g>
-      )}
-      {kind === 1 && (
-        <g>
-          <path d="M14 11c0 10 4 14.5 10 14.5S34 21 34 11" />
-          <path d="M19 9.5c1.4 3.2 2.9 4.6 5 4.6s3.6-1.4 5-4.6" />
-          <path d="M24 25.5V40" />
-          <path d="M24 32c-3.6 0-6-2.2-6.6-5.4" />
-          <path d="M24 36c3.2 0 5.4-1.8 6-4.4" />
-        </g>
-      )}
-      {kind === 2 && (
-        <g>
-          <path d="M24 42V11" />
-          <path d="M24 23c-7 0-10.5-4.4-10.5-10.5C20.5 12.5 24 17 24 23Z" />
-          <path d="M24 31c7 0 10.5-4.4 10.5-10.5C27.5 20.5 24 25 24 31Z" />
-          <circle cx="24" cy="9.5" r="1.6" />
-        </g>
-      )}
-    </svg>
-  );
-}
-
 /** 小小的括号形笔记图标（参考卡底部的 note 位） */
 function NoteGlyph() {
   return (
