@@ -1,31 +1,44 @@
-/* Studio — a quiet creative atelier with a paper-like, moonlit surface. */
-.studio-page{min-height:100%;max-width:760px;margin:0 auto;padding-bottom:max(34px,env(safe-area-inset-bottom));background:radial-gradient(ellipse at 94% 2%,rgba(164,199,220,.2),transparent 36%),linear-gradient(180deg,rgba(255,255,255,.24),transparent 48%)}
-.studio-heading{padding-top:clamp(26px,5vh,42px);padding-bottom:16px;border-bottom:1px solid var(--line-strong)}
-.studio-edition-line{display:flex;justify-content:space-between;gap:8px;margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid rgba(120,158,184,.24);color:#87a7bd;font:8px/1.4 Georgia,serif;letter-spacing:.17em}
-.studio-edition-line span:last-child{text-align:right}
-.studio-heading h1{font-family:"Noto Serif SC","Songti SC",serif;font-weight:500;letter-spacing:.09em}
-.studio-heading .page-head-sub{color:var(--ink-faint);font-size:10px;letter-spacing:.15em}
-.studio-prompt-panel{position:relative;margin-top:22px!important;padding:18px!important;border:1px solid rgba(128,166,190,.24);border-radius:4px!important;background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(233,243,249,.68));box-shadow:0 14px 34px -27px rgba(53,94,119,.34),inset 0 1px rgba(255,255,255,.94)}
-.studio-prompt-panel:before{content:"01  /  DESCRIBE YOUR DREAM";display:block;margin-bottom:12px;color:#86a8bd;font:8px Georgia,serif;letter-spacing:.19em}
-.studio-prompt{min-height:92px;padding:12px 2px!important;border-bottom:1px solid rgba(120,158,184,.2);line-height:1.9!important}
-.studio-prompt::placeholder{color:#9aafbd}
-.studio-generate{min-height:46px;margin-top:14px!important;border-radius:3px!important;background:linear-gradient(110deg,#789db8,#5e83a1)!important;box-shadow:0 8px 20px -15px rgba(53,94,119,.6);letter-spacing:.08em}
-.studio-generate:focus-visible{outline:2px solid #7da8c4;outline-offset:3px}
-.studio-result-panel{margin-top:18px!important;border:1px solid rgba(128,166,190,.2);border-radius:4px!important;background:rgba(250,253,255,.58);box-shadow:0 12px 30px -27px rgba(53,94,119,.3)}
-.studio-result-panel:before{content:"02  /  YOUR CANVAS";display:block;padding:13px 15px 10px;border-bottom:1px solid var(--line);color:#86a8bd;font:8px Georgia,serif;letter-spacing:.19em}
-.studio-preview,.studio-empty{position:relative;min-height:230px;aspect-ratio:4/3;background:radial-gradient(ellipse at 50% 42%,rgba(213,233,244,.92),rgba(236,245,250,.72) 48%,rgba(248,251,253,.88) 78%)}
-.studio-preview:before,.studio-empty:before{content:"";position:absolute;inset:15px;border:1px solid rgba(127,168,191,.24);pointer-events:none}
-.studio-preview svg,.studio-empty svg{color:#83a9c0;stroke-width:1.1}
-.studio-empty p{color:#8da6b7;letter-spacing:.05em}
-.studio-result-panel>p{padding:13px 16px!important;border-top:1px solid var(--line);font-size:12px!important;line-height:1.8!important}
-[data-theme="night"] .studio-page{background:radial-gradient(ellipse at 94% 2%,rgba(82,128,157,.2),transparent 38%),linear-gradient(180deg,rgba(255,255,255,.025),transparent 48%)}
-[data-theme="night"] .studio-edition-line{color:#a3c2d5;border-color:rgba(157,194,210,.2)}
-[data-theme="night"] .studio-prompt-panel{background:linear-gradient(145deg,rgba(34,56,71,.9),rgba(24,43,57,.82));border-color:rgba(157,194,210,.2);box-shadow:inset 0 1px rgba(235,246,252,.05)}
-[data-theme="night"] .studio-prompt{border-color:rgba(157,194,210,.2)}
-[data-theme="night"] .studio-prompt::placeholder{color:#8eaabb}
-[data-theme="night"] .studio-result-panel{background:rgba(23,41,54,.78);border-color:rgba(157,194,210,.18)}
-[data-theme="night"] .studio-preview,[data-theme="night"] .studio-empty{background:radial-gradient(ellipse at 50% 42%,rgba(75,112,136,.42),rgba(34,57,73,.7) 54%,rgba(24,42,56,.86) 82%)}
-[data-theme="night"] .studio-preview:before,[data-theme="night"] .studio-empty:before{border-color:rgba(157,194,210,.2)}
-@media(max-width:420px){.studio-page{padding-left:18px;padding-right:18px}.studio-edition-line{font-size:7px;letter-spacing:.13em}.studio-prompt-panel{padding:15px!important}}
-@media(prefers-reduced-transparency:reduce){.studio-prompt-panel,.studio-result-panel{background:var(--surface);backdrop-filter:none;box-shadow:none}}
-@media(prefers-reduced-motion:reduce){.studio-page *{scroll-behavior:auto;transition:none!important}}
+/* A full editorial composition, not a reskin of the former stacked cards. */
+.studio-atelier{--atelier-ink:#294455;--atelier-muted:#8299a8;--atelier-blue:#789db7;max-width:920px;margin:0 auto;min-height:100%;padding:18px 22px 110px;color:var(--atelier-ink);background:radial-gradient(ellipse at 88% 4%,rgba(176,207,225,.26),transparent 30%),linear-gradient(180deg,#f7fafc 0%,#f0f5f8 100%);overflow-y:auto}
+.studio-atelier .atelier-topline{display:flex;align-items:center;gap:14px;height:42px;border-bottom:1px solid rgba(105,145,169,.24);font:8px Georgia,serif;letter-spacing:.19em;color:#829cac}
+.atelier-back{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(105,145,169,.25);border-radius:50%;color:#597b91}
+.atelier-issue{margin-left:auto}
+.atelier-hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 190px;align-items:center;min-height:300px;padding:40px 5% 26px;border-bottom:1px solid rgba(105,145,169,.22);overflow:hidden}
+.atelier-kicker,.atelier-number{font:8px Georgia,serif;letter-spacing:.2em;color:#88a5b8}
+.atelier-hero h1{margin:18px 0 15px;font:400 clamp(36px,8vw,62px)/1.28 "Noto Serif SC","Songti SC",serif;letter-spacing:.08em}
+.atelier-hero h1 em{font-style:normal;color:#789bb3}
+.atelier-intro{max-width:330px;color:#7d929f;font:12px/2 "Noto Serif SC","Songti SC",serif;letter-spacing:.06em}
+.atelier-orbit{position:relative;display:grid;place-items:center;width:164px;aspect-ratio:1;margin:auto;border:1px solid rgba(121,163,187,.32);border-radius:50%;color:#7397af}
+.atelier-orbit:before,.atelier-orbit:after{content:"";position:absolute;inset:13px;border:1px solid rgba(121,163,187,.23);border-radius:50%}
+.atelier-orbit:after{inset:-9px;transform:rotate(-28deg) scaleX(.72);border-color:rgba(121,163,187,.2)}
+.atelier-orbit span{font:42px "Noto Serif SC",serif;opacity:.75}
+.atelier-orbit i,.atelier-orbit b{position:absolute;width:5px;height:5px;border-radius:50%;background:#8eb1c7;box-shadow:0 0 12px #8eb1c7}
+.atelier-orbit i{top:18px;right:30px}.atelier-orbit b{bottom:27px;left:18px}
+.atelier-hero-index{position:absolute;right:0;bottom:13px;display:flex;gap:12px;font:7px Georgia,serif;letter-spacing:.18em;color:#9aafbc}
+.atelier-hero-index span:first-child{color:#668ca6}
+.atelier-workspace,.atelier-canvas-section{padding:30px 5% 0}
+.atelier-section-heading{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:16px}
+.atelier-section-heading h2{margin-top:7px;font:400 23px "Noto Serif SC","Songti SC",serif;letter-spacing:.1em}
+.atelier-section-heading>p,.atelier-canvas-note{font:9px/1.8 Georgia,"Noto Serif SC",serif;letter-spacing:.08em;color:#92a5b1;text-align:right}
+.atelier-writing{padding:20px 22px 18px;border:1px solid rgba(122,160,183,.25);background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(235,243,248,.78));box-shadow:0 18px 38px -32px rgba(46,84,108,.45)}
+.atelier-writing label{font:8px Georgia,serif;letter-spacing:.2em;color:#8ca8b9}
+.atelier-writing textarea{display:block;width:100%;min-height:110px;margin-top:13px;resize:vertical;border:0;outline:0;background:transparent;color:#38566a;font:13px/2 "Noto Serif SC","Songti SC",serif;letter-spacing:.04em}
+.atelier-writing textarea::placeholder{color:#a5b5bf}
+.atelier-writing-foot{display:flex;justify-content:space-between;padding:10px 0 13px;border-top:1px solid rgba(122,160,183,.18);font:7px Georgia,serif;letter-spacing:.15em;color:#9aafbc}
+.atelier-create{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;background:#668ca6;color:white;font:11px "Noto Serif SC",serif;letter-spacing:.14em;transition:opacity .2s}
+.atelier-create:disabled{opacity:.4}
+.atelier-canvas{padding:12px;border:1px solid rgba(122,160,183,.25);background:rgba(255,255,255,.48)}
+.atelier-canvas-frame{display:flex;min-height:230px;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:1px solid rgba(122,160,183,.22);background:radial-gradient(circle at 50% 42%,rgba(196,220,234,.42),transparent 42%),linear-gradient(145deg,#f7fbfd,#e9f1f6);color:#7c9db2;text-align:center;padding:24px}
+.atelier-canvas-moon{display:grid;place-items:center;width:76px;height:76px;border:1px solid rgba(119,160,184,.42);border-radius:50%;font:32px "Noto Serif SC",serif;box-shadow:0 0 0 12px rgba(255,255,255,.26),0 0 0 24px rgba(143,181,202,.08)}
+.atelier-canvas-frame>span,.atelier-canvas-caption{font:7px Georgia,serif;letter-spacing:.2em;color:#91a9b8}
+.atelier-canvas-frame p{max-width:360px;font:12px/1.9 "Noto Serif SC",serif;color:#7893a5}
+.atelier-canvas-caption{display:block;padding:12px 3px 2px}
+.atelier-footer,.moments-footer{display:flex;align-items:center;justify-content:center;gap:13px;padding:34px 0 10px;font:8px Georgia,"Noto Serif SC",serif;letter-spacing:.14em;color:#9aafbc}
+.atelier-footer i,.moments-footer i{font-style:normal;color:#7e9fb4}
+[data-theme="night"] .studio-atelier{background:radial-gradient(ellipse at 85% 5%,rgba(76,117,147,.2),transparent 32%),linear-gradient(180deg,#142433,#101d29);color:#e5eff5}
+[data-theme="night"] .atelier-writing{background:linear-gradient(135deg,rgba(35,57,74,.92),rgba(25,43,58,.88));border-color:rgba(178,207,225,.18)}
+[data-theme="night"] .atelier-writing textarea{color:#e2edf4}
+[data-theme="night"] .atelier-canvas{background:rgba(25,44,60,.7);border-color:rgba(178,207,225,.18)}
+[data-theme="night"] .atelier-canvas-frame{background:radial-gradient(circle at 50% 42%,rgba(84,125,154,.24),transparent 42%),linear-gradient(145deg,#20384b,#172b3b);border-color:rgba(178,207,225,.16)}
+@media(max-width:560px){.studio-atelier{padding:12px 16px 104px}.atelier-hero{grid-template-columns:minmax(0,1fr) 92px;min-height:260px;padding:34px 0 25px}.atelier-orbit{width:88px}.atelier-orbit span{font-size:29px}.atelier-orbit:before{inset:8px}.atelier-orbit:after{inset:-6px}.atelier-hero h1{font-size:37px}.atelier-intro{font-size:11px;max-width:240px}.atelier-workspace,.atelier-canvas-section{padding:26px 0 0}.atelier-writing{padding:17px}.atelier-canvas-frame{min-height:205px}.atelier-section-heading h2{font-size:21px}}
+@media(prefers-reduced-motion:reduce){.atelier-create{transition:none}}
