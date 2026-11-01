@@ -54,7 +54,6 @@ export function MemoryTree() {
     {openedDay && <div className="mt-memory-reveal" role="dialog" aria-modal="true" aria-label={`${openedDay} 的记忆`} onMouseDown={(event) => { if (event.target === event.currentTarget) closeMemory(); }}>
       <section className="mt-memory-sheet">
         <button className="mt-memory-close" type="button" onClick={closeMemory} aria-label="关闭记忆">‹</button>
-        <div className="mt-memory-ink-branch" aria-hidden="true"><svg viewBox="0 0 520 250" role="presentation"><path d="M520 0C465 28 455 82 418 113S354 157 322 250M420 112C378 83 360 57 337 18M416 115C446 91 475 80 505 73M365 160C326 143 294 139 260 145M337 18C320 9 301 7 283 9M475 80C478 50 491 28 516 12M322 250C318 217 302 195 276 178" /><path d="M337 18c-18 5-31 18-42 38M505 73c-19-8-37-7-54 1M260 145c-12-20-30-31-53-34M276 178c-19 3-34 13-47 29" /></svg></div>
         <header className="mt-memory-masthead">
           <p className="mt-memory-script">Dear Memories.</p>
           <div className="mt-memory-subtitle"><i /> <span>乔木 · 记忆档案</span> <i /></div>
