@@ -19,6 +19,7 @@ const depthOf = (p: string) => p.split("/").filter(Boolean).length;
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const isMoonGarden = location.pathname === "/";
+  const isWideLounge = location.pathname === "/lounge";
   const mainRef = useRef<HTMLElement>(null);
   const scrollMem = useRef<Record<string, number>>({});
   const prevPath = useRef(location.pathname);
@@ -42,7 +43,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className={`relative h-full w-full overflow-hidden ${isMoonGarden ? "moon-garden-shell" : ""}`}>
       {!isMoonGarden && <BackgroundLayer />}
       <div className="pocket-shell relative flex h-full w-full justify-center">
-        <div className={`relative flex h-full w-full ${isMoonGarden ? "max-w-none" : "max-w-[600px]"} flex-col`}>
+        <div className={`relative flex h-full w-full ${isMoonGarden || isWideLounge ? "max-w-none" : "max-w-[600px]"} flex-col`}>
           <main
             key={location.pathname}
             ref={mainRef}
