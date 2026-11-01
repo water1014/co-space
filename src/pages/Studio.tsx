@@ -20,53 +20,49 @@ export function Studio() {
   };
 
   return (
-    <div className="studio-page px-5 pt-6 pb-10">
-      <div className="studio-heading flex items-start gap-2 pb-2 pt-1">
-        <button onClick={() => navigate(-1)} aria-label="返回" className="press mt-2 text-ink-faint">
-          <IconChevron width={16} height={16} className="rotate-180" />
-        </button>
-        <div>
-          <div className="studio-edition-line"><span>JINGHUA · CREATIVE ATELIER</span><span>VOL. 01 / MOONLIGHT</span></div>
-          <h1 className="page-head-title text-[30px] leading-none text-ink">生图室</h1>
-          <p className="page-head-sub mt-1 text-[12.5px]">AI 插画 · 情侣配图创作</p>
+    <main className="studio-page studio-atelier">
+      <header className="atelier-topline">
+        <button onClick={() => navigate(-1)} aria-label="返回" className="atelier-back"><IconChevron width={17} height={17} className="rotate-180" /></button>
+        <span>JINGHUA / IMAGE ATELIER</span>
+        <span className="atelier-issue">NO. 01</span>
+      </header>
+
+      <section className="atelier-hero">
+        <div className="atelier-hero-copy">
+          <p className="atelier-kicker">A SMALL WORLD, MADE OF LIGHT</p>
+          <h1>把想象<br/><em>留成一幅画。</em></h1>
+          <p className="atelier-intro">为某个瞬间、一个梦，或你们共同想象的世界，留下专属的视觉注脚。</p>
         </div>
-      </div>
-
-      <section className="studio-prompt-panel card mt-5 rounded-3xl p-4">
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="描述你想画的画面，例如：黄昏的海边，两个人牵手散步，水彩风格"
-          rows={3}
-          className="studio-prompt ghost-input w-full resize-none bg-transparent text-[14.5px] leading-[1.7] text-ink"
-        />
-        <button
-          onClick={generate}
-          disabled={!prompt.trim() || busy}
-          className="studio-generate tap mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--accent)] py-3 text-[14px] font-medium text-white disabled:opacity-40"
-        >
-          <IconSpark width={17} height={17} className={busy ? "animate-spin" : ""} />
-          {busy ? "生成中…" : "生成插画"}
-        </button>
+        <div className="atelier-orbit" aria-hidden="true"><span>月</span><i/><b/></div>
+        <div className="atelier-hero-index"><span>01</span><span>THE ART OF MEMORY</span></div>
       </section>
 
-      <section className="studio-result-panel card mt-4 overflow-hidden rounded-3xl">
-        {result ? (
-          <>
-            <div className="studio-preview flex aspect-[4/3] items-center justify-center">
-              <IconStudio width={40} height={40} />
-            </div>
-            <p className="border-t border-[var(--line)] px-4 py-2.5 text-[12.5px] leading-[1.6] text-ink-soft">
-              {result}
-            </p>
-          </>
-        ) : (
-          <div className="studio-empty flex aspect-[4/3] flex-col items-center justify-center gap-2 px-6 text-center text-ink-ghost">
-            <IconStudio width={34} height={34} />
-            <p className="text-[12.5px]">写下第一句 prompt，生成你们的专属插画</p>
+      <section className="atelier-workspace">
+        <div className="atelier-section-heading">
+          <div><span className="atelier-number">01 / PROMPT</span><h2>描述灵感</h2></div>
+          <p>从一句话开始<br/>让画面慢慢浮现</p>
+        </div>
+        <div className="atelier-writing">
+          <label htmlFor="studio-prompt">YOUR IMAGINATION</label>
+          <textarea id="studio-prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="黄昏的海边，两个人并肩看潮汐。风吹起衣角，远处有一轮将落未落的月……" rows={5} />
+          <div className="atelier-writing-foot"><span>{prompt.length.toString().padStart(3,"0")} CHARACTERS</span><span>写下你想收藏的画面</span></div>
+          <button onClick={generate} disabled={!prompt.trim() || busy} className="atelier-create"><span>{busy ? "正在描绘…" : "开始创作"}</span><IconSpark width={17} height={17} className={busy ? "animate-spin" : ""}/></button>
+        </div>
+      </section>
+
+      <section className="atelier-canvas-section">
+        <div className="atelier-section-heading">
+          <div><span className="atelier-number">02 / CANVAS</span><h2>你的画布</h2></div>
+          <span className="atelier-canvas-note">A PLACE FOR YOUR DREAMS</span>
+        </div>
+        <div className={`atelier-canvas ${result ? "has-result" : ""}`}>
+          <div className="atelier-canvas-frame">
+            {result ? <><IconStudio width={38} height={38}/><p>{result}</p></> : <><div className="atelier-canvas-moon">月</div><span>THE FIRST IMAGE IS WAITING</span><p>每一幅画，都从一个念头开始。</p></>}
           </div>
-        )}
+          <span className="atelier-canvas-caption">FIG. 01　·　MOONLIGHT STUDY</span>
+        </div>
       </section>
-    </div>
+      <footer className="atelier-footer"><span>JING HUA SHUI YUE</span><i>✧</i><span>让想象有迹可循。</span></footer>
+    </main>
   );
 }
