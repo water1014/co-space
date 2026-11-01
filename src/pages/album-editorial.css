@@ -1,0 +1,106 @@
+/* Keepsake Journal — a cool, quiet editorial treatment for the private photo archive. */
+.album-page{
+  color:var(--ink);
+  background:
+    radial-gradient(ellipse at 92% 0%,rgba(161,202,220,.16),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.18),transparent 48%);
+}
+.album-page>header{padding-top:max(18px,env(safe-area-inset-top));}
+.album-page .album-heading{padding-top:22px;padding-bottom:17px;}
+.album-edition-line{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin:0 0 15px;padding:0 0 9px;
+  border-bottom:1px solid rgba(112,157,179,.2);
+  color:#86a6b6;font:8px/1.4 Georgia,serif;letter-spacing:.19em;
+}
+.album-edition-line span:last-child{font-size:7px;letter-spacing:.12em;text-align:right}
+.album-page .album-title{
+  color:var(--ink);font-family:"Playfair Display","Noto Serif SC",serif;
+  font-size:clamp(31px,8.5vw,39px);font-weight:500;letter-spacing:-.035em;
+}
+.album-page .album-heading p{
+  color:var(--ink-faint);font-size:9px;letter-spacing:.19em;
+}
+.album-page .album-heading button[aria-pressed="true"]{
+  border-color:rgba(112,163,187,.38);background:rgba(183,216,229,.24);color:#547d91;
+}
+.album-page .album-heading button[aria-label="添加照片"]{
+  border-radius:3px!important;background:linear-gradient(145deg,#8fb8ca,#6f9caf)!important;
+  box-shadow:0 8px 20px -13px rgba(62,116,140,.55)!important;
+}
+.album-page .scroll-x{scrollbar-width:none;overscroll-behavior-x:contain}
+.album-page .scroll-x::-webkit-scrollbar{display:none}
+.album-page .day-chip{min-width:34px;min-height:56px;border-radius:2px;color:var(--ink-faint)}
+.album-page .day-chip[data-on="true"]{
+  background:rgba(177,213,229,.28);box-shadow:inset 0 -2px 0 #86b2c6;color:#496d80;
+}
+.album-page .day-chip .dot:not(.off){background:#8eb8ca}
+.album-page .album-photo-card{
+  overflow:hidden;padding:5px 5px 0;border:1px solid rgba(119,162,183,.2);border-radius:3px;
+  background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(235,245,249,.68));
+  box-shadow:0 12px 28px -23px rgba(48,91,112,.32),inset 0 1px 0 rgba(255,255,255,.94);
+  transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease;
+}
+.album-page .album-thumb{border-radius:1px;background:rgba(181,208,220,.18)}
+.album-page .album-thumb img{display:block;max-height:420px;object-fit:cover;transition:transform .45s cubic-bezier(.2,.75,.25,1)}
+.album-page .album-photo-card:active .album-thumb img{transform:scale(1.015)}
+.album-photo-caption{
+  display:flex;flex-direction:column;gap:4px;min-width:0;padding:10px 7px 11px;
+  color:var(--ink-soft);text-align:left;
+}
+.album-photo-caption span{
+  overflow:hidden;color:var(--ink);font:12px/1.55 "Noto Serif SC",serif;
+  letter-spacing:.025em;text-overflow:ellipsis;white-space:nowrap;
+}
+.album-photo-caption time{
+  color:#8aa6b5;font:8px/1.3 Georgia,serif;letter-spacing:.14em;
+  font-variant-numeric:tabular-nums;
+}
+.album-page .scroll-area>div>section>div:first-child{padding-bottom:8px;border-bottom:1px solid rgba(112,157,179,.18)}
+.album-page .scroll-area>div>section>div:last-child button{
+  border-color:rgba(119,162,183,.2);border-radius:3px!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.7),rgba(232,243,248,.45));
+}
+.album-empty-kicker{color:#86a6b6;font:8px Georgia,serif;letter-spacing:.2em}
+.album-empty-title{color:var(--ink);font:500 19px/1.6 "Noto Serif SC",serif;letter-spacing:.06em}
+.album-page .keepsake{
+  border:1px solid rgba(126,174,194,.3);border-bottom:0;border-radius:22px 22px 0 0!important;
+  background:radial-gradient(ellipse at 92% 4%,rgba(165,204,221,.18),transparent 36%),linear-gradient(155deg,rgba(255,255,255,.98),rgba(235,245,249,.96));
+  box-shadow:0 -18px 54px -34px rgba(48,91,112,.38),inset 0 1px rgba(255,255,255,.92);
+}
+.album-page .keepsake-body{border-left:1px solid rgba(126,174,194,.45)}
+.album-page .keepsake-body textarea{min-height:82px;line-height:2.05}
+.album-page .keepsake .album-thumb{border:1px solid rgba(126,174,194,.2);padding:4px;background:rgba(255,255,255,.52)}
+[data-theme="night"] .album-page{
+  background:radial-gradient(ellipse at 92% 0%,rgba(87,139,164,.15),transparent 36%),#111b23;
+}
+[data-theme="night"] .album-edition-line{border-color:rgba(157,194,210,.18);color:#a4c3d2}
+[data-theme="night"] .album-page .day-chip[data-on="true"]{background:rgba(100,154,179,.22);box-shadow:inset 0 -2px 0 #8bb9ce;color:#dcecf2}
+[data-theme="night"] .album-page .album-photo-card{
+  border-color:rgba(157,194,210,.18);
+  background:linear-gradient(145deg,rgba(39,59,72,.88),rgba(25,43,55,.84));
+  box-shadow:inset 0 1px rgba(235,247,251,.05);
+}
+[data-theme="night"] .album-photo-caption span{color:#dceaf0}
+[data-theme="night"] .album-photo-caption time{color:#9bbdcc}
+[data-theme="night"] .album-page .scroll-area>div>section>div:last-child button{
+  border-color:rgba(157,194,210,.18);background:rgba(39,59,72,.52);
+}
+[data-theme="night"] .album-page .keepsake{
+  border-color:rgba(157,194,210,.22);
+  background:radial-gradient(ellipse at 92% 4%,rgba(87,139,164,.16),transparent 36%),linear-gradient(155deg,rgba(35,54,67,.98),rgba(23,40,52,.98));
+}
+[data-theme="night"] .album-page .keepsake-body{border-color:rgba(157,194,210,.34)}
+@media(max-width:420px){
+  .album-edition-line{font-size:7px;letter-spacing:.15em}
+  .album-edition-line span:last-child{font-size:6px}
+  .album-page .album-heading{padding-top:18px}
+  .album-page .album-photo-card{padding:4px 4px 0}
+  .album-photo-caption{padding:8px 5px 9px}
+}
+@media(prefers-reduced-motion:reduce){
+  .album-page .album-photo-card,.album-page .album-thumb img{transition:none}
+}
+@media(prefers-reduced-transparency:reduce){
+  .album-page .album-photo-card,.album-page .keepsake{background:var(--surface);box-shadow:none}
+}
