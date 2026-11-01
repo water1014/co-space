@@ -23,6 +23,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isWideMemory = location.pathname.startsWith("/memory");
   const isWideChat = location.pathname === "/chat";
   const isWideSettings = location.pathname === "/mit";
+  const isWidePartner = location.pathname === "/partner";
+  const isWideMoments = location.pathname === "/moments";
   const mainRef = useRef<HTMLElement>(null);
   const scrollMem = useRef<Record<string, number>>({});
   const prevPath = useRef(location.pathname);
@@ -46,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className={`relative h-full w-full overflow-hidden ${isMoonGarden ? "moon-garden-shell" : ""}`}>
       {!isMoonGarden && <BackgroundLayer />}
       <div className="pocket-shell relative flex h-full w-full justify-center">
-        <div className={`relative flex h-full w-full ${isMoonGarden || isWideLounge || isWideMemory || isWideChat || isWideSettings ? "max-w-none" : "max-w-[600px]"} flex-col`}>
+        <div className={`relative flex h-full w-full ${isMoonGarden || isWideLounge || isWideMemory || isWideChat || isWideSettings || isWidePartner || isWideMoments ? "max-w-none" : "max-w-[600px]"} flex-col`}>
           <main
             key={location.pathname}
             ref={mainRef}
