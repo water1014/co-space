@@ -251,3 +251,39 @@
  .chat-letter-room .scroll-area{padding:20px 15px 16px;border-left:0;border-right:0}
  .chat-letter-room .chat-composer-shell{padding:12px 12px max(12px,env(safe-area-inset-bottom));border-left:0;border-right:0;border-radius:0}
 }
+
+
+/* Private letter room — responsive editorial canvas. */
+.chat-letter-room{
+  width:100%;
+  max-width:1180px;
+  margin-inline:auto;
+  padding-inline:clamp(16px,4vw,64px);
+}
+.chat-room-masthead{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  min-height:32px;flex-shrink:0;
+  border-bottom:1px solid var(--chat-line);
+  color:var(--chat-muted);font:8px Georgia,serif;letter-spacing:.24em;
+}
+.chat-room-masthead i{font-style:normal;color:#91b5c8}
+.chat-letter-room .chat-header{padding-inline:clamp(2px,1vw,14px)}
+.chat-letter-room .scroll-area{padding-inline:clamp(10px,3vw,42px)}
+.chat-letter-room .chat-composer-shell{padding-inline:clamp(2px,1vw,14px)}
+@media(min-width:760px){
+  .chat-letter-room .chat-header{min-height:92px}
+  .chat-letter-room .chat-header h1{font-size:26px}
+  .chat-letter-room .scroll-area{max-width:980px;width:100%;margin-inline:auto}
+  .chat-letter-room .chat-composer-shell{max-width:980px;width:100%;margin-inline:auto}
+  .chat-letter-room .assistant-bubble,.chat-letter-room .user-bubble{
+    max-width:min(76%,680px);font-size:14px;line-height:1.95;padding:15px 19px
+  }
+}
+@media(max-width:520px){
+  .chat-letter-room{padding-inline:12px}
+  .chat-room-masthead{min-height:27px;font-size:7px;letter-spacing:.19em}
+  .chat-letter-room .scroll-area{padding-inline:2px}
+  .chat-letter-room .chat-header{min-height:70px}
+  .chat-letter-room .chat-composer-shell{padding-inline:0}
+}
+[data-theme="night"] .chat-room-masthead{border-color:rgba(157,194,210,.16);color:#9bb5c6}
