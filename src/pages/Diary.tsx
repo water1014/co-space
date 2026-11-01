@@ -15,6 +15,7 @@ import { Calendar, dayKey } from "../components/home/Calendar";
 import { Reader } from "../components/diary/Reader";
 import { useDiaryStore, replyToQuote } from "../stores/diaryStore";
 import { useText } from "../lib/content/useText";
+import "./diary-editorial.css";
 import type { DiaryEntry } from "../types";
 
 const MOODS = ["平静", "温和", "低电量", "专注"];
@@ -448,7 +449,7 @@ function DiaryCard({
             {MON_EN[d.getMonth()]}
           </span>
         </div>
-        <PlantMark i={index} />
+        <span className="diary-card-index"><small>NO.</small><b>{String(index + 1).padStart(2, "0")}</b></span>
       </div>
 
       <p className="mt-1 text-[10.5px] text-ink-ghost">
@@ -518,7 +519,7 @@ function EntryReader({
                   {MON_EN[d.getMonth()]}
                 </span>
               </div>
-              <PlantMark i={Math.max(index, 0)} size={56} />
+              <span className="diary-reader-mark"><small>DAY</small><b>{String(d.getDate()).padStart(2, "0")}</b><i>{MON_EN[d.getMonth()]}</i></span>
             </div>
 
             <p className="mt-3 text-[11px] text-ink-ghost">
