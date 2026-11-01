@@ -230,3 +230,24 @@
 @media(prefers-reduced-motion:reduce){
   .chat-page *,.chat-page *:before,.chat-page *:after{transition:none!important;animation:none!important}
 }
+/* Private letters — a more intentional reading-room frame around the live conversation. */
+.chat-letter-room{padding:0 clamp(10px,2vw,22px) max(8px,env(safe-area-inset-bottom));}
+.chat-room-masthead{display:flex;align-items:center;justify-content:center;gap:12px;flex:none;height:29px;color:#91a9b8;font:7px Georgia,"Noto Serif SC",serif;letter-spacing:.2em}
+.chat-room-masthead i{font-style:normal;color:#83a9c0;font-size:10px}
+.chat-letter-room .chat-header{flex:none;min-height:82px;margin:0 auto;width:100%;max-width:900px;padding-left:clamp(8px,2vw,22px);padding-right:clamp(8px,2vw,22px);border:1px solid rgba(255,255,255,.8);border-bottom-color:rgba(112,157,179,.2);border-radius:3px 3px 0 0}
+.chat-letter-room .chat-header:after{bottom:5px}
+.chat-letter-room .chat-header h1{font-size:19px;letter-spacing:.13em}
+.chat-letter-room .scroll-area{width:100%;max-width:900px;align-self:center;padding:24px clamp(18px,5vw,62px) 18px;border-left:1px solid rgba(112,157,179,.16);border-right:1px solid rgba(112,157,179,.16);background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.08));}
+.chat-letter-room .scroll-area>div{max-width:720px;width:100%;margin-inline:auto}
+.chat-letter-room .chat-composer-shell{width:100%;max-width:900px;align-self:center;padding:15px clamp(12px,3vw,34px) max(14px,env(safe-area-inset-bottom));border-left:1px solid rgba(112,157,179,.16);border-right:1px solid rgba(112,157,179,.16);border-bottom:1px solid rgba(112,157,179,.16);border-radius:0 0 3px 3px}
+.chat-letter-room .composer-pill{max-width:760px;margin-inline:auto}
+[data-theme="night"] .chat-letter-room .chat-header{border-color:rgba(157,194,210,.16);border-bottom-color:rgba(157,194,210,.12)}
+[data-theme="night"] .chat-letter-room .scroll-area{border-color:rgba(157,194,210,.12);background:linear-gradient(180deg,rgba(255,255,255,.018),transparent)}
+[data-theme="night"] .chat-letter-room .chat-composer-shell{border-color:rgba(157,194,210,.12)}
+@media(max-width:640px){
+ .chat-letter-room{padding-left:0;padding-right:0}
+ .chat-room-masthead{height:25px;font-size:6.5px;letter-spacing:.16em}
+ .chat-letter-room .chat-header{min-height:76px;border-left:0;border-right:0;border-radius:0}
+ .chat-letter-room .scroll-area{padding:20px 15px 16px;border-left:0;border-right:0}
+ .chat-letter-room .chat-composer-shell{padding:12px 12px max(12px,env(safe-area-inset-bottom));border-left:0;border-right:0;border-radius:0}
+}
