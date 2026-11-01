@@ -181,3 +181,218 @@
   .lounge-intro { max-width: 900px; }
   .lounge-room-section { max-width: 900px; }
 }
+
+
+/* Art direction v2 — quiet lunar editorial, inspired by the supplied references. */
+.lounge-page {
+  --lounge-ink: #202a31;
+  --lounge-muted: #78858b;
+  --lounge-line: rgba(49, 67, 77, .16);
+  position: relative;
+  isolation: isolate;
+  max-width: 1280px;
+  padding-left: clamp(22px, 5.5vw, 84px);
+  padding-right: clamp(22px, 5.5vw, 84px);
+}
+.lounge-intro {
+  min-height: clamp(310px, 36vw, 450px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: clamp(42px, 6vw, 90px);
+  padding-bottom: clamp(32px, 5vw, 62px);
+  border-bottom: 0;
+}
+.lounge-intro::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: clamp(210px, 34vw, 410px);
+  aspect-ratio: 1;
+  right: clamp(0px, 5vw, 72px);
+  top: 50%;
+  transform: translateY(-47%);
+  border-radius: 50%;
+  opacity: .78;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255,255,255,.94), transparent 23%),
+    radial-gradient(circle at 62% 64%, rgba(93,116,128,.17), transparent 17%),
+    radial-gradient(circle at 42% 48%, #e8edef 0%, #cbd5d9 46%, #aebdc4 68%, rgba(177,193,201,.18) 72%, transparent 74%);
+  filter: drop-shadow(0 20px 35px rgba(54,75,87,.13));
+  mask-image: radial-gradient(circle, #000 62%, transparent 72%);
+}
+.lounge-intro::before {
+  content: "MOON PHASE  ·  01 / 03";
+  position: absolute;
+  right: clamp(18px, 9vw, 130px);
+  bottom: 25px;
+  color: var(--lounge-muted);
+  font: 8px Georgia, serif;
+  letter-spacing: .22em;
+}
+.lounge-kicker { letter-spacing: .28em; }
+.lounge-intro h1 {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  font-family: "Iowan Old Style", "Baskerville", Georgia, "Songti SC", serif;
+  font-size: clamp(54px, 10vw, 112px);
+  line-height: .94;
+  letter-spacing: -.075em;
+  color: #26333b;
+}
+.lounge-intro h1 em {
+  display: block;
+  margin-top: 13px;
+  font-size: .48em;
+  letter-spacing: -.025em;
+  font-style: italic;
+  color: #6f8792;
+}
+.lounge-lede {
+  position: relative;
+  z-index: 1;
+  max-width: 420px;
+  margin-top: 15px;
+  color: #64737b;
+  font-size: 13px;
+  line-height: 2.1;
+}
+.lounge-intro-foot {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  border-top: 1px solid var(--lounge-line);
+  padding-top: 13px;
+  margin-top: 34px;
+}
+.lounge-section-heading h2 {
+  font-family: "Iowan Old Style", Baskerville, Georgia, "Songti SC", serif;
+  letter-spacing: -.025em;
+}
+.lounge-room-list {
+  border-top: 1px solid rgba(49,67,77,.24);
+  border-bottom: 1px solid rgba(49,67,77,.24);
+}
+.lounge-room-choice {
+  position: relative;
+  min-height: 126px;
+  background: transparent;
+  transition: background .3s ease, transform .3s ease;
+}
+.lounge-room-choice.is-active {
+  background: linear-gradient(110deg, rgba(211,224,230,.62), rgba(242,246,247,.25));
+}
+.lounge-room-choice.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 18%; bottom: 18%;
+  width: 2px;
+  background: #6e8b99;
+}
+.lounge-room-icon {
+  width: 48px; height: 48px;
+  border-color: rgba(79,104,117,.25);
+  background: rgba(255,255,255,.38);
+}
+.lounge-session {
+  border: 1px solid rgba(49,67,77,.16);
+  border-radius: 2px;
+  background: linear-gradient(135deg, rgba(255,255,255,.54), rgba(226,235,239,.34));
+  box-shadow: 0 22px 60px rgba(48,68,78,.07);
+}
+.lounge-session-art {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 52% 48%, rgba(226,237,241,.96), transparent 39%),
+    radial-gradient(ellipse at 50% 50%, rgba(124,151,164,.18), transparent 62%),
+    linear-gradient(145deg, #edf1f2 0%, #d9e2e6 48%, #f5f6f4 100%);
+}
+.lounge-session-art::before {
+  content: "";
+  position: absolute;
+  width: min(62%, 330px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255,255,255,.95), transparent 26%),
+    radial-gradient(circle at 64% 65%, rgba(111,134,146,.20), transparent 19%),
+    radial-gradient(circle at 43% 42%, #f4f6f6 0%, #d7e0e3 48%, #aebfc6 69%, #dce5e8 72%);
+  box-shadow: 0 22px 48px rgba(58,82,94,.16), inset -15px -18px 35px rgba(89,113,125,.14);
+  opacity: .9;
+}
+.lounge-session-art::after {
+  content: "";
+  position: absolute;
+  width: 82%; height: 36%;
+  border: 1px solid rgba(93,119,132,.34);
+  border-radius: 50%;
+  transform: rotate(-19deg);
+  box-shadow: 0 0 0 12px rgba(255,255,255,.08), 0 0 0 28px rgba(93,119,132,.06);
+}
+.lounge-art-glyph {
+  z-index: 2;
+  color: rgba(54,76,88,.72);
+  font-family: "Iowan Old Style", Baskerville, Georgia, "Songti SC", serif;
+  text-shadow: 0 2px 18px rgba(255,255,255,.8);
+}
+.lounge-orbit { z-index: 1; border-color: rgba(75,101,114,.22); }
+.lounge-art-index { z-index: 3; }
+.lounge-session-content { background: rgba(250,252,252,.28); }
+.lounge-session-title h3 {
+  font-family: "Iowan Old Style", Baskerville, Georgia, "Songti SC", serif;
+  letter-spacing: -.035em;
+}
+.lounge-play-button {
+  background: #536f7d;
+  box-shadow: 0 8px 24px rgba(54,82,96,.2);
+}
+.lounge-session-note { letter-spacing: .04em; }
+.lounge-footer { letter-spacing: .13em; }
+
+:root[data-theme="dark"] .lounge-page {
+  --lounge-ink: #e2e9ec;
+  --lounge-muted: #9aaab2;
+  --lounge-line: rgba(208,224,231,.17);
+}
+:root[data-theme="dark"] .lounge-intro h1 { color: #e5ecef; }
+:root[data-theme="dark"] .lounge-intro h1 em { color: #a8c0ca; }
+:root[data-theme="dark"] .lounge-lede { color: #a7b6bd; }
+:root[data-theme="dark"] .lounge-intro::after {
+  opacity: .48;
+  filter: brightness(.72) drop-shadow(0 20px 35px rgba(0,0,0,.3));
+}
+:root[data-theme="dark"] .lounge-session {
+  border-color: rgba(205,224,232,.16);
+  background: linear-gradient(135deg, rgba(35,49,58,.86), rgba(23,35,43,.88));
+}
+:root[data-theme="dark"] .lounge-session-art {
+  background:
+    radial-gradient(ellipse at 52% 48%, rgba(93,126,142,.32), transparent 42%),
+    linear-gradient(145deg, #273842, #17252d 72%);
+}
+:root[data-theme="dark"] .lounge-session-art::before { opacity: .36; filter: brightness(.65); }
+:root[data-theme="dark"] .lounge-art-glyph { color: #d2e0e5; }
+:root[data-theme="dark"] .lounge-room-choice.is-active {
+  background: linear-gradient(110deg, rgba(87,119,135,.28), rgba(43,62,72,.16));
+}
+:root[data-theme="dark"] .lounge-session-content { background: rgba(15,26,33,.18); }
+
+@media (max-width: 639px) {
+  .lounge-intro { min-height: 350px; padding-top: 48px; padding-bottom: 34px; }
+  .lounge-intro::after {
+    width: 220px;
+    right: -34px;
+    top: 48%;
+    opacity: .56;
+  }
+  .lounge-intro::before { right: 4px; bottom: 9px; font-size: 7px; }
+  .lounge-intro h1 { max-width: 100%; font-size: clamp(58px, 17vw, 76px); }
+  .lounge-intro h1 em { font-size: .46em; }
+  .lounge-lede { max-width: 82%; font-size: 12px; }
+  .lounge-intro-foot { max-width: 100%; margin-top: 26px; }
+  .lounge-room-choice { min-height: 84px; }
+  .lounge-session-art { min-height: 290px; }
+  .lounge-session-art::before { width: 220px; }
+  .lounge-session-art::after { width: 86%; height: 34%; }
+}
