@@ -22,3 +22,50 @@ body:has(.moon-world-map) .moon-garden-shell,body:has(.moon-world-map) .pocket-s
 /* Keep the panorama hidden until its saved horizontal position has been restored. */
 .moon-world-map.panorama-restoring .moon-scene-viewport{visibility:hidden!important}
 .moon-world-map.panorama-ready .moon-scene-viewport{visibility:visible!important}
+
+
+/* A quiet wayfinding cue: the panorama remains the hero, while its horizontal journey becomes legible. */
+.moon-panorama-guide{
+  position:fixed;z-index:12;left:50%;bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  width:min(220px,48vw);transform:translateX(-50%);
+  color:rgba(49,83,103,.84);pointer-events:none;
+  text-shadow:0 1px 10px rgba(255,255,255,.88);
+  transition:opacity .35s ease;
+}
+.moon-panorama-guide-label{
+  font:11px/1.5 "Noto Serif SC","Songti SC",serif;letter-spacing:.2em;
+}
+.moon-panorama-guide-en{
+  font:7px/1.3 Georgia,serif;letter-spacing:.24em;opacity:.66;
+}
+.moon-panorama-progress{
+  position:relative;display:block;width:100%;height:1px;margin-top:3px;
+  overflow:hidden;background:rgba(90,132,154,.2);
+}
+.moon-panorama-progress::before{
+  content:"";position:absolute;inset:0 auto 0 0;width:100%;
+  background:linear-gradient(90deg,rgba(102,157,181,.12),rgba(102,157,181,.42));
+}
+.moon-panorama-progress i{
+  position:absolute;top:50%;left:0;width:5px;height:5px;border-radius:50%;
+  background:#719db2;box-shadow:0 0 8px rgba(113,157,178,.45);
+  transform:translate(var(--panorama-progress,36%),-50%);
+  transition:transform .12s linear;
+}
+.immersive-moon.is-night .moon-panorama-guide{
+  color:rgba(224,239,247,.9);text-shadow:0 1px 12px rgba(5,22,36,.88);
+}
+.immersive-moon.is-night .moon-panorama-progress{background:rgba(200,224,238,.2)}
+.immersive-moon.is-night .moon-panorama-progress::before{background:linear-gradient(90deg,rgba(169,207,226,.1),rgba(169,207,226,.38))}
+.immersive-moon.is-night .moon-panorama-progress i{background:#b7d9e8;box-shadow:0 0 9px rgba(183,217,232,.6)}
+@media(max-width:767px){
+  .moon-panorama-guide{bottom:max(15px,calc(env(safe-area-inset-bottom) + 10px));width:clamp(150px,43vw,190px);gap:4px}
+  .moon-panorama-guide-label{font-size:10px;letter-spacing:.16em}
+  .moon-panorama-guide-en{font-size:6px}
+}
+@media(hover:hover){
+  .moon-panorama-guide{opacity:.72}
+  .moon-scene-viewport:hover~.moon-panorama-guide{opacity:1}
+}
+@media(prefers-reduced-motion:reduce){.moon-panorama-guide{transition:none}.moon-panorama-progress i{transition:none}}
