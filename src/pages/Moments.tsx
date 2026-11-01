@@ -129,7 +129,7 @@ export function Moments() {
               <IconHeart width={14} height={14} />
               <span className="text-[12px]">赞</span>
             </div>
-          </div>
+          </article>
         ))}
       </div>
     </div>
