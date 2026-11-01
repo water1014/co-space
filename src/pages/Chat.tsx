@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import "./chat-editorial.css";
 import {
   AssistantRuntimeProvider,
   MessagePrimitive,
