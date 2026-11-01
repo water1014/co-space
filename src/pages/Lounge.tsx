@@ -196,9 +196,9 @@ function SessionDemo({
       {/* 控制 */}
       <div className="mt-4 flex items-center justify-center gap-3">
         <button
-          onClick={onToggle className="lounge-play"
+          onClick={onToggle}
           aria-label={playing ? "暂停" : "播放"}
-          className="tap flex h-11 w-11 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-md shadow-[var(--accent-soft)]"
+          className="lounge-play tap flex h-11 w-11 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-md shadow-[var(--accent-soft)]"
         >
           {playing ? <IconPause width={18} height={18} /> : <IconPlay width={18} height={18} />}
         </button>
