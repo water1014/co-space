@@ -1,30 +1,48 @@
-
-/* Moments: a personal journal stream, not a generic social feed. */
-.moments-page{min-height:100%;max-width:760px;margin:0 auto;background:radial-gradient(ellipse at 100% 0%,rgba(164,199,220,.18),transparent 35%)}
-.moments-heading{position:relative;padding-top:clamp(28px,6vh,48px);padding-bottom:19px;border-bottom:1px solid rgba(112,157,179,.22)}
-.moments-title{font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(34px,9vw,46px);font-weight:500;letter-spacing:.035em}
-.moments-subtitle{margin-top:9px;color:var(--ink-faint);letter-spacing:.16em;font-size:10px}
-.moments-composer{position:relative;margin-top:22px;border:1px solid rgba(119,162,183,.24);border-radius:5px;background:linear-gradient(135deg,rgba(255,255,255,.74),rgba(232,243,249,.62));box-shadow:0 12px 34px rgba(48,91,112,.05),inset 0 1px 0 rgba(255,255,255,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.moments-composer::before{content:"WRITE A MOMENT";display:block;margin:0 0 13px;color:#86a9bc;font:9px Georgia,serif;letter-spacing:.22em}
-.moments-person{border:1px solid rgba(119,162,183,.28);border-radius:2px!important;background:transparent!important;color:var(--ink-soft)!important}
-.moments-person:focus-visible,.moments-person:active{border-color:rgba(104,153,181,.68);background:rgba(177,213,229,.22)!important;color:var(--ink)!important}
-.moments-draft{min-height:76px;padding:10px 1px!important;outline:none}
-.moments-draft::placeholder{color:var(--ink-faint);letter-spacing:.025em}
-.moments-compose-foot{border-color:rgba(112,157,179,.18)!important}
-.moments-compose-foot button{border-radius:2px!important;padding:8px 18px!important;letter-spacing:.08em}
-.moments-feed{position:relative;margin-top:27px}
-.moments-feed::before{content:"RECENT NOTES";display:block;margin-bottom:5px;color:#86a9bc;font:9px Georgia,serif;letter-spacing:.24em}
-.moments-post{position:relative;padding:20px 2px 22px;border-bottom:1px solid rgba(112,157,179,.18)}
-.moments-post-head{gap:11px!important}
-.moments-avatar{width:34px!important;height:34px!important;border-radius:50%!important;border:1px solid rgba(255,255,255,.82);box-shadow:0 2px 9px rgba(48,91,112,.09);font-family:"Noto Serif SC",serif;font-weight:500!important}
-.moments-post-head p:first-child{letter-spacing:.04em}
-.moments-post-text{margin-top:13px!important;padding-left:45px;font-size:14px!important;line-height:2!important;letter-spacing:.025em;white-space:pre-wrap;overflow-wrap:anywhere}
-.moments-post-actions{margin:11px 0 0 45px!important;opacity:.68}
-.moments-post-actions svg{stroke-width:1.35}
-[data-theme="night"] .moments-page{background:radial-gradient(ellipse at 100% 0%,rgba(87,139,164,.14),transparent 38%)}
-[data-theme="night"] .moments-composer{background:linear-gradient(135deg,rgba(34,55,68,.84),rgba(22,40,52,.78));border-color:rgba(157,194,210,.19);box-shadow:inset 0 1px 0 rgba(231,244,251,.05)}
-[data-theme="night"] .moments-composer::before,[data-theme="night"] .moments-feed::before{color:#a8c7d6}
-[data-theme="night"] .moments-post{border-color:rgba(157,194,210,.17)}
-[data-theme="night"] .moments-avatar{border-color:rgba(220,238,247,.16)}
-@media(max-width:520px){.moments-page{padding-left:20px;padding-right:20px}.moments-heading{padding-top:26px}.moments-composer{padding:16px!important}.moments-post{padding:18px 0 20px}}
-@media(prefers-reduced-motion:reduce){.moments-page *{scroll-behavior:auto}}
+/* Shared life journal — asymmetrical magazine rhythm and a clear writing-to-reading hierarchy. */
+.moments-journal{--moment-ink:#2d485b;--moment-muted:#8ba0ae;max-width:900px;min-height:100%;margin:0 auto;padding:16px 22px 110px;background:radial-gradient(ellipse at 88% 8%,rgba(175,207,225,.22),transparent 30%),linear-gradient(180deg,#f7fafc,#f0f5f8);color:var(--moment-ink);overflow-y:auto}
+.moments-masthead{display:flex;align-items:center;gap:12px;height:42px;border-bottom:1px solid rgba(108,149,173,.23);font:8px Georgia,serif;letter-spacing:.16em;color:#8ba2b1}
+.moments-back{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(108,149,173,.25);border-radius:50%;color:#62859d}
+.moments-masthead>span:last-child{margin-left:auto}
+.moments-cover{position:relative;min-height:245px;padding:38px 5% 28px;border-bottom:1px solid rgba(108,149,173,.23);overflow:hidden}
+.moments-cover-copy{position:relative;z-index:1;max-width:480px}
+.moments-overline,.moments-section-title>div>span{font:8px Georgia,serif;letter-spacing:.2em;color:#88a5b8}
+.moments-cover h1{margin:18px 0 10px;font:400 clamp(38px,8vw,60px)/1.2 "Noto Serif SC","Songti SC",serif;letter-spacing:.12em}
+.moments-cover h1 span{color:#789bb3}.moments-cover h1 i{font-style:normal;color:#91b0c3}
+.moments-cover-copy>p:last-child{max-width:330px;font:12px/2 "Noto Serif SC",serif;letter-spacing:.05em;color:#8197a5}
+.moments-cover-mark{position:absolute;right:8%;top:42px;display:grid;place-items:center;width:118px;height:118px;border:1px solid rgba(122,164,188,.32);border-radius:50%;color:#83a5ba}
+.moments-cover-mark:before{content:"";position:absolute;inset:10px;border:1px solid rgba(122,164,188,.22);border-radius:50%}
+.moments-cover-mark span{font:35px "Noto Serif SC",serif}.moments-cover-mark i{position:absolute;right:9px;top:12px;font-style:normal}
+.moments-cover-foot{position:absolute;right:0;bottom:12px;display:flex;gap:16px;font:7px Georgia,serif;letter-spacing:.16em;color:#9aafbc}
+.moments-compose-section,.moments-feed-section{padding:28px 5% 0}
+.moments-section-title{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:15px}
+.moments-section-title h2{margin-top:7px;font:400 22px "Noto Serif SC",serif;letter-spacing:.1em}
+.moments-section-title>p{font:9px/1.8 "Noto Serif SC",serif;color:#91a5b2;text-align:right}
+.moments-feed-count{font:7px Georgia,serif;letter-spacing:.15em;color:#9aafbc}
+.moments-composer{padding:18px 20px;border:1px solid rgba(119,159,182,.24);background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(234,243,248,.76));box-shadow:0 16px 34px -30px rgba(45,84,108,.45)}
+.moments-person-switch{display:flex;gap:8px}
+.moments-person-switch button{padding:6px 13px;border:1px solid rgba(119,159,182,.22);border-radius:30px;font:10px "Noto Serif SC",serif;color:#849cab}
+.moments-person-switch button.is-active{background:#668ca6;border-color:#668ca6;color:white}
+.moments-composer textarea{display:block;width:100%;margin:13px 0;resize:vertical;border:0;outline:0;background:transparent;font:13px/2 "Noto Serif SC",serif;color:#36566b}
+.moments-composer textarea::placeholder{color:#a5b5bf}
+.moments-compose-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:11px;border-top:1px solid rgba(119,159,182,.18)}
+.moments-compose-foot>span{display:flex;align-items:center;gap:6px;font:9px "Noto Serif SC",serif;color:#9aafbc}
+.moments-compose-foot button{padding:9px 14px;background:#668ca6;color:white;font:10px "Noto Serif SC",serif;letter-spacing:.08em}
+.moments-compose-foot button:disabled{opacity:.4}
+.moments-feed{border-top:1px solid rgba(108,149,173,.23)}
+.moments-post{display:grid;grid-template-columns:46px minmax(0,1fr);gap:15px;padding:22px 3px;border-bottom:1px solid rgba(108,149,173,.2)}
+.moments-post-index{padding-top:4px;font:10px Georgia,serif;color:#a0b3bf}
+.moments-post-head{display:flex;align-items:center;gap:10px}
+.moments-avatar{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(119,159,182,.25);border-radius:50%;font:13px "Noto Serif SC",serif}
+.moments-avatar.is-wan{background:#e8f0f5;color:#67869b}.moments-avatar.is-yan{background:#dce9f1;color:#527b98}
+.moments-post-head>div{display:flex;flex-direction:column;gap:2px}
+.moments-post-head strong{font:11px "Noto Serif SC",serif;font-weight:500}
+.moments-post-head time{font:8px Georgia,serif;letter-spacing:.06em;color:#9aafbc}
+.moments-post-text{margin:14px 0 12px;font:13px/2 "Noto Serif SC",serif;letter-spacing:.03em;white-space:pre-wrap;overflow-wrap:anywhere}
+.moments-post-actions{display:flex;align-items:center;gap:6px;color:#8ba4b4;font:9px "Noto Serif SC",serif}
+.moments-empty{padding:48px 16px;text-align:center;color:#8ba4b4}
+.moments-empty>span{font-size:24px}.moments-empty p{margin:9px 0;font:16px "Noto Serif SC",serif}.moments-empty small{font-size:10px}
+[data-theme="night"] .moments-journal{background:radial-gradient(ellipse at 88% 8%,rgba(76,117,147,.2),transparent 32%),linear-gradient(180deg,#142433,#101d29);color:#e5eff5}
+[data-theme="night"] .moments-composer{background:linear-gradient(135deg,rgba(35,57,74,.92),rgba(25,43,58,.88));border-color:rgba(178,207,225,.18)}
+[data-theme="night"] .moments-composer textarea{color:#e5eff5}
+[data-theme="night"] .moments-person-switch button.is-active{background:#789db7;color:#102131}
+@media(max-width:560px){.moments-journal{padding:12px 16px 104px}.moments-cover{min-height:220px;padding:32px 0 27px}.moments-cover h1{font-size:40px}.moments-cover-mark{right:0;top:47px;width:82px;height:82px;opacity:.72}.moments-cover-mark span{font-size:26px}.moments-cover-mark:before{inset:7px}.moments-cover-copy>p:last-child{max-width:245px;font-size:11px}.moments-compose-section,.moments-feed-section{padding:25px 0 0}.moments-composer{padding:15px}.moments-post{grid-template-columns:30px minmax(0,1fr);gap:10px;padding:19px 0}.moments-section-title h2{font-size:20px}}
