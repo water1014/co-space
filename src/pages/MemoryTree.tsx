@@ -58,7 +58,7 @@ export function MemoryTree() {
         <header className="mt-memory-masthead">
           <p className="mt-memory-script">Dear Memories.</p>
           <div className="mt-memory-subtitle"><i /> <span>乔木 · 记忆档案</span> <i /></div>
-          <p className="mt-memory-summary">{openedDay.replaceAll("-",".")}　·　共 {openedEntries.length} 条　·　{openedEntries.reduce((n,e)=>n+e.text.length,0).toLocaleString("zh-CN")} 字</p>
+          <p className="mt-memory-summary">{openedDay.replace(/-/g,".")}　·　共 {openedEntries.length} 条　·　{openedEntries.reduce((n,e)=>n+e.text.length,0).toLocaleString("zh-CN")} 字</p>
         </header>
         <nav className="mt-memory-time-rail" aria-label="当天记忆时间">
           {openedEntries.map((entry,index)=><button type="button" key={entry.id} onClick={()=>document.getElementById(`mt-memory-entry-${entry.id}`)?.scrollIntoView({behavior:"smooth",block:"center"})} className={index===0?"is-first":""}>{new Date(entry.createdAt).toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",hour12:false})}</button>)}
