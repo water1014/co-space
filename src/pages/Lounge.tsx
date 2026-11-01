@@ -9,26 +9,24 @@ import {
   IconHeart,
 } from "../components/ui/icons";
 import { useText } from "../lib/content/useText";
+import "./lounge-editorial.css";
 
 type RoomKey = "read" | "listen" | "watch";
 
-const ROOMS: Record<
-  RoomKey,
-  {
-    icon: React.ComponentType<{ width?: number; height?: number }>;
-    title: string;
-    sub: string;
-    desc: string;
-    media: string;
-    by: string;
-    total: number;
-    progress: number;
-  }
-> = {
+const ROOMS: Record<RoomKey, {
+  icon: React.ComponentType<{ width?: number; height?: number }>;
+  title: string;
+  sub: string;
+  desc: string;
+  media: string;
+  by: string;
+  total: number;
+  progress: number;
+}> = {
   read: {
     icon: IconBook,
     title: "共读",
-    sub: "同步读书",
+    sub: "READ TOGETHER",
     desc: "同一本书，同一页进度。读到心动的句子，划给彼此看。",
     media: "《小王子》",
     by: "安托万·德·圣埃克苏佩里",
@@ -38,7 +36,7 @@ const ROOMS: Record<
   listen: {
     icon: IconMusic,
     title: "共听",
-    sub: "同步听音频",
+    sub: "LISTEN TOGETHER",
     desc: "同一档播客、同一首歌，让声音把两个人连在一起。",
     media: "晚安，淼淼",
     by: "宋祁 · 私房歌单",
@@ -48,7 +46,7 @@ const ROOMS: Record<
   watch: {
     icon: IconPlay,
     title: "共影",
-    sub: "同步观影",
+    sub: "WATCH TOGETHER",
     desc: "隔着屏幕一起按下播放键，吐槽和爆笑都实时同步。",
     media: "怦然心动",
     by: "2012 · 爱情 / 喜剧",
@@ -68,76 +66,64 @@ export function Lounge() {
   const t = useText();
   const [open, setOpen] = useState<RoomKey | null>(null);
   const [playing, setPlaying] = useState(true);
+  const selected = open ?? "read";
+  const current = ROOMS[selected];
 
   return (
-    <div className="px-5 pt-6 pb-10">
-      <div className="flex items-start gap-2 pb-2 pt-1">
-        <button onClick={() => navigate(-1)} aria-label="返回" className="press mt-2 text-ink-faint">
-          <IconChevron width={16} height={16} className="rotate-180" />
+    <main className="lounge-page">
+      <header className="lounge-topline">
+        <button onClick={() => navigate(-1)} aria-label="返回" className="lounge-back">
+          <IconChevron width={17} height={17} className="rotate-180" />
         </button>
-        <div>
-          <h1 className="page-head-title text-[30px] leading-none text-ink">共读听影</h1>
-          <p className="page-head-sub mt-1 text-[12.5px]">同步读书 · 听音频 · 观影</p>
+        <span>JING HUA SHUI YUE</span>
+        <span>TOGETHER · SHARED MOMENTS</span>
+      </header>
+
+      <section className="lounge-intro">
+        <p className="lounge-kicker">TOGETHER / OUR PRIVATE SPACE</p>
+        <h1>Together<em> · 共处</em></h1>
+        <p className="lounge-lede">同一页书，同一段旋律，同一场电影。让相隔的日常，在这里拥有相同的节拍。</p>
+        <div className="lounge-intro-foot"><span>共处 · 一起听、一起读、一起看</span><span>01 — 03</span></div>
+      </section>
+
+      <section className="lounge-room-section" aria-label="选择共处方式">
+        <div className="lounge-section-heading">
+          <div><span>THREE WAYS TO BE TOGETHER</span><h2>选择我们的共同时间</h2></div>
+          <span className="lounge-heading-note">三种共享方式</span>
         </div>
-      </div>
+        <div className="lounge-room-list">
+          {(Object.keys(ROOMS) as RoomKey[]).map((key, index) => {
+            const room = ROOMS[key];
+            const Icon = room.icon;
+            const active = selected === key;
+            return (
+              <button key={key} onClick={() => { setOpen(key); setPlaying(true); }}
+                className={`lounge-room-choice ${active ? "is-active" : ""}`} aria-pressed={active}>
+                <span className="lounge-room-number">0{index + 1}</span>
+                <span className="lounge-room-icon"><Icon width={19} height={19} /></span>
+                <span className="lounge-room-name"><strong>{room.title}</strong><small>{room.sub}</small></span>
+                <span className="lounge-room-arrow">↗</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
-      <p className="mt-5 text-[14px] leading-[1.8] text-ink-soft">
-        把一个人的消遣，变成两个人的仪式。同一时刻，做同一件事，距离就短了一截。
-      </p>
+      <section className="lounge-session-wrap">
+        <div className="lounge-section-heading lounge-session-heading">
+          <div><span>NOW IN OUR LITTLE ROOM</span><h2>正在共享的时光</h2></div>
+          <span className="lounge-live"><i /> ROOM OPEN</span>
+        </div>
+        <SessionDemo room={current} playing={playing} onToggle={() => setPlaying(v => !v)}
+          wan={t.people.wan} yan={t.people.yan} />
+      </section>
 
-      {/* 三个功能入口 */}
-      <div className="mt-4 grid grid-cols-3 gap-3">
-        {(Object.keys(ROOMS) as RoomKey[]).map((k) => {
-          const r = ROOMS[k];
-          const Icon = r.icon;
-          const active = open === k;
-          return (
-            <button
-              key={k}
-              onClick={() => {
-                setOpen(active ? null : k);
-                setPlaying(true);
-              }}
-              className={`card tap flex flex-col items-center gap-2 rounded-3xl px-3 py-5 text-center transition-colors ${
-                active ? "ring-2 ring-[var(--accent)]" : ""
-              }`}
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-soft)] text-[var(--accent-deep)]">
-                <Icon width={24} height={24} />
-              </span>
-              <p className="text-[15px] font-semibold text-ink">{r.title}</p>
-              <p className="text-[11px] text-ink-faint">{r.sub}</p>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 同步会话演示 */}
-      {open ? (
-        <SessionDemo
-          room={ROOMS[open]}
-          playing={playing}
-          onToggle={() => setPlaying((v) => !v)}
-          wan={t.people.wan}
-          yan={t.people.yan}
-        />
-      ) : (
-        <p className="mt-6 text-center text-[12px] tracking-[0.14em] text-ink-ghost">
-          选择一个功能，进入同步房间
-        </p>
-      )}
-    </div>
+      <footer className="lounge-footer"><span>JING HUA SHUI YUE</span><i>✧</i><span>Love you to the moon and back.</span></footer>
+    </main>
   );
 }
 
-/** 同步房间演示：双人在线 + 同一进度 */
-function SessionDemo({
-  room,
-  playing,
-  onToggle,
-  wan,
-  yan,
-}: {
+function SessionDemo({ room, playing, onToggle, wan, yan }: {
   room: (typeof ROOMS)[RoomKey];
   playing: boolean;
   onToggle: () => void;
@@ -148,64 +134,41 @@ function SessionDemo({
   const cur = Math.round((room.progress / room.total) * mins);
   const Icon = room.icon;
   return (
-    <section className="card mt-4 overflow-hidden rounded-3xl p-5">
-      {/* 在线双人 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#f3ddd3] to-[#e7c4b6] text-[13px] font-semibold text-[#9c6b52]">
-            {wan[0]}
-          </span>
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-[13px] font-semibold text-white">
-            {yan[0]}
-          </span>
-        </div>
-        <span className="flex items-center gap-1.5 rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--accent-deep)]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-          已同步
-        </span>
+    <article className="lounge-session">
+      <div className="lounge-session-art" aria-hidden="true">
+        <span className="lounge-orbit lounge-orbit-one" />
+        <span className="lounge-orbit lounge-orbit-two" />
+        <span className="lounge-art-glyph">{room.title === "共读" ? "页" : room.title === "共听" ? "音" : "影"}</span>
+        <span className="lounge-art-index">A SHARED MOMENT</span>
+        <span className="lounge-art-star">✧</span>
       </div>
-
-      {/* 媒体信息 */}
-      <div className="mt-4 flex items-center gap-3">
-        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-[var(--surface-2)] text-[var(--accent-deep)]">
-          <Icon width={26} height={26} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] font-medium text-ink">{room.media}</p>
-          <p className="truncate text-[12px] text-ink-faint">{room.by}</p>
+      <div className="lounge-session-content">
+        <div className="lounge-session-meta">
+          <span>OUR ROOM / 0{room.title === "共读" ? "1" : room.title === "共听" ? "2" : "3"}</span>
+          <span className="lounge-sync"><i /> 已同步</span>
         </div>
-      </div>
-
-      {/* 进度条 */}
-      <div className="mt-4">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
-          <div
-            className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500"
-            style={{ width: `${room.progress / room.total * 100}%` }}
-          />
+        <div className="lounge-session-title">
+          <div><p>{room.sub}</p><h3>{room.media}</h3><span>{room.by}</span></div>
+          <span className="lounge-media-icon"><Icon width={23} height={23} /></span>
         </div>
-        <div className="mt-1.5 flex justify-between text-[11px] text-ink-faint">
-          <span className="num">{room.total > 600 ? fmt(cur * 60) : `${cur} 页`}</span>
-          <span className="num">
-            {room.total > 600 ? fmt(mins * 60) : `${mins} 页`}
-          </span>
+        <p className="lounge-session-desc">{room.desc}</p>
+        <div className="lounge-progress-track"><span style={{ width: `${room.progress / room.total * 100}%` }} /></div>
+        <div className="lounge-progress-label">
+          <span>{room.total > 600 ? fmt(cur * 60) : `${cur} / ${mins} 页`}</span>
+          <span>{room.total > 600 ? fmt(mins * 60) : `${mins} 页`}</span>
         </div>
+        <div className="lounge-session-bottom">
+          <div className="lounge-together-people">
+            <span className="lounge-person lounge-person-one">{wan[0]}</span>
+            <span className="lounge-person lounge-person-two">{yan[0]}</span>
+            <span>两个人都在这里</span>
+          </div>
+          <button onClick={onToggle} aria-label={playing ? "暂停" : "播放"} className="lounge-play-button">
+            {playing ? <IconPause width={17} height={17} /> : <IconPlay width={17} height={17} />}
+          </button>
+        </div>
+        <p className="lounge-session-note"><IconHeart width={13} height={13} /> 同步的不只是进度，还有此刻。</p>
       </div>
-
-      {/* 控制 */}
-      <div className="mt-4 flex items-center justify-center gap-3">
-        <button
-          onClick={onToggle}
-          aria-label={playing ? "暂停" : "播放"}
-          className="tap flex h-11 w-11 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-md shadow-[var(--accent-soft)]"
-        >
-          {playing ? <IconPause width={18} height={18} /> : <IconPlay width={18} height={18} />}
-        </button>
-        <p className="flex items-center gap-1 text-[12px] text-ink-faint">
-          <IconHeart width={13} height={13} className="text-[var(--accent)]" />
-          两人进度一致
-        </p>
-      </div>
-    </section>
+    </article>
   );
 }
