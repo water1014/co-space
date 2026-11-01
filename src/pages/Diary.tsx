@@ -327,7 +327,6 @@ export function Diary() {
       {openEntry && (
         <EntryReader
           entry={openEntry}
-          index={sorted.findIndex((x) => x.id === openEntry.id)}
           onClose={() => setOpenId(null)}
           onEdit={() => {
             const d = openEntry.date;
@@ -477,13 +476,11 @@ function DiaryCard({
 
 function EntryReader({
   entry,
-  index,
   onClose,
   onEdit,
   onDelete,
 }: {
   entry: DiaryEntry;
-  index: number;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
