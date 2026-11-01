@@ -9,6 +9,7 @@ import {
   IconHeart,
 } from "../components/ui/icons";
 import { useText } from "../lib/content/useText";
+import "./lounge-editorial.css";
 
 type RoomKey = "read" | "listen" | "watch";
 
@@ -70,8 +71,8 @@ export function Lounge() {
   const [playing, setPlaying] = useState(true);
 
   return (
-    <div className="px-5 pt-6 pb-10">
-      <div className="flex items-start gap-2 pb-2 pt-1">
+    <div className="lounge-page px-5 pt-6 pb-10">
+      <div className="lounge-heading flex items-start gap-2 pb-2 pt-1">
         <button onClick={() => navigate(-1)} aria-label="返回" className="press mt-2 text-ink-faint">
           <IconChevron width={16} height={16} className="rotate-180" />
         </button>
@@ -81,7 +82,7 @@ export function Lounge() {
         </div>
       </div>
 
-      <p className="mt-5 text-[14px] leading-[1.8] text-ink-soft">
+      <p className="lounge-intro mt-5 text-[14px] leading-[1.8] text-ink-soft">
         把一个人的消遣，变成两个人的仪式。同一时刻，做同一件事，距离就短了一截。
       </p>
 
@@ -98,11 +99,11 @@ export function Lounge() {
                 setOpen(active ? null : k);
                 setPlaying(true);
               }}
-              className={`card tap flex flex-col items-center gap-2 rounded-3xl px-3 py-5 text-center transition-colors ${
+              className={`lounge-room-card card tap flex flex-col items-center gap-2 rounded-3xl px-3 py-5 text-center transition-colors ${
                 active ? "ring-2 ring-[var(--accent)]" : ""
               }`}
             >
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-soft)] text-[var(--accent-deep)]">
+              <span className="lounge-room-icon flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-soft)] text-[var(--accent-deep)]">
                 <Icon width={24} height={24} />
               </span>
               <p className="text-[15px] font-semibold text-ink">{r.title}</p>
@@ -122,7 +123,7 @@ export function Lounge() {
           yan={t.people.yan}
         />
       ) : (
-        <p className="mt-6 text-center text-[12px] tracking-[0.14em] text-ink-ghost">
+        <p className="lounge-empty mt-6 text-center text-[12px] tracking-[0.14em] text-ink-ghost">
           选择一个功能，进入同步房间
         </p>
       )}
@@ -148,7 +149,7 @@ function SessionDemo({
   const cur = Math.round((room.progress / room.total) * mins);
   const Icon = room.icon;
   return (
-    <section className="card mt-4 overflow-hidden rounded-3xl p-5">
+    <section className="lounge-session card mt-4 overflow-hidden rounded-3xl p-5">
       {/* 在线双人 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -159,7 +160,7 @@ function SessionDemo({
             {yan[0]}
           </span>
         </div>
-        <span className="flex items-center gap-1.5 rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--accent-deep)]">
+        <span className="lounge-sync flex items-center gap-1.5 rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--accent-deep)]">
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
           已同步
         </span>
@@ -167,7 +168,7 @@ function SessionDemo({
 
       {/* 媒体信息 */}
       <div className="mt-4 flex items-center gap-3">
-        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-[var(--surface-2)] text-[var(--accent-deep)]">
+        <span className="lounge-media-icon flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-[var(--surface-2)] text-[var(--accent-deep)]">
           <Icon width={26} height={26} />
         </span>
         <div className="min-w-0 flex-1">
@@ -178,7 +179,7 @@ function SessionDemo({
 
       {/* 进度条 */}
       <div className="mt-4">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
+        <div className="lounge-progress h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
           <div
             className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500"
             style={{ width: `${room.progress / room.total * 100}%` }}
@@ -197,7 +198,7 @@ function SessionDemo({
         <button
           onClick={onToggle}
           aria-label={playing ? "暂停" : "播放"}
-          className="tap flex h-11 w-11 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-md shadow-[var(--accent-soft)]"
+          className="lounge-play tap flex h-11 w-11 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-md shadow-[var(--accent-soft)]"
         >
           {playing ? <IconPause width={18} height={18} /> : <IconPlay width={18} height={18} />}
         </button>
