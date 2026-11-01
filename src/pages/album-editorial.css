@@ -104,3 +104,21 @@
 @media(prefers-reduced-transparency:reduce){
   .album-page .album-photo-card,.album-page .keepsake{background:var(--surface);box-shadow:none}
 }
+
+
+/* Day index — small photographic contact sheet, not generic rounded tiles. */
+.album-page .album-list-entry{
+  gap:13px!important;padding:9px!important;border:1px solid rgba(119,162,183,.2)!important;
+  border-radius:3px!important;background:linear-gradient(110deg,rgba(255,255,255,.78),rgba(235,244,248,.54))!important;
+  box-shadow:0 8px 22px -22px rgba(48,91,112,.4);transition:transform .2s ease,border-color .2s ease;
+}
+.album-page .album-list-entry:active{transform:scale(.99)}
+.album-page .album-list-image{width:68px;height:68px;border-radius:1px!important;object-fit:cover}
+.album-page .album-list-entry .text-ink{font:12px/1.6 "Noto Serif SC",serif;letter-spacing:.025em}
+.album-page .album-list-date{color:#86a6b6;font-size:8px;letter-spacing:.1em}
+.album-page .album-list-entry>svg{color:#8caebe}
+[data-theme="night"] .album-page .album-list-entry{
+  border-color:rgba(157,194,210,.17)!important;background:linear-gradient(110deg,rgba(39,59,72,.8),rgba(25,43,55,.68))!important;
+}
+[data-theme="night"] .album-page .album-list-date{color:#9bbdcc}
+@media(prefers-reduced-motion:reduce){.album-page .album-list-entry{transition:none}}
