@@ -1,30 +1,121 @@
-
-/* Moments: a personal journal stream, not a generic social feed. */
-.moments-page{min-height:100%;max-width:760px;margin:0 auto;background:radial-gradient(ellipse at 100% 0%,rgba(185,207,198,.16),transparent 35%)}
-.moments-heading{position:relative;padding-top:clamp(28px,6vh,48px);padding-bottom:19px;border-bottom:1px solid rgba(111,133,119,.2)}
-.moments-title{font-family:"Playfair Display","Noto Serif SC",serif;font-size:clamp(34px,9vw,46px);font-weight:500;letter-spacing:.035em}
-.moments-subtitle{margin-top:9px;color:var(--ink-faint);letter-spacing:.16em;font-size:10px}
-.moments-composer{position:relative;margin-top:22px;border:1px solid rgba(132,158,143,.23);border-radius:5px;background:linear-gradient(135deg,rgba(255,255,255,.74),rgba(238,245,240,.52));box-shadow:0 12px 34px rgba(45,70,55,.045),inset 0 1px 0 rgba(255,255,255,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.moments-composer::before{content:"WRITE A MOMENT";display:block;margin:0 0 13px;color:#8da194;font:9px Georgia,serif;letter-spacing:.22em}
-.moments-person{border:1px solid rgba(127,151,136,.24);border-radius:2px!important;background:transparent!important;color:var(--ink-soft)!important}
-.moments-person:focus-visible,.moments-person:active{border-color:rgba(104,143,119,.65);background:rgba(182,208,190,.2)!important;color:var(--ink)!important}
-.moments-draft{min-height:76px;padding:10px 1px!important;outline:none}
+/* Moments — a quiet blue editorial for a private life archive. */
+.moments-page{
+  min-height:100%;max-width:760px;margin:0 auto;
+  color:var(--ink);
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(151,185,211,.16),transparent 38%),
+    linear-gradient(180deg,rgba(247,250,253,.28),transparent 42%);
+}
+.moments-heading{
+  position:relative;padding-top:clamp(28px,6vh,48px);padding-bottom:20px;
+  border-bottom:1px solid rgba(115,145,174,.24);
+}
+.moments-heading::after{
+  content:"";position:absolute;left:0;bottom:-1px;width:54px;height:1px;
+  background:rgba(91,132,169,.7);
+}
+.moments-title{
+  font-family:"Playfair Display","Noto Serif SC",serif;
+  font-size:clamp(34px,9vw,46px);font-weight:500;letter-spacing:.035em;
+}
+.moments-subtitle{
+  margin-top:9px;color:var(--ink-faint);letter-spacing:.16em;font-size:10px;
+}
+.moments-composer{
+  position:relative;margin-top:23px;padding:19px!important;
+  border:1px solid rgba(130,161,190,.25);border-radius:4px;
+  background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(232,241,249,.58));
+  box-shadow:0 14px 38px rgba(45,76,108,.055),inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.moments-composer::before{
+  content:"A NOTE TO KEEP";display:block;margin:0 0 15px;
+  color:#7894ae;font:9px Georgia,serif;letter-spacing:.24em;
+}
+.moments-person{
+  min-height:34px;border:1px solid rgba(125,156,185,.28);
+  border-radius:2px!important;background:rgba(255,255,255,.28)!important;
+  color:var(--ink-soft)!important;letter-spacing:.04em;
+}
+.moments-person:hover{border-color:rgba(94,137,177,.58);background:rgba(211,228,243,.34)!important}
+.moments-person:focus-visible,.moments-person:active{
+  outline:2px solid rgba(102,145,184,.32);outline-offset:2px;
+  border-color:rgba(94,137,177,.72);background:rgba(211,228,243,.48)!important;
+  color:var(--ink)!important;
+}
+.moments-draft{
+  min-height:86px;padding:11px 1px!important;outline:none;
+  caret-color:#6389ad;
+}
 .moments-draft::placeholder{color:var(--ink-faint);letter-spacing:.025em}
-.moments-compose-foot{border-color:rgba(111,133,119,.17)!important}
-.moments-compose-foot button{border-radius:2px!important;padding:8px 18px!important;letter-spacing:.08em}
-.moments-feed{position:relative;margin-top:27px}
-.moments-feed::before{content:"RECENT NOTES";display:block;margin-bottom:5px;color:#8da194;font:9px Georgia,serif;letter-spacing:.24em}
-.moments-post{position:relative;padding:20px 2px 22px;border-bottom:1px solid rgba(111,133,119,.17)}
+.moments-compose-foot{border-color:rgba(115,145,174,.2)!important}
+.moments-compose-foot>span{letter-spacing:.04em}
+.moments-compose-foot button{
+  min-height:36px;border-radius:2px!important;padding:8px 19px!important;
+  background:linear-gradient(135deg,#7899b8,#5e7f9f)!important;
+  box-shadow:0 4px 12px rgba(75,111,147,.16);
+  letter-spacing:.1em;transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease;
+}
+.moments-compose-foot button:not(:disabled):active{transform:translateY(1px);box-shadow:0 2px 6px rgba(75,111,147,.12)}
+.moments-compose-foot button:focus-visible{outline:2px solid #7899b8;outline-offset:3px}
+.moments-feed{position:relative;margin-top:31px}
+.moments-feed::before{
+  content:"RECENT NOTES";display:block;margin-bottom:7px;
+  color:#7894ae;font:9px Georgia,serif;letter-spacing:.25em;
+}
+.moments-post{
+  position:relative;padding:21px 2px 23px;
+  border-bottom:1px solid rgba(115,145,174,.2);
+}
 .moments-post-head{gap:11px!important}
-.moments-avatar{width:34px!important;height:34px!important;border-radius:50%!important;border:1px solid rgba(255,255,255,.75);box-shadow:0 2px 9px rgba(45,70,55,.08);font-family:"Noto Serif SC",serif;font-weight:500!important}
+.moments-avatar{
+  width:35px!important;height:35px!important;border-radius:50%!important;
+  border:1px solid rgba(255,255,255,.88);
+  box-shadow:0 3px 12px rgba(54,86,119,.11);
+  font-family:"Noto Serif SC",serif;font-weight:500!important;
+}
 .moments-post-head p:first-child{letter-spacing:.04em}
-.moments-post-text{margin-top:13px!important;padding-left:45px;font-size:14px!important;line-height:2!important;letter-spacing:.025em;white-space:pre-wrap;overflow-wrap:anywhere}
-.moments-post-actions{margin:11px 0 0 45px!important;opacity:.68}
+.moments-post-text{
+  margin-top:13px!important;padding-left:46px;
+  font-size:14px!important;line-height:2!important;letter-spacing:.025em;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.moments-post-actions{
+  margin:11px 0 0 46px!important;opacity:.7;
+  transition:opacity .2s ease,color .2s ease;
+}
 .moments-post-actions svg{stroke-width:1.35}
-[data-theme="night"] .moments-page{background:radial-gradient(ellipse at 100% 0%,rgba(105,143,121,.12),transparent 38%)}
-[data-theme="night"] .moments-composer{background:linear-gradient(135deg,rgba(39,58,63,.78),rgba(25,42,49,.72));border-color:rgba(166,196,176,.17);box-shadow:inset 0 1px 0 rgba(238,248,240,.045)}
-[data-theme="night"] .moments-composer::before,[data-theme="night"] .moments-feed::before{color:#a6bca9}
-[data-theme="night"] .moments-post{border-color:rgba(166,196,176,.15)}
-[data-theme="night"] .moments-avatar{border-color:rgba(220,238,225,.15)}
-@media(max-width:520px){.moments-page{padding-left:20px;padding-right:20px}.moments-heading{padding-top:26px}.moments-composer{padding:16px!important}.moments-post{padding:18px 0 20px}}
-@media(prefers-reduced-motion:reduce){.moments-page *{scroll-behavior:auto}}
+.moments-post:hover .moments-post-actions{opacity:1}
+[data-theme="night"] .moments-page{
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(103,143,181,.13),transparent 40%),
+    linear-gradient(180deg,rgba(18,35,52,.16),transparent 45%);
+}
+[data-theme="night"] .moments-heading{border-color:rgba(157,185,211,.2)}
+[data-theme="night"] .moments-heading::after{background:rgba(151,184,214,.62)}
+[data-theme="night"] .moments-composer{
+  background:linear-gradient(135deg,rgba(35,55,75,.82),rgba(24,42,61,.76));
+  border-color:rgba(157,185,211,.2);
+  box-shadow:inset 0 1px 0 rgba(239,247,255,.055),0 14px 38px rgba(0,0,0,.12);
+}
+[data-theme="night"] .moments-composer::before,[data-theme="night"] .moments-feed::before{color:#a4bdd5}
+[data-theme="night"] .moments-person{border-color:rgba(157,185,211,.24);background:rgba(220,235,249,.035)!important;color:var(--ink-soft)!important}
+[data-theme="night"] .moments-person:hover,[data-theme="night"] .moments-person:focus-visible{background:rgba(132,169,203,.15)!important}
+[data-theme="night"] .moments-compose-foot{border-color:rgba(157,185,211,.17)!important}
+[data-theme="night"] .moments-compose-foot button{background:linear-gradient(135deg,#6f91b2,#4f7192)!important}
+[data-theme="night"] .moments-post{border-color:rgba(157,185,211,.16)}
+[data-theme="night"] .moments-avatar{border-color:rgba(220,238,255,.18)}
+@media(max-width:520px){
+  .moments-page{padding-left:20px;padding-right:20px}
+  .moments-heading{padding-top:26px}
+  .moments-composer{padding:16px!important}
+  .moments-post{padding:19px 0 21px}
+  .moments-post-text{padding-left:0;margin-top:12px!important}
+  .moments-post-actions{margin-left:0!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .moments-page *{scroll-behavior:auto;transition:none!important}
+}
+@media(prefers-reduced-transparency:reduce){
+  .moments-composer{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--surface)}
+}
