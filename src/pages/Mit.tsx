@@ -18,6 +18,7 @@ import {
 import { useThemeStore } from "../stores/themeStore";
 import { useBoundaryStore } from "../stores/boundaryStore";
 import { useConnectorStore } from "../stores/connectorStore";
+import { testModelConnection } from "../lib/chat/live";
 import { useContentStore } from "../stores/contentStore";
 import { useMemoryStore } from "../stores/memoryStore";
 import { useChatStore } from "../stores/chatStore";
@@ -42,6 +43,15 @@ import {
 } from "../types";
 
 const LEVELS: InitiativeLevel[] = [0, 1, 2, 3];
+
+/** 常见 OpenAI 兼容服务商预设：点一下填好接口地址和默认模型名。 */
+const PROVIDERS = [
+  { name: "OpenAI", baseUrl: "https://api.openai.com/v1", model: "gpt-4o-mini" },
+  { name: "DeepSeek", baseUrl: "https://api.deepseek.com/v1", model: "deepseek-chat" },
+  { name: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", model: "openai/gpt-4o-mini" },
+  { name: "Moonshot", baseUrl: "https://api.moonshot.cn/v1", model: "moonshot-v1-8k" },
+  { name: "智谱 GLM", baseUrl: "https://open.bigmodel.cn/api/paas/v4", model: "glm-4-flash" },
+];
 
 export function Mit() {
   const theme = useThemeStore((s) => s.theme);
@@ -86,6 +96,18 @@ export function Mit() {
   const [keyDraft, setKeyDraft] = useState("");
   const [customOpen, setCustomOpen] = useState(false);
   const [customUrl, setCustomUrl] = useState("");
+  const [test, setTest] = useState<{
+    status: "idle" | "testing" | "ok" | "fail";
+    msg?: string;
+  }>({ status: "idle" });
+
+  /** 用当前配置发一个最小请求，验证接口地址 + Key 能不能通。 */
+  const runTest = async () => {
+    setTest({ status: "testing" });
+    const r = await testModelConnection(keyDraft || undefined);
+    if (r.ok) setTest({ status: "ok", msg: `连接成功（HTTP ${r.status}）` });
+    else setTest({ status: "fail", msg: r.error ?? `端点返回 ${r.status}` });
+  };
 
   return (
     <div className="settings-observatory px-5 pt-6 pb-10">
@@ -432,6 +454,43 @@ export function Mit() {
               </span>
             )}
           </label>
+
+          {/* 常见服务商预设：点一下填好接口地址和默认模型名 */}
+          <div className="mt-4 border-t border-[var(--line)] pt-4">
+            <span className="eyebrow">常见服务商</span>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {PROVIDERS.map((p) => (
+                <button
+                  key={p.name}
+                  onClick={() => {
+                    connector.setModel({ baseUrl: p.baseUrl, model: p.model });
+                    if (keyDraft.trim()) connector.setSessionKey(keyDraft);
+                  }}
+                  className="press rounded-full border border-[var(--line)] px-3 py-1.5 text-[12.5px] text-ink-soft transition-colors hover:border-[var(--accent-deep)] hover:text-[var(--accent-deep)]"
+                >
+                  {p.name}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] leading-[1.8] text-ink-faint">
+              点一下填好接口地址和默认模型名，再补上 Key 即可；想接自己的网关就直接改接口地址。
+            </p>
+
+            <button
+              onClick={runTest}
+              disabled={test.status === "testing"}
+              className="press mt-3 flex items-center gap-2 rounded-xl border border-[var(--accent-deep)] px-4 py-2 text-[13px] text-[var(--accent-deep)] transition-opacity disabled:opacity-50"
+            >
+              {test.status === "testing" ? "测试中…" : "测试连接"}
+            </button>
+            {test.status === "ok" && (
+              <p className="mt-2 text-[12px] text-emerald-500">✓ {test.msg}</p>
+            )}
+            {test.status === "fail" && (
+              <p className="mt-2 text-[12px] text-[#c45d69]">✗ {test.msg}</p>
+            )}
+          </div>
+
           <p className="mt-3 text-[12.5px] leading-[1.9] text-ink-faint">
             Key 只放在内存里，不写 localStorage，刷新就没了。自定义请求头会随配置持久化。
           </p>
