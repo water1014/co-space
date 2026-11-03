@@ -30,6 +30,8 @@ export type ReplyContext = {
   lifeSummary?: string;
   /** 今天喝了几杯奶茶。 */
   bobaCount?: number;
+  /** 之前说过的对话（不含当前这句），让模型有连续记忆，而不是每轮都失忆。 */
+  history?: { role: "user" | "assistant"; text: string }[];
 };
 
 export type ReplyPlan = {
