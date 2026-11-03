@@ -1,71 +1,428 @@
-/* Edge-to-edge Moon Garden. The artwork is the surface; entrances stay light. */
-html:has(.moon-world-map),body:has(.moon-world-map),#root:has(.moon-world-map){width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}
-body:has(.moon-world-map) .moon-garden-shell,body:has(.moon-world-map) .pocket-shell,body:has(.moon-world-map) .pocket-shell>div,body:has(.moon-world-map) .scroll-area,body:has(.moon-world-map) main:has(.moon-world-map){position:static!important;inset:auto!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;filter:none!important;background:transparent!important;background-image:none!important;overflow:hidden!important}
-.moon-home.immersive-moon.moon-world-map{position:fixed!important;inset:0!important;z-index:999!important;display:block!important;width:100vw!important;height:100vh!important;height:100dvh!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
-.moon-scene-viewport{position:absolute!important;inset:0!important;width:100vw!important;height:100%!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;scroll-behavior:auto!important;outline:none;border:0;border-radius:0;box-shadow:none;background:transparent!important;cursor:grab;user-select:none;-webkit-user-select:none}
-.moon-scene-viewport::-webkit-scrollbar{display:none}.moon-scene-viewport:active{cursor:grabbing}
-.moon-scene{position:relative;width:100vw;height:100%!important;min-height:0!important;isolation:isolate;overflow:hidden;background:transparent!important}
-.moon-artwork-image{position:absolute!important;inset:0!important;z-index:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:fill!important;object-position:center!important;user-select:none;pointer-events:none;-webkit-user-drag:none}
-.moon-map-entries{position:absolute;inset:0;z-index:2;pointer-events:none}
-.moon-map-place{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;padding:5px 8px;color:#254b65;text-decoration:none;transform:translate(-50%,-50%);pointer-events:auto;-webkit-tap-highlight-color:transparent;transition:transform .25s ease,filter .25s ease}
-.moon-map-place.is-right{transform:translate(-85%,-50%)}
-.moon-entry-ornament{display:grid;place-items:center;height:10px;opacity:.78}
-.moon-entry-mark{display:block;width:28px;height:12px;fill:none;stroke:currentColor;stroke-width:.85;stroke-linecap:round;stroke-linejoin:round}
-.moon-map-label{display:block;padding:0;border:0;background:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;font-family:"Noto Serif SC","Songti SC","STSong",serif;font-size:clamp(15px,1.25vw,19px);font-weight:500;line-height:1.4;letter-spacing:.15em;white-space:nowrap;color:inherit;text-shadow:0 1px 2px rgba(255,255,255,.95),0 0 9px rgba(255,255,255,.88)}
-.moon-map-place.is-major .moon-entry-mark{width:32px;height:14px}.moon-map-place.is-major .moon-map-label{font-size:clamp(16px,1.35vw,21px);letter-spacing:.18em}
-.moon-map-place:focus-visible{outline:1px solid currentColor;outline-offset:5px}.moon-map-place:active{transform:translate(-50%,-50%) scale(.97)}.moon-map-place.is-right:active{transform:translate(-85%,-50%) scale(.97)}
-@media(hover:hover){.moon-map-place:hover{transform:translate(-50%,-53%);filter:drop-shadow(0 2px 5px rgba(177,220,244,.55))}.moon-map-place.is-right:hover{transform:translate(-85%,-53%)}}
-.immersive-moon.is-night .moon-map-place{color:#e4f2fa}.immersive-moon.is-night .moon-map-label{text-shadow:0 1px 3px rgba(4,18,32,.95),0 0 9px rgba(4,18,32,.82)}
-@media(max-width:767px){.moon-map-place{padding:4px 5px;gap:2px}.moon-entry-ornament{height:8px}.moon-entry-mark{width:23px;height:10px}.moon-map-place.is-major .moon-entry-mark{width:27px;height:12px}.moon-map-label{font-size:14px;letter-spacing:.12em}.moon-map-place.is-major .moon-map-label{font-size:15px}}
-@media(prefers-reduced-motion:reduce){.moon-scene-viewport,.moon-map-place{scroll-behavior:auto;transition:none}}
+/* 2.5D 月庭：透视立体小屋 + 物件上的发光热点 + 双语飘标。 */
 
-/* Keep the panorama hidden until its saved horizontal position has been restored. */
-.moon-world-map.panorama-restoring .moon-scene-viewport{visibility:hidden!important}
-.moon-world-map.panorama-ready .moon-scene-viewport{visibility:visible!important}
+html:has(.moon-world-map),
+body:has(.moon-world-map),
+#root:has(.moon-world-map) {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+body:has(.moon-world-map) .moon-garden-shell,
+body:has(.moon-world-map) .pocket-shell,
+body:has(.moon-world-map) .pocket-shell > div,
+body:has(.moon-world-map) .scroll-area,
+body:has(.moon-world-map) main:has(.moon-world-map) {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  overflow: hidden !important;
+}
 
+.moon-home.immersive-moon.moon-world-map {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999 !important;
+  display: block !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: radial-gradient(120% 90% at 50% 8%, #1a1530 0%, #0d0a1a 55%, #060409 100%) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.immersive-moon.is-day.moon-world-map {
+  background: radial-gradient(120% 90% at 50% 6%, #f3e4ec 0%, #e6c9d8 45%, #b89bbf 100%) !important;
+}
 
-/* A quiet wayfinding cue: the panorama remains the hero, while its horizontal journey becomes legible. */
-.moon-panorama-guide{
-  position:fixed;z-index:12;left:50%;bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  width:min(220px,48vw);transform:translateX(-50%);
-  color:rgba(49,83,103,.84);pointer-events:none;
-  text-shadow:0 1px 10px rgba(255,255,255,.88);
-  transition:opacity .35s ease;
+/* 视口：横向漫游 + 透视机位 */
+.moon-scene-viewport {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  touch-action: pan-x;
+  scroll-behavior: auto !important;
+  outline: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent !important;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  perspective: 1700px;
+  perspective-origin: 50% 44%;
+  --px: 0;
+  --py: 0;
+  --rx: 0;
+  --ry: 0;
 }
-.moon-panorama-guide-label{
-  font:11px/1.5 "Noto Serif SC","Songti SC",serif;letter-spacing:.2em;
+.moon-scene-viewport::-webkit-scrollbar {
+  display: none;
 }
-.moon-panorama-guide-en{
-  font:7px/1.3 Georgia,serif;letter-spacing:.24em;opacity:.66;
+.moon-scene-viewport:active {
+  cursor: grabbing;
 }
-.moon-panorama-progress{
-  position:relative;display:block;width:100%;height:1px;margin-top:3px;
-  overflow:hidden;background:rgba(90,132,154,.2);
+
+/* 立体舞台：随指针轻微倾斜 + 视差 */
+.moon-scene {
+  position: relative;
+  width: 100vw;
+  height: 100% !important;
+  min-height: 0 !important;
+  isolation: isolate;
+  overflow: visible;
+  background: transparent !important;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) scale(1.02);
+  transition: transform 0.25s ease-out;
+  will-change: transform;
 }
-.moon-panorama-progress::before{
-  content:"";position:absolute;inset:0 auto 0 0;width:100%;
-  background:linear-gradient(90deg,rgba(102,157,181,.12),rgba(102,157,181,.42));
+
+/* 背景图：沉到后面，轻微放大补位，随指针反向视差 */
+.moon-art-stack {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
 }
-.moon-panorama-progress i{
-  position:absolute;top:50%;left:0;width:5px;height:5px;border-radius:50%;
-  background:#719db2;box-shadow:0 0 8px rgba(113,157,178,.45);
-  transform:translate(var(--panorama-progress,36%),-50%);
-  transition:transform .12s linear;
+.moon-artwork-image {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: fill !important;
+  object-position: center !important;
+  user-select: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  transform: translateZ(-110px) scale(1.14) translate3d(calc(var(--px) * 1px), calc(var(--py) * 1px), 0);
+  transition: opacity 0.9s ease;
 }
-.immersive-moon.is-night .moon-panorama-guide{
-  color:rgba(224,239,247,.9);text-shadow:0 1px 12px rgba(5,22,36,.88);
+.moon-art-night {
+  opacity: 0;
 }
-.immersive-moon.is-night .moon-panorama-progress{background:rgba(200,224,238,.2)}
-.immersive-moon.is-night .moon-panorama-progress::before{background:linear-gradient(90deg,rgba(169,207,226,.1),rgba(169,207,226,.38))}
-.immersive-moon.is-night .moon-panorama-progress i{background:#b7d9e8;box-shadow:0 0 9px rgba(183,217,232,.6)}
-@media(max-width:767px){
-  .moon-panorama-guide{bottom:max(15px,calc(env(safe-area-inset-bottom) + 10px));width:clamp(150px,43vw,190px);gap:4px}
-  .moon-panorama-guide-label{font-size:10px;letter-spacing:.16em}
-  .moon-panorama-guide-en{font-size:6px}
+.is-night .moon-art-day {
+  opacity: 0;
 }
-@media(hover:hover){
-  .moon-panorama-guide{opacity:.72}
-  .moon-scene-viewport:hover~.moon-panorama-guide{opacity:1}
+.is-night .moon-art-night {
+  opacity: 1;
 }
-@media(prefers-reduced-motion:reduce){.moon-panorama-guide{transition:none}.moon-panorama-progress i{transition:none}}
+
+/* 漂浮尘埃微光，增加景深 */
+.moon-dust {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transform: translateZ(96px) translate3d(calc(var(--px) * -0.5px), calc(var(--py) * -0.5px), 0);
+  transform-style: preserve-3d;
+}
+.moon-dust i {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6da 0%, rgba(255, 246, 218, 0) 70%);
+  filter: blur(1px);
+  opacity: 0.55;
+  animation: moonFloat 9s ease-in-out infinite;
+}
+@keyframes moonFloat {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-14px) scale(1.15);
+    opacity: 0.7;
+  }
+}
+
+/* 热点层浮在场景前面，制造 2.5D 纵深 */
+.moon-map-entries {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  transform: translateZ(64px) translate3d(calc(var(--px) * -0.5px), calc(var(--py) * -0.5px), 0);
+}
+
+/* 单个热点：零尺寸锚点 + 居中发光点 + 浮动双语标 */
+.moon-hotspot {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.moon-hotspot > * {
+  position: absolute;
+}
+.moon-hotspot__dot {
+  top: 0;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff7e0 0%, #ffd98a 58%, #f4b15a 100%);
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.5),
+    0 0 12px 3px rgba(255, 210, 130, 0.7),
+    0 0 26px 8px rgba(255, 190, 110, 0.32);
+  pointer-events: auto;
+  animation: moonPulse 2.8s ease-in-out infinite;
+  transition: transform 0.2s ease;
+}
+.moon-hotspot.is-major .moon-hotspot__dot {
+  width: 14px;
+  height: 14px;
+}
+.moon-hotspot__halo {
+  top: 0;
+  left: 0;
+  width: 56px;
+  height: 56px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 236, 189, 0.55) 0%, rgba(255, 236, 189, 0) 70%);
+  filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.moon-hotspot__label {
+  top: 15px;
+  left: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  text-align: center;
+  pointer-events: auto;
+  opacity: 0.92;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.moon-hotspot.label-above .moon-hotspot__label {
+  top: auto;
+  bottom: 15px;
+}
+.moon-hotspot__en {
+  font: 600 10px/1.1 "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff4dc;
+  text-shadow: 0 1px 6px rgba(20, 10, 0, 0.85);
+}
+.moon-hotspot__cn {
+  font: 500 14px/1.3 "Noto Serif SC", "Songti SC", "STSong", serif;
+  letter-spacing: 0.14em;
+  color: #fffaf0;
+  text-shadow: 0 1px 8px rgba(20, 10, 0, 0.9), 0 0 12px rgba(255, 220, 150, 0.4);
+}
+.moon-hotspot.is-major .moon-hotspot__cn {
+  font-size: 15px;
+}
+
+@media (hover: hover) {
+  .moon-hotspot:hover .moon-hotspot__halo {
+    opacity: 1;
+  }
+  .moon-hotspot:hover .moon-hotspot__dot {
+    transform: translate(-50%, -50%) scale(1.28);
+  }
+  .moon-hotspot:hover .moon-hotspot__label {
+    opacity: 1;
+    transform: translateX(-50%) translateY(2px) scale(1.04);
+  }
+  .moon-hotspot.label-above:hover .moon-hotspot__label {
+    transform: translateX(-50%) translateY(-2px) scale(1.04);
+  }
+}
+.moon-hotspot:focus-visible {
+  outline: none;
+}
+.moon-hotspot:focus-visible .moon-hotspot__dot {
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.85),
+    0 0 14px 4px rgba(255, 210, 130, 0.85),
+    0 0 30px 10px rgba(255, 190, 110, 0.4);
+}
+.moon-hotspot:focus-visible .moon-hotspot__halo {
+  opacity: 1;
+}
+
+@keyframes moonPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px rgba(255, 255, 255, 0.5),
+      0 0 12px 3px rgba(255, 210, 130, 0.7),
+      0 0 26px 8px rgba(255, 190, 110, 0.32);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(255, 255, 255, 0.62),
+      0 0 16px 5px rgba(255, 220, 150, 0.85),
+      0 0 34px 12px rgba(255, 200, 120, 0.45);
+  }
+}
+
+@media (max-width: 767px) {
+  .moon-hotspot__cn {
+    font-size: 13px;
+  }
+  .moon-hotspot.is-major .moon-hotspot__cn {
+    font-size: 14px;
+  }
+  .moon-hotspot__label {
+    top: 13px;
+  }
+  .moon-hotspot.label-above .moon-hotspot__label {
+    bottom: 13px;
+  }
+}
+
+/* 待命到横向位置恢复前先隐藏 */
+.moon-world-map.panorama-restoring .moon-scene-viewport {
+  visibility: hidden !important;
+}
+.moon-world-map.panorama-ready .moon-scene-viewport {
+  visibility: visible !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .moon-scene,
+  .moon-hotspot,
+  .moon-artwork-image {
+    transition: none !important;
+  }
+  .moon-dust i,
+  .moon-hotspot__dot {
+    animation: none !important;
+  }
+}
+
+/* 底部漫游提示 */
+.moon-panorama-guide {
+  position: fixed;
+  z-index: 12;
+  left: 50%;
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 12px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: min(220px, 48vw);
+  transform: translateX(-50%);
+  color: rgba(49, 83, 103, 0.84);
+  pointer-events: none;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.88);
+  transition: opacity 0.35s ease;
+}
+.moon-panorama-guide-label {
+  font: 11px/1.5 "Noto Serif SC", "Songti SC", serif;
+  letter-spacing: 0.2em;
+}
+.moon-panorama-guide-en {
+  font: 7px/1.3 Georgia, serif;
+  letter-spacing: 0.24em;
+  opacity: 0.66;
+}
+.moon-panorama-progress {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin-top: 3px;
+  overflow: hidden;
+  background: rgba(90, 132, 154, 0.2);
+}
+.moon-panorama-progress i {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #719db2;
+  box-shadow: 0 0 8px rgba(113, 157, 178, 0.45);
+  transform: translate(var(--panorama-progress, 36%), -50%);
+  transition: transform 0.12s linear;
+}
+.immersive-moon.is-night .moon-panorama-guide {
+  color: rgba(224, 239, 247, 0.9);
+  text-shadow: 0 1px 12px rgba(5, 22, 36, 0.88);
+}
+.immersive-moon.is-night .moon-panorama-progress {
+  background: rgba(200, 224, 238, 0.2);
+}
+.immersive-moon.is-night .moon-panorama-progress i {
+  background: #b7d9e8;
+  box-shadow: 0 0 9px rgba(183, 217, 232, 0.6);
+}
+@media (max-width: 767px) {
+  .moon-panorama-guide {
+    bottom: max(15px, calc(env(safe-area-inset-bottom) + 10px));
+    width: clamp(150px, 43vw, 190px);
+    gap: 4px;
+  }
+  .moon-panorama-guide-label {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+  }
+  .moon-panorama-guide-en {
+    font-size: 6px;
+  }
+}
+@media (hover: hover) {
+  .moon-panorama-guide {
+    opacity: 0.72;
+  }
+  .moon-scene-viewport:hover ~ .moon-panorama-guide {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moon-panorama-guide {
+    transition: none;
+  }
+  .moon-panorama-progress i {
+    transition: none;
+  }
+}
