@@ -5,10 +5,11 @@ import { useMemoryStore } from "../../stores/memoryStore";
 import { useLifeStore } from "../../stores/lifeStore";
 import { useConnectorStore } from "../../stores/connectorStore";
 import { useProjectsStore } from "../../stores/projectsStore";
-import { openTurn, takeFallbackExtras } from "./live";
+import { openTurn, takeFallbackExtras, takeTurnSource } from "./live";
 import { parseLifeActions } from "./tools";
 import { dueWords, lifeContext } from "../life/derive";
 import { uid } from "../utils/id";
+import { messageText } from "../../types";
 import type { ChatMessage, MessagePart } from "../../types";
 
 /**
@@ -46,6 +47,16 @@ async function respond(userText: string): Promise<void> {
   currentAbort = controller;
 
   const started = Date.now();
+
+  // 历史对话：当前这句 user 消息已经 append 进来了，取除最后一条以外的全部，
+  // 转成 user/assistant 文本（只取文字段，不含思考/附件），最近 16 条喂给模型，
+  // 让它有连续记忆，而不是每轮都失忆。
+  const history = useChatStore
+    .getState()
+    .messages.slice(0, -1)
+    .map((m) => ({ role: m.role, text: messageText(m).trim() }))
+    .filter((h) => h.text.length > 0)
+    .slice(-16);
 
   // 先把这条 assistant 消息建出来，思考卡是空的。
   // 流式是往这条消息上「长」出来的，不是等全部到齐再贴上去。
@@ -96,6 +107,7 @@ async function respond(userText: string): Promise<void> {
     bobaCount: lifeNow.bobas.filter(
       (b) => new Date(b.at).toDateString() === new Date().toDateString(),
     ).length,
+    history,
   };
 
   let sawText = false;
@@ -139,6 +151,8 @@ async function respond(userText: string): Promise<void> {
         useChatStore.getState().appendPart(assistantId, extra);
       }
       useChatStore.getState().finish(assistantId, "complete");
+      // 标记这条回复到底来自真模型还是本地兜底，界面好区分、不静默降级。
+      useChatStore.getState().setSource(assistantId, takeTurnSource());
     }
   } catch (err) {
     console.error("[turn] stream failed", err);
