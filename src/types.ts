@@ -58,6 +58,8 @@ export type ChatMessage = {
   createdAt: number;
   status: "streaming" | "complete" | "cancelled";
   origin: "user" | "initiative" | "reply";
+  /** 这条回复来自真模型还是本地兜底：界面据此区分，避免静默降级。 */
+  source?: "model" | "local";
   boundary?: { hits: BoundaryHit[]; calibrated: string };
 };
 
