@@ -631,6 +631,18 @@ function AssistantRow({ meta }: { meta: ChatMessage }) {
         </MessagePrimitive.Root>
         <div className="mt-[5px] flex items-center gap-3 pl-2 text-[10px] text-ink-faint">
           <span>{formatClock(meta.createdAt)}</span>
+          {meta.source === "model" && (
+            <span className="flex items-center gap-1 text-emerald-500">
+              <span className="h-[4px] w-[4px] rounded-full bg-emerald-500" />
+              模型
+            </span>
+          )}
+          {meta.source === "local" && (
+            <span className="flex items-center gap-1 text-[#c9a24b]">
+              <span className="h-[4px] w-[4px] rounded-full bg-[#c9a24b]" />
+              本地回复
+            </span>
+          )}
           {!streaming && (
             <button
               onClick={() => void regenerateLast()}
