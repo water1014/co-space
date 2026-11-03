@@ -51,6 +51,20 @@ const STREAM_CONTRACT =
 /** 协议里允许出现的工具名。模型说别的就不认。 */
 const KNOWN_TOOLS = ["life", "recall", "project", "write"];
 
+/**
+ * 上一轮到底走的是真模型还是本地兜底。openTurn 在真正用上流式时
+ * 置为 "model"，任何回退路径都置为 "local"。turn.ts 用来给这条
+ * 助手消息打标，让界面能区分「真模型回复」和「本地兜底」，不再静默降级。
+ */
+let lastTurnSource: "model" | "local" = "local";
+
+/** 取走上一轮的来源标记（取完即复位为 local）。 */
+export function takeTurnSource(): "model" | "local" {
+  const s = lastTurnSource;
+  lastTurnSource = "local";
+  return s;
+}
+
 /** Parse optional OpenAI-compatible gateway headers from the model settings. */
 function buildRequestHeaders(raw: string, key: string): Headers {
   const headers = new Headers({
@@ -126,7 +140,10 @@ function buildMemories(ctx: ReplyContext): string {
 }
 
 /**
- * 组装 messages：第一段人设、第二段状态、第三段记忆、第四段输出契约。
+ * 组装 messages：第一段人设、第二段状态、第三段记忆、然后是历史对话、
+ * 第四段输出契约、最后才是当前这句。
+ *
+ * 历史对话让模型有连续记忆——之前说过的话它都看得到，不会每轮都失忆。
  */
 function buildMessages(
   input: string,
@@ -136,16 +153,24 @@ function buildMessages(
   const connector = useConnectorStore.getState();
   const persona = (ctx.persona || connector.persona || "").trim();
 
-  return [
+  const messages: { role: string; content: string }[] = [
     {
       role: "system",
       content: persona || "你是一个说话简短、具体、不敷衍的陪伴者。",
     },
     { role: "system", content: buildState(ctx) },
     { role: "system", content: buildMemories(ctx) },
-    { role: "system", content: contract },
-    { role: "user", content: input },
   ];
+
+  // 把之前说过的对话接进来（最近若干轮，由调用方裁剪好）。
+  for (const h of ctx.history ?? []) {
+    const text = h.text.trim();
+    if (text) messages.push({ role: h.role, content: text });
+  }
+
+  messages.push({ role: "system", content: contract });
+  messages.push({ role: "user", content: input });
+  return messages;
 }
 
 /** 从模型的原始文本里抠出 JSON 对象：先整段 parse，再截 { … } 再 parse。 */
@@ -368,6 +393,7 @@ export async function* openTurn(
       return;
     }
 
+    lastTurnSource = "model";
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
 
@@ -568,6 +594,7 @@ async function* fallbackTurn(
   ctx: ReplyContext,
   signal: AbortSignal,
 ): AsyncGenerator<TurnEvent> {
+  lastTurnSource = "local";
   const plan = await composePlanLive(input, ctx, signal);
   if (signal.aborted) return;
 
@@ -584,5 +611,49 @@ async function* fallbackTurn(
   for await (const chunk of streamText(plan.text, signal)) {
     if (signal.aborted) return;
     yield { type: "text", delta: chunk };
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 测试连接                                                            */
+/* ------------------------------------------------------------------ */
+
+/** 测试连接的结果。ok=false 时带 error 或 status。 */
+export type ConnTestResult = { ok: boolean; status?: number; error?: string };
+
+/**
+ * 用当前配置（接口地址 + Key + 自定义头）发一个最小请求，验证能不能通。
+ *
+ * 浏览器直连 api.openai.com 这类会被 CORS 拦——这是真实情况，
+ * 所以连不通时如实报「CORS 拦截或地址不可达」，逼着用户走中转/网关，
+ * 而不是假装成功。overrideKey 优先用输入框里还没提交的 Key。
+ */
+export async function testModelConnection(
+  overrideKey?: string,
+): Promise<ConnTestResult> {
+  const { model, sessionKey } = useConnectorStore.getState();
+  const baseUrl = (model.baseUrl || "").trim().replace(/\/+$/, "");
+  const key = (overrideKey?.trim() || sessionKey || "").trim();
+
+  if (!baseUrl) return { ok: false, error: "还没填接口地址" };
+  if (!key) return { ok: false, error: "还没填 API Key" };
+
+  try {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: buildRequestHeaders(model.headers || "", key),
+      body: JSON.stringify({
+        model: model.model,
+        messages: [{ role: "user", content: "ping" }],
+        max_tokens: 1,
+        stream: false,
+      }),
+    });
+    return { ok: res.ok, status: res.status };
+  } catch {
+    return {
+      ok: false,
+      error: "请求失败：多半是 CORS 拦截或地址不可达，请走支持浏览器直连的中转/网关",
+    };
   }
 }
