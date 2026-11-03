@@ -20,6 +20,8 @@ type ChatState = {
   setMessages: (m: ChatMessage[]) => void;
   setRunning: (v: boolean) => void;
   reset: () => void;
+  /** 给某条消息打上来源标记（真模型 / 本地兜底）。 */
+  setSource: (id: string, source: "model" | "local") => void;
 };
 
 
@@ -156,6 +158,12 @@ export const useChatStore = create<ChatState>()(
       setMessages: (messages) => set({ messages }),
       setRunning: (isRunning) => set({ isRunning }),
       reset: () => set({ messages: [], isRunning: false, draft: "" }),
+      setSource: (id, source) =>
+        set((s) => ({
+          messages: s.messages.map((m) =>
+            m.id === id ? { ...m, source } : m,
+          ),
+        })),
     }),
     {
       name: "co-space::chat",
