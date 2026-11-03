@@ -17,22 +17,22 @@ type Place = {
 };
 
 const places: Place[] = [
-  { id: "chat", title: "同心阁", to: "/chat", x: 8, y: 48, level: "major" },
-  { id: "memory", title: "藏忆阁", to: "/memory", x: 18, y: 70, level: "major" },
-  { id: "album", title: "浮光相册", to: "/album", x: 29, y: 39, level: "major" },
-  { id: "diary", title: "拾光日记", to: "/diary", x: 38, y: 69, level: "minor" },
-  { id: "moments", title: "心绪片刻", to: "/moments", x: 47, y: 27, level: "minor" },
-  { id: "together", title: "共游境", to: "/together", x: 56, y: 62, level: "major" },
-  { id: "lounge", title: "共读听影", to: "/lounge", x: 65, y: 37, level: "minor" },
-  { id: "studio", title: "幻梦工坊", to: "/studio", x: 74, y: 68, level: "major" },
-  { id: "partner", title: "月下人", to: "/partner", x: 84, y: 43, level: "major" },
-  { id: "mit", title: "镜心", to: "/mit", x: 93, y: 68, level: "minor", side: "right" },
-  { id: "calendar", title: "月序历", to: "/calendar", x: 13, y: 18, level: "minor" },
-  { id: "travel", title: "山海行记", to: "/travel", x: 25, y: 88, level: "minor" },
-  { id: "music", title: "听月台", to: "/music", x: 51, y: 88, level: "minor" },
-  { id: "health", title: "安康录", to: "/health", x: 70, y: 16, level: "minor" },
-  { id: "ledger", title: "清欢账", to: "/ledger", x: 80, y: 88, level: "minor" },
-  { id: "budget", title: "共同预算", to: "/budget", x: 91, y: 17, level: "minor", side: "right" },
+  { id: "calendar", title: "月序历", to: "/calendar", x: 12, y: 18, level: "minor" },
+  { id: "chat", title: "同心阁", to: "/chat", x: 20, y: 52, level: "major" },
+  { id: "memory", title: "藏忆阁", to: "/memory", x: 30, y: 74, level: "major" },
+  { id: "album", title: "浮光相册", to: "/album", x: 38, y: 44, level: "major" },
+  { id: "diary", title: "拾光日记", to: "/diary", x: 46, y: 70, level: "minor" },
+  { id: "moments", title: "心绪片刻", to: "/moments", x: 50, y: 22, level: "minor" },
+  { id: "together", title: "共游境", to: "/together", x: 54, y: 40, level: "major" },
+  { id: "lounge", title: "共读听影", to: "/lounge", x: 62, y: 38, level: "minor" },
+  { id: "studio", title: "幻梦工坊", to: "/studio", x: 72, y: 66, level: "major" },
+  { id: "partner", title: "月下人", to: "/partner", x: 82, y: 46, level: "major" },
+  { id: "mit", title: "镜心", to: "/mit", x: 92, y: 30, level: "minor", side: "right" },
+  { id: "travel", title: "山海行记", to: "/travel", x: 26, y: 86, level: "minor" },
+  { id: "music", title: "听月台", to: "/music", x: 50, y: 88, level: "minor" },
+  { id: "health", title: "安康录", to: "/health", x: 68, y: 16, level: "minor" },
+  { id: "ledger", title: "清欢账", to: "/ledger", x: 80, y: 86, level: "minor" },
+  { id: "budget", title: "共同预算", to: "/budget", x: 90, y: 18, level: "minor", side: "right" },
 ];
 
 const PANORAMA_PROGRESS_KEY = "jinghua-home-panorama-progress";
